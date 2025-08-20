@@ -337,8 +337,8 @@
         function renderStudentSelector() {
             const presentStudents = appState.students.filter(s => s.isPresent);
             let studentListHtml = appState.students.map(student => `
-                <div class="p-2 rounded-md flex items-center justify-between transition-colors ${student.isPresent ? 'bg-white' : 'bg-gray-200'}">
-                    <p class="font-medium ${student.isPresent ? 'text-gray-800' : 'text-gray-500 line-through'}">${student.name}</p>
+                <div class="p-3 rounded-md flex items-center justify-between transition-colors ${student.isPresent ? 'bg-white' : 'bg-gray-200'}">
+                    <p class="font-medium text-lg ${student.isPresent ? 'text-gray-800' : 'text-gray-500 line-through'}">${student.name}</p>
                     <button data-id="${student.id}" class="toggle-presence-btn relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${student.isPresent ? 'bg-green-500' : 'bg-gray-400'}">
                         <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${student.isPresent ? 'translate-x-6' : 'translate-x-1'}"></span>
                     </button>
@@ -346,26 +346,26 @@
             `).join('');
 
             toolDisplay.innerHTML = `
-                <div class="w-full">
-                    <h2 class="text-2xl font-bold text-gray-700 mb-4 text-center">Student Selector</h2>
-                    <div class="grid md:grid-cols-2 gap-8">
+                <div class="w-full h-full flex flex-col justify-center">
+                    <h2 class="text-3xl font-bold text-gray-700 mb-6 text-center">Student Selector</h2>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
                         <div>
-                            <h3 class="font-semibold text-gray-600 mb-2 text-center">Daily Attendance</h3>
-                            <div class="max-h-64 overflow-y-auto border rounded-md p-2 bg-gray-50 space-y-2">${studentListHtml}</div>
+                            <h3 class="font-semibold text-xl text-gray-600 mb-3 text-center">Daily Attendance</h3>
+                            <div class="border rounded-md p-4 bg-gray-50 space-y-3">${studentListHtml}</div>
                         </div>
-                        <div class="flex flex-col items-center justify-center bg-gradient-to-br from-yellow-200 to-orange-300 rounded-lg p-6 space-y-4">
-                            <button id="select-one-btn" ${presentStudents.length === 0 ? 'disabled' : ''} class="w-full bg-white text-teal-600 font-bold py-3 px-6 rounded-full text-lg shadow-lg hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-400 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-transform transform hover:scale-105">
+                        <div class="flex flex-col items-center justify-center bg-gradient-to-br from-yellow-200 to-orange-300 rounded-lg p-8 space-y-6">
+                            <button id="select-one-btn" ${presentStudents.length === 0 ? 'disabled' : ''} class="w-full bg-white text-teal-600 font-bold py-4 px-8 rounded-full text-xl shadow-lg hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-400 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-transform transform hover:scale-105">
                                 Select One Student
                             </button>
                             <div class="w-full text-center">
-                                <p class="font-semibold text-orange-800 mb-2">Or Generate Groups:</p>
-                                <div class="flex justify-center gap-2">
-                                    ${[2,3,4].map(size => `<button data-size="${size}" ${presentStudents.length < size ? 'disabled' : ''} class="generate-groups-btn bg-white text-teal-600 font-bold py-2 px-4 rounded-full shadow-md hover:bg-teal-50 disabled:bg-gray-300 disabled:text-gray-500 transition-transform transform hover:scale-105">of ${size}</button>`).join('')}
+                                <p class="font-semibold text-lg text-orange-800 mb-2">Or Generate Groups:</p>
+                                <div class="flex justify-center gap-3">
+                                    ${[2,3,4].map(size => `<button data-size="${size}" ${presentStudents.length < size ? 'disabled' : ''} class="generate-groups-btn bg-white text-teal-600 font-bold py-3 px-5 rounded-full text-lg shadow-md hover:bg-teal-50 disabled:bg-gray-300 disabled:text-gray-500 transition-transform transform hover:scale-105">of ${size}</button>`).join('')}
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div id="selector-results" class="mt-8 pt-6 border-t border-gray-200 min-h-[100px]"></div>
+                    <div id="selector-results" class="mt-6 pt-6 border-t border-gray-200 min-h-[120px]"></div>
                 </div>
             `;
             
@@ -391,8 +391,8 @@
                     const selected = present[randomIndex];
                     document.getElementById('selector-results').innerHTML = `
                         <div class="text-center p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg animate-fade-in w-1/2 mx-auto pulse">
-                            <p class="text-gray-600">And the student is...</p>
-                            <p class="text-4xl font-bold text-teal-600 mt-2">${selected.name}!</p>
+                            <p class="text-gray-600 text-lg">And the student is...</p>
+                            <p class="text-5xl font-bold text-teal-600 mt-2">${selected.name}!</p>
                         </div>`;
                 }
             };
@@ -1055,6 +1055,3 @@
     </script>
 </body>
 </html>
-
-</html>
-
