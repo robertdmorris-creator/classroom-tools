@@ -140,7 +140,7 @@
         function initializeLocalMode() {
             console.warn("Authentication failed. Initializing in local-only mode. Data will not be saved.");
             appState.isAuthReady = true;
-            appState.students = ['Skylar', 'Terrell', 'DJ', 'Joshua', 'Cody', 'Leon', 'Alisha', 'Miracle', 'Brayden', 'Kaylee', 'Zoe', 'Jackson'].map((name, index) => ({ id: `local-${index}`, name, isPresent: true }));
+            appState.students = ['Skylar', 'Terrell', 'DJ', 'Joshua', 'Cody', 'Leon', 'Alisha', 'Miracle'].map((name, index) => ({ id: `local-${index}`, name, isPresent: true }));
             renderApp();
         }
 
@@ -256,7 +256,7 @@
                     for (const docSnap of existingDocs.docs) {
                         await deleteDoc(docSnap.ref);
                     }
-                    const defaultRoster = ['Skylar', 'Terrell', 'DJ', 'Joshua', 'Cody', 'Leon', 'Alisha', 'Miracle', 'Brayden', 'Kaylee', 'Zoe', 'Jackson'];
+                    const defaultRoster = ['Skylar', 'Terrell', 'DJ', 'Joshua', 'Cody', 'Leon', 'Alisha', 'Miracle'];
                     for (const name of defaultRoster) {
                         await addDoc(studentsCollectionRef, { name, isPresent: true });
                     }
