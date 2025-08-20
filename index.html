@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Tools Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS for animations and loaders */
+        html, body {
+            height: 100%;
+            overflow: hidden; /* Prevent scrolling on the body */
+        }
+        #app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Full viewport height */
+        }
+        main {
+            flex-grow: 1; /* Allow main to fill available space */
+            overflow-y: auto; /* Allow scrolling within main if needed, but layout should prevent it */
+            display: flex;
+            flex-direction: column;
+        }
+        #tool-display {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Center the tool content vertically */
+        }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #14b8a6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+        .image-loader { border: 2px solid #f3f3f3; border-top: 2px solid #14b8a6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .confetti { position: absolute; width: 10px; height: 20px; background: #f00; top: -20px; animation: confetti-fall 3s linear infinite; z-index: 100; }
+        @keyframes confetti-fall { 0% { transform: translateY(0) rotate(0); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+        .firework { position: absolute; border-radius: 50%; animation: firework-burst 1.5s ease-out forwards; z-index: 100;}
+        .firework::before { content: ''; position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: radial-gradient(circle, #fff, #fff0, #fff0); transform: scale(0); animation: firework-spark 1.5s ease-out forwards; }
+        @keyframes firework-burst { 0% { opacity: 1; } 100% { opacity: 0; transform: scale(2); } }
+        @keyframes firework-spark { 0% { transform: scale(0); opacity: 1; } 50% { opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+        .pulse { animation: pulse-animation 2s infinite; }
+        @keyframes pulse-animation { 0% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(20, 184, 166, 0); } 100% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0); } }
+        [draggable="true"] { cursor: move; }
+        .dragging { opacity: 0.5; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-cyan-50 via-teal-50 to-blue-100 min-h-screen font-sans antialiased">
+
+    <div id="app-container">
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <div></div> <!-- Spacer -->
+                    <h1 class="text-3xl font-bold text-gray-800 bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-cyan-600">
+                        Classroom Tools Dashboard
+                    </h1>
+                    <button id="fullscreen-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors" title="Toggle Fullscreen">
+                        <svg id="fullscreen-open-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                        <svg id="fullscreen-close-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+            <!-- Navigation -->
+            <div class="bg-white/70 backdrop-blur-sm rounded-xl shadow-md p-2 mb-8 sticky top-0 z-20">
+                <nav id="tool-nav" class="flex flex-wrap justify-center -mb-px">
+                    <!-- Nav buttons will be injected by JS -->
+                </nav>
+            </div>
+            <!-- Tool Display Area -->
+            <div id="tool-display" class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-6 relative">
+                <!-- Tools will be rendered here by JS -->
+                 <div class="text-center p-8"><div class="loader"></div><p>Loading Tools...</p></div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="text-center py-2 text-gray-500 text-sm">
+            <p>Created with ❤️ by your awesome assistant</p>
+        </footer>
+    </div>
+
+    <!-- Firebase and App Logic -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- App State and Configuration ---
+        const appState = {
+            userId: null,
+            isAuthReady: false,
+            activeTool: 'classRoster',
+            students: [],
+            // State for tools in local mode
+            lunchColumns: null,
+            lunchMenu: { 
+                choice1: { text: '', imageUrl: '', emoji: '' }, 
+                choice2: { text: '', imageUrl: '', emoji: '' } 
+            },
+            bracket: null,
+            podium: null,
+        };
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "DEMO", authDomain: "DEMO", projectId: "DEMO" };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-classroom-tools-html';
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const toolDisplay = document.getElementById('tool-display');
+        const toolNav = document.getElementById('tool-nav');
+
+        const tools = {
+            classRoster: { name: 'Class Roster', icon: '📝', render: renderClassRoster },
+            studentSelector: { name: 'Student Selector', icon: '🎯', render: renderStudentSelector },
+            lunchChoice: { name: 'Lunch Choice', icon: '🍔', render: renderLunchChoice },
+            tournamentBracket: { name: 'Tournament Bracket', icon: '🏆', render: renderTournamentBracket },
+            hangman: { name: 'Hangman', icon: '🤔', render: renderHangman },
+        };
+        
+        // --- Utility Functions ---
+        function debounce(func, delay) {
+            let timeout;
+            return function(...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), delay);
+            };
+        }
+
+        // --- Graceful Fallback for Local Files ---
+        function initializeLocalMode() {
+            console.warn("Authentication failed. Initializing in local-only mode. Data will not be saved.");
+            appState.isAuthReady = true;
+            appState.students = ['Skylar', 'Terrell', 'DJ', 'Joshua', 'Cody', 'Leon', 'Alisha', 'Miracle'].map((name, index) => ({ id: `local-${index}`, name, isPresent: true }));
+            renderApp();
+        }
+
+
+        // --- Main App Logic ---
+
+        function renderApp() {
+            renderNav();
+            renderActiveTool();
+        }
+
+        function renderNav() {
+            toolNav.innerHTML = '';
+            for (const toolId in tools) {
+                const tool = tools[toolId];
+                const isActive = appState.activeTool === toolId;
+                const button = document.createElement('button');
+                button.className = `flex items-center gap-2 whitespace-nowrap py-3 px-5 border-b-4 font-semibold text-sm focus:outline-none transition-all duration-300 ${isActive ? 'border-teal-500 text-teal-600 bg-teal-100 rounded-t-lg' : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'}`;
+                button.innerHTML = `<span class="text-xl">${tool.icon}</span> ${tool.name}`;
+                button.onclick = () => {
+                    appState.activeTool = toolId;
+                    renderApp();
+                };
+                toolNav.appendChild(button);
+            }
+        }
+        
+        function renderActiveTool() {
+            if (!appState.isAuthReady) {
+                toolDisplay.innerHTML = `<div class="text-center p-8"><div class="loader"></div><p>Authenticating...</p></div>`;
+                return;
+            }
+            const tool = tools[appState.activeTool];
+            if (tool && typeof tool.render === 'function') {
+                tool.render();
+            } else {
+                toolDisplay.innerHTML = `<p>Error: Tool not found.</p>`;
+            }
+        }
+        
+        // --- Fullscreen Logic ---
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const openIcon = document.getElementById('fullscreen-open-icon');
+        const closeIcon = document.getElementById('fullscreen-close-icon');
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function updateFullscreenIcons() {
+            if (document.fullscreenElement) {
+                openIcon.classList.add('hidden');
+                closeIcon.classList.remove('hidden');
+            } else {
+                openIcon.classList.remove('hidden');
+                closeIcon.classList.add('hidden');
+            }
+        }
+
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+        document.addEventListener('fullscreenchange', updateFullscreenIcons);
+
+
+        // --- Firebase Logic ---
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                appState.userId = user.uid;
+                appState.isAuthReady = true;
+                await initializeRosterIfNeeded();
+                setupStudentListener();
+                renderApp();
+            }
+        });
+        
+        // Attempt to sign in
+        (async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                initializeLocalMode();
+            }
+        })();
+
+        // Failsafe timer. If auth state is not ready after a few seconds, assume it failed silently.
+        setTimeout(() => {
+            if (!appState.isAuthReady) {
+                initializeLocalMode();
+            }
+        }, 3000);
+        
+        
+        async function initializeRosterIfNeeded() {
+            if (!appState.userId) return;
+            const settingsDocRef = doc(db, `artifacts/${appId}/users/${appState.userId}/settings`, 'roster');
+            try {
+                const settingsDoc = await getDoc(settingsDocRef);
+                if (!settingsDoc.exists() || !settingsDoc.data().initialized) {
+                    const studentsCollectionRef = collection(db, `artifacts/${appId}/users/${appState.userId}/students`);
+                    const existingDocs = await getDocs(studentsCollectionRef);
+                    for (const docSnap of existingDocs.docs) {
+                        await deleteDoc(docSnap.ref);
+                    }
+                    const defaultRoster = ['Skylar', 'Terrell', 'DJ', 'Joshua', 'Cody', 'Leon', 'Alisha', 'Miracle'];
+                    for (const name of defaultRoster) {
+                        await addDoc(studentsCollectionRef, { name, isPresent: true });
+                    }
+                    await setDoc(settingsDocRef, { initialized: true });
+                }
+            } catch (error) {
+                console.error("Error initializing roster:", error);
+            }
+        }
+
+        function setupStudentListener() {
+            if (!appState.userId) return;
+            const studentsCollectionRef = collection(db, `artifacts/${appId}/users/${appState.userId}/students`);
+            onSnapshot(studentsCollectionRef, (snapshot) => {
+                appState.students = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (['classRoster', 'studentSelector', 'lunchChoice', 'tournamentBracket'].includes(appState.activeTool)) {
+                    renderActiveTool();
+                }
+            }, (error) => {
+                console.error("Error fetching students:", error);
+                toolDisplay.innerHTML = `<p class="text-red-500 text-center">Could not load student data.</p>`;
+            });
+        }
+        
+        // --- Tool: Class Roster ---
+        function renderClassRoster() {
+            let studentListHtml = appState.students.map(student => `
+                <div class="p-3 rounded-lg shadow-sm flex items-center justify-between bg-white">
+                    <p class="font-medium text-gray-800">${student.name}</p>
+                    <button data-id="${student.id}" class="remove-student-btn text-red-500 hover:text-red-700 font-bold">✕</button>
+                </div>
+            `).join('');
+
+            toolDisplay.innerHTML = `
+                <div class="w-full max-w-md mx-auto">
+                    <h2 class="text-2xl font-bold text-gray-700 mb-4 text-center">Class Roster Management</h2>
+                    <p class="text-gray-600 mb-6 text-center">Add or remove students from your class list.</p>
+                    <div class="mx-auto">
+                        <form id="add-student-form" class="flex gap-2 mb-4">
+                            <input type="text" id="new-student-name" placeholder="Add a new student's name" class="flex-grow p-2 border rounded-md focus:ring-teal-500 focus:border-teal-500" />
+                            <button type="submit" class="bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold py-2 px-4 rounded-md hover:opacity-90 transition-transform transform hover:scale-105">+</button>
+                        </form>
+                        <div class="space-y-3" id="roster-list">${studentListHtml}</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('add-student-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const input = document.getElementById('new-student-name');
+                const newName = input.value.trim();
+                if (newName) {
+                    if (!appState.userId) { // Local mode
+                        appState.students.push({ id: `local-${Date.now()}`, name: newName, isPresent: true });
+                        renderClassRoster();
+                    } else { // Online mode
+                        const studentsCollectionRef = collection(db, `artifacts/${appId}/users/${appState.userId}/students`);
+                        await addDoc(studentsCollectionRef, { name: newName, isPresent: true });
+                    }
+                    input.value = '';
+                }
+            };
+            
+            document.querySelectorAll('.remove-student-btn').forEach(button => {
+                button.onclick = async () => {
+                    const studentId = button.dataset.id;
+                    if (!appState.userId) { // Local mode
+                        appState.students = appState.students.filter(s => s.id !== studentId);
+                        renderClassRoster();
+                    } else { // Online mode
+                        await deleteDoc(doc(db, `artifacts/${appId}/users/${appState.userId}/students`, studentId));
+                    }
+                };
+            });
+        }
+
+        // --- Tool: Random Student Selector ---
+        function renderStudentSelector() {
+            const presentStudents = appState.students.filter(s => s.isPresent);
+            let studentListHtml = appState.students.map(student => `
+                <div class="p-2 rounded-md flex items-center justify-between transition-colors ${student.isPresent ? 'bg-white' : 'bg-gray-200'}">
+                    <p class="font-medium ${student.isPresent ? 'text-gray-800' : 'text-gray-500 line-through'}">${student.name}</p>
+                    <button data-id="${student.id}" class="toggle-presence-btn relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${student.isPresent ? 'bg-green-500' : 'bg-gray-400'}">
+                        <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${student.isPresent ? 'translate-x-6' : 'translate-x-1'}"></span>
+                    </button>
+                </div>
+            `).join('');
+
+            toolDisplay.innerHTML = `
+                <div class="w-full">
+                    <h2 class="text-2xl font-bold text-gray-700 mb-4 text-center">Student Selector</h2>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="font-semibold text-gray-600 mb-2 text-center">Daily Attendance</h3>
+                            <div class="max-h-64 overflow-y-auto border rounded-md p-2 bg-gray-50 space-y-2">${studentListHtml}</div>
+                        </div>
+                        <div class="flex flex-col items-center justify-center bg-gradient-to-br from-yellow-200 to-orange-300 rounded-lg p-6 space-y-4">
+                            <button id="select-one-btn" ${presentStudents.length === 0 ? 'disabled' : ''} class="w-full bg-white text-teal-600 font-bold py-3 px-6 rounded-full text-lg shadow-lg hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-400 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-transform transform hover:scale-105">
+                                Select One Student
+                            </button>
+                            <div class="w-full text-center">
+                                <p class="font-semibold text-orange-800 mb-2">Or Generate Groups:</p>
+                                <div class="flex justify-center gap-2">
+                                    ${[2,3,4].map(size => `<button data-size="${size}" ${presentStudents.length < size ? 'disabled' : ''} class="generate-groups-btn bg-white text-teal-600 font-bold py-2 px-4 rounded-full shadow-md hover:bg-teal-50 disabled:bg-gray-300 disabled:text-gray-500 transition-transform transform hover:scale-105">of ${size}</button>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="selector-results" class="mt-8 pt-6 border-t border-gray-200 min-h-[100px]"></div>
+                </div>
+            `;
+            
+            document.querySelectorAll('.toggle-presence-btn').forEach(button => {
+                button.onclick = async () => {
+                    const studentId = button.dataset.id;
+                    const student = appState.students.find(s => s.id === studentId);
+                    if (student) {
+                        student.isPresent = !student.isPresent;
+                        if (appState.userId) { // Online mode
+                            const studentDoc = doc(db, `artifacts/${appId}/users/${appState.userId}/students`, student.id);
+                            await updateDoc(studentDoc, { isPresent: student.isPresent });
+                        }
+                        renderStudentSelector(); // Re-render for local mode
+                    }
+                };
+            });
+
+            document.getElementById('select-one-btn').onclick = () => {
+                const present = appState.students.filter(s => s.isPresent);
+                if (present.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * present.length);
+                    const selected = present[randomIndex];
+                    document.getElementById('selector-results').innerHTML = `
+                        <div class="text-center p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg animate-fade-in w-1/2 mx-auto pulse">
+                            <p class="text-gray-600">And the student is...</p>
+                            <p class="text-4xl font-bold text-teal-600 mt-2">${selected.name}!</p>
+                        </div>`;
+                }
+            };
+            
+            document.querySelectorAll('.generate-groups-btn').forEach(button => {
+                button.onclick = () => {
+                    const size = parseInt(button.dataset.size, 10);
+                    const present = appState.students.filter(s => s.isPresent);
+                    const shuffled = [...present].sort(() => 0.5 - Math.random());
+                    const groups = [];
+                    for (let i = 0; i < shuffled.length; i += size) {
+                        groups.push(shuffled.slice(i, i + size));
+                    }
+                    const groupsHtml = groups.map((group, index) => `
+                        <div class="p-4 rounded-lg bg-gradient-to-br from-blue-200 to-cyan-200 shadow-md">
+                            <h4 class="font-bold text-blue-800 text-center mb-2">Group ${index + 1}</h4>
+                            <ul class="space-y-1 text-center">
+                                ${group.map(student => `<li class="text-blue-700 bg-white/50 rounded-md py-1">${student.name}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `).join('');
+                    document.getElementById('selector-results').innerHTML = `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fade-in">${groupsHtml}</div>`;
+                };
+            });
+        }
+
+        // --- Tool: Lunch Choice ---
+        const LUNCH_EMOJI_DB = {
+            "pizza": "🍕", "hamburger": "🍔", "burger": "🍔", "cheeseburger": "🍔",
+            "taco": "🌮", "burrito": "🌯", "salad": "🥗", "sandwich": "🥪",
+            "turkey wrap": "🌯", "wrap": "🌯", "hot dog": "🌭", "corndog": "🌭",
+            "chicken nuggets": "🍗", "nuggets": "🍗", "grilled cheese": "🧀",
+            "spaghetti": "🍝", "mac and cheese": "🧀", "soup": "🥣", "sushi": "🍣",
+            "apple": "🍎", "banana": "🍌", "orange": "🍊", "milk": "🥛"
+        };
+        
+        async function generateImageWithRetry(prompt, maxRetries = 3) {
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+            const payload = { instances: [{ prompt: `a simple, clear, cartoon-style icon of ${prompt} on a white background` }], parameters: { "sampleCount": 1 } };
+
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
+                        return `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                    } else {
+                        throw new Error("Invalid response structure from API.");
+                    }
+                } catch (error) {
+                    console.error(`Attempt ${i + 1} failed:`, error);
+                    if (i === maxRetries - 1) {
+                        return null; // Failed after all retries
+                    }
+                    await new Promise(res => setTimeout(res, 1000 * Math.pow(2, i))); // Exponential backoff
+                }
+            }
+            return null;
+        }
+
+        async function renderLunchChoice() {
+            if (!appState.lunchColumns) {
+                appState.lunchColumns = {
+                    unselected: [...appState.students.filter(s => s.isPresent)],
+                    choice1: [],
+                    choice2: [],
+                    sackLunch: [],
+                };
+            }
+            const columns = appState.lunchColumns;
+            const menu = appState.lunchMenu;
+
+            const studentVisuals = ['🍎','🍊','🍋','🍏','🍇','🍓','🍑','🥥','🥝','🍍'];
+            const studentColorClasses = ['bg-red-200','bg-orange-200','bg-yellow-200','bg-green-200','bg-purple-200','bg-pink-200','bg-rose-200','bg-gray-200','bg-lime-200','bg-amber-200'];
+
+            const getStudentHtml = (student, fromColumn) => {
+                const studentIndex = appState.students.findIndex(s => s.id === student.id);
+                const emoji = studentVisuals[studentIndex % studentVisuals.length];
+                const color = studentColorClasses[studentIndex % studentColorClasses.length];
+                return `<div id="student-${student.id}" draggable="true" data-student-id="${student.id}" data-from-column="${fromColumn}" class="student-draggable p-3 rounded-lg shadow-sm border cursor-move text-center font-medium flex items-center justify-center gap-2 ${color}">
+                            <span class="text-xl">${emoji}</span>
+                            <span>${student.name}</span>
+                        </div>`;
+            };
+            
+            const createMenuSection = (choiceId, choiceData) => {
+                const { text, imageUrl, emoji } = choiceData;
+                let imageContent = `<div class="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center text-2xl">${emoji || '?'}</div>`;
+                if (imageUrl) {
+                    imageContent = `<img src="${imageUrl}" class="w-12 h-12 object-cover rounded-md" alt="${text}">`;
+                }
+
+                return `
+                    <div class="text-center p-4 space-y-2">
+                        <div class="flex items-center justify-center gap-2">
+                            <input type="text" id="menu-input-${choiceId}" value="${text}" placeholder="Enter Lunch" class="p-2 border rounded-md w-full text-center font-bold bg-white" />
+                            <div id="image-container-${choiceId}" class="relative w-12 h-12">
+                               ${imageContent}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            };
+
+            toolDisplay.innerHTML = `
+                <div class="w-full">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-700">Daily Lunch Choice</h2>
+                            <p class="text-gray-500">Drag and drop students to make their lunch choice.</p>
+                        </div>
+                        <button id="reset-lunch-btn" class="bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-2 px-4 rounded-md hover:opacity-90 transition-transform transform hover:scale-105">Reset Choices</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 flex-grow">
+                        <div id="dropzone-choice1" class="dropzone p-4 rounded-lg flex flex-col transition-colors bg-yellow-100">
+                            <h3 class="font-bold text-yellow-800 mb-2 text-center text-xl">Choice 1 (${columns.choice1.length})</h3>
+                            ${createMenuSection('choice1', menu.choice1)}
+                            <div class="space-y-2 flex-grow overflow-y-auto">${columns.choice1.map(s => getStudentHtml(s, 'choice1')).join('')}</div>
+                        </div>
+                        <div id="dropzone-choice2" class="dropzone p-4 rounded-lg flex flex-col transition-colors bg-yellow-100">
+                            <h3 class="font-bold text-yellow-800 mb-2 text-center text-xl">Choice 2 (${columns.choice2.length})</h3>
+                            ${createMenuSection('choice2', menu.choice2)}
+                            <div class="space-y-2 flex-grow overflow-y-auto">${columns.choice2.map(s => getStudentHtml(s, 'choice2')).join('')}</div>
+                        </div>
+                        <div id="dropzone-sackLunch" class="dropzone p-4 rounded-lg flex flex-col transition-colors bg-yellow-100">
+                            <h3 class="font-bold text-yellow-800 mb-2 text-center text-xl">Sack Lunch (${columns.sackLunch.length})</h3>
+                            <div class="space-y-2 pt-4 flex-grow overflow-y-auto">${columns.sackLunch.map(s => getStudentHtml(s, 'sackLunch')).join('')}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <div id="dropzone-unselected" class="dropzone p-4 rounded-lg min-h-[120px] transition-colors bg-teal-100 border-2 border-dashed border-teal-300">
+                            <div class="flex flex-wrap gap-3 justify-center">
+                                ${columns.unselected.length > 0 ? columns.unselected.map(s => getStudentHtml(s, 'unselected')).join('') : `<p class="text-gray-500 p-4">All students have made their choice!</p>`}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const setupMenuChoice = (choiceId) => {
+                const input = document.getElementById(`menu-input-${choiceId}`);
+                const imageContainer = document.getElementById(`image-container-${choiceId}`);
+
+                const handleImageGeneration = async () => {
+                    const prompt = appState.lunchMenu[choiceId].text;
+                    if (!prompt) return;
+                    
+                    appState.lunchMenu[choiceId].imageUrl = ''; // Clear old image
+                    imageContainer.innerHTML = `<div class="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center"><div class="image-loader"></div></div>`;
+                    
+                    const imageUrl = await generateImageWithRetry(prompt);
+                    
+                    if (imageUrl) {
+                        appState.lunchMenu[choiceId].imageUrl = imageUrl;
+                        imageContainer.innerHTML = `<img src="${imageUrl}" class="w-12 h-12 object-cover rounded-md" alt="${prompt}">`;
+                    } else {
+                         imageContainer.innerHTML = `<div class="w-12 h-12 bg-red-100 rounded-md flex items-center justify-center text-xl" title="Image generation failed">😢</div>`;
+                    }
+                };
+                
+                const debouncedImageGen = debounce(handleImageGeneration, 1000);
+
+                input.oninput = (e) => {
+                    const text = e.target.value.toLowerCase().trim();
+                    appState.lunchMenu[choiceId].text = e.target.value;
+                    appState.lunchMenu[choiceId].emoji = LUNCH_EMOJI_DB[text] || '';
+                    appState.lunchMenu[choiceId].imageUrl = ''; // Clear image when text changes
+                    imageContainer.innerHTML = `<div class="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center text-2xl">${appState.lunchMenu[choiceId].emoji || '?'}</div>`;
+                    
+                    if(appState.lunchMenu[choiceId].text.length > 2) {
+                        debouncedImageGen();
+                    }
+                };
+            };
+
+            setupMenuChoice('choice1');
+            setupMenuChoice('choice2');
+
+            let draggedElement = null;
+            let draggedItemId = null;
+            let fromColumnId = null;
+
+            document.querySelectorAll('.student-draggable').forEach(item => {
+                item.addEventListener('touchstart', (e) => {
+                    draggedElement = e.target.closest('.student-draggable');
+                    draggedItemId = draggedElement.dataset.studentId;
+                    fromColumnId = draggedElement.dataset.fromColumn;
+                    draggedElement.classList.add('dragging');
+                }, { passive: false });
+
+                item.ondragstart = (e) => {
+                    draggedItemId = e.target.closest('.student-draggable').dataset.studentId;
+                    fromColumnId = e.target.closest('.student-draggable').dataset.fromColumn;
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.target.classList.add('dragging');
+                };
+                item.ondragend = (e) => {
+                    e.target.classList.remove('dragging');
+                };
+            });
+            
+            toolDisplay.addEventListener('touchmove', (e) => {
+                if (!draggedElement) return;
+                e.preventDefault();
+                const touch = e.touches[0];
+                const elementUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
+                const dropzone = elementUnderTouch?.closest('.dropzone');
+
+                document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('bg-yellow-200'));
+                if (dropzone) {
+                    dropzone.classList.add('bg-yellow-200');
+                }
+            }, { passive: false });
+
+            toolDisplay.addEventListener('touchend', (e) => {
+                if (!draggedElement) return;
+                
+                const touch = e.changedTouches[0];
+                const elementUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
+                const dropzone = elementUnderTouch?.closest('.dropzone');
+                
+                if (dropzone) {
+                    const toColumnId = dropzone.id.replace('dropzone-', '');
+                    if (fromColumnId !== toColumnId) {
+                         const studentToMove = appState.lunchColumns[fromColumnId].find(s => s.id === draggedItemId);
+                        if (studentToMove) {
+                            appState.lunchColumns[fromColumnId] = appState.lunchColumns[fromColumnId].filter(s => s.id !== draggedItemId);
+                            appState.lunchColumns[toColumnId].push(studentToMove);
+                            renderLunchChoice();
+                        }
+                    }
+                }
+                
+                document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('bg-yellow-200'));
+                draggedElement.classList.remove('dragging');
+                draggedElement = null;
+                draggedItemId = null;
+                fromColumnId = null;
+            });
+
+            document.querySelectorAll('.dropzone').forEach(zone => {
+                zone.ondragover = (e) => { e.preventDefault(); zone.classList.add('bg-yellow-200'); };
+                zone.ondragleave = (e) => { zone.classList.remove('bg-yellow-200'); };
+                zone.ondrop = (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('bg-yellow-200');
+                    const toColumnId = zone.id.replace('dropzone-', '');
+                    
+                    if (fromColumnId !== toColumnId) {
+                        const studentToMove = appState.lunchColumns[fromColumnId].find(s => s.id === draggedItemId);
+                        if (studentToMove) {
+                            appState.lunchColumns[fromColumnId] = appState.lunchColumns[fromColumnId].filter(s => s.id !== draggedItemId);
+                            appState.lunchColumns[toColumnId].push(studentToMove);
+                            renderLunchChoice();
+                        }
+                    }
+                };
+            });
+            
+            document.getElementById('reset-lunch-btn').onclick = () => {
+                appState.lunchColumns = null;
+                appState.lunchMenu = { 
+                    choice1: { text: '', imageUrl: '', emoji: '' }, 
+                    choice2: { text: '', imageUrl: '', emoji: '' } 
+                };
+                renderLunchChoice();
+            };
+        }
+
+        // --- Tool: Tournament Bracket ---
+        function renderTournamentBracket() {
+            const bracket = appState.bracket;
+
+            const getPlayerHtml = (player, winner, clickHandler) => {
+                if (!player) return `<div class="p-2 my-1 rounded bg-gray-200 text-gray-400">TBD</div>`;
+                const isWinner = winner && player && winner.id === player.id;
+                const canSelect = !winner && player && player.name !== 'BYE' && clickHandler;
+                return `<div ${canSelect ? `onclick="${clickHandler}"` : ''}
+                             class="p-2 my-1 rounded transition-all 
+                                    ${canSelect ? 'cursor-pointer hover:bg-green-100' : ''} 
+                                    ${isWinner ? 'bg-green-300 font-bold text-green-800' : 'bg-gray-100'} 
+                                    ${player.name === 'BYE' ? 'text-gray-400 italic' : ''}">
+                          ${player.name}
+                        </div>`;
+            };
+            
+            const getMatchHtml = (match, bracketType, roundIndex, matchIndex) => {
+                const [p1, p2] = match.players;
+                const p1ClickHandler = p1 && p2 && !match.winner ? `handleWinnerClick('${bracketType}', ${roundIndex}, ${matchIndex}, '${p1.id}')` : '';
+                const p2ClickHandler = p1 && p2 && !match.winner ? `handleWinnerClick('${bracketType}', ${roundIndex}, ${matchIndex}, '${p2.id}')` : '';
+                const bgColor = bracketType === 'winners' ? 'border-green-300' : bracketType === 'losers' ? 'border-orange-300' : 'border-yellow-400';
+
+                return `<div class="bg-white p-3 rounded-lg shadow-md border-2 ${bgColor} w-52">
+                          ${getPlayerHtml(p1, match.winner, p1ClickHandler)}
+                          <div class="text-center text-xs font-bold text-gray-400">VS</div>
+                          ${getPlayerHtml(p2, match.winner, p2ClickHandler)}
+                        </div>`;
+            };
+
+            let bracketHtml = '';
+            if (bracket) {
+                bracketHtml = `<div class="flex flex-col xl:flex-row justify-start items-start space-y-12 xl:space-y-0 xl:space-x-12">`;
+                // Winners Bracket
+                bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-green-600">🏆 Winners Bracket</h3><div class="flex space-x-6 pb-4">`;
+                bracket.winners.forEach((round, roundIndex) => {
+                    bracketHtml += `<div class="flex flex-col space-y-8 justify-around min-w-max"><h4 class="text-center font-semibold text-gray-600">Round ${roundIndex + 1}</h4>`;
+                    round.forEach((match, matchIndex) => {
+                        bracketHtml += getMatchHtml(match, 'winners', roundIndex, matchIndex);
+                    });
+                    bracketHtml += `</div>`;
+                });
+                bracketHtml += `</div></div>`;
+
+                // Losers Bracket
+                bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-orange-500">🥈 Second Chance</h3><div class="flex space-x-6 pb-4">`;
+                 bracket.losers.forEach((round, roundIndex) => {
+                    if(round.length > 0) {
+                        bracketHtml += `<div class="flex flex-col space-y-8 justify-around min-w-max"><h4 class="text-center font-semibold text-gray-600">Round ${roundIndex + 1}</h4>`;
+                        round.forEach((match, matchIndex) => {
+                            bracketHtml += getMatchHtml(match, 'losers', roundIndex, matchIndex);
+                        });
+                        bracketHtml += `</div>`;
+                    }
+                });
+                bracketHtml += `</div></div>`;
+                
+                // Final Match
+                if(bracket.final && bracket.final.length > 0) {
+                     bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-yellow-500">👑 Championship</h3><div class="flex space-x-6 pb-4">`;
+                     bracketHtml += `<div class="flex flex-col space-y-8 justify-around min-w-max">`;
+                     bracket.final.forEach((match, matchIndex) => {
+                        bracketHtml += getMatchHtml(match, 'final', 0, matchIndex);
+                     });
+                     bracketHtml += `</div></div></div>`;
+                }
+
+                bracketHtml += `</div>`;
+            }
+            
+            let podiumHtml = '';
+            if (appState.podium) {
+                const { first, second, third } = appState.podium;
+                podiumHtml = `<div id="confetti-container" class="absolute inset-0 overflow-hidden z-10 pointer-events-none"></div>
+                              <div class="flex flex-col items-center justify-center h-full animate-fade-in">
+                                <div class="bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-2xl text-center relative z-20">
+                                    <h2 class="text-4xl font-bold text-gray-800 mb-6">Tournament Over!</h2>
+                                    <div class="flex items-end justify-center space-x-4">
+                                        <div class="text-center">
+                                            <p class="text-2xl font-bold text-gray-600">🥈 ${second.name}</p>
+                                            <div class="bg-gray-300 text-gray-700 p-6 rounded-t-lg mt-2 h-24 flex items-center justify-center text-4xl font-bold">2nd</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <p class="text-3xl font-bold text-yellow-500">🏆 ${first.name}</p>
+                                            <div class="bg-yellow-400 text-white p-8 rounded-t-lg mt-2 h-32 flex items-center justify-center text-5xl font-bold">1st</div>
+                                        </div>
+                                        ${third ? `<div class="text-center">
+                                            <p class="text-xl font-bold text-amber-700">🥉 ${third.name}</p>
+                                            <div class="bg-amber-600 text-white p-4 rounded-t-lg mt-2 h-20 flex items-center justify-center text-3xl font-bold">3rd</div>
+                                        </div>` : ''}
+                                    </div>
+                                </div>
+                            </div>`;
+            }
+
+            toolDisplay.innerHTML = `
+                <div class="font-sans relative overflow-x-auto p-4 bg-teal-50 rounded-lg h-full">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Tournament Bracket</h2>
+                    <div class="flex justify-center mb-6 relative z-30">
+                        <button id="generate-bracket-btn" class="bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:opacity-90 transform hover:scale-105 transition-all">
+                            Generate Bracket
+                        </button>
+                         ${bracket ? `<button id="reset-bracket-btn" class="ml-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:opacity-90 transform hover:scale-105 transition-all">Reset</button>` : ''}
+                    </div>
+                    ${podiumHtml}
+                    <div id="bracket-container" class="overflow-x-auto">${bracketHtml}</div>
+                </div>
+            `;
+            
+            if(appState.podium) {
+                triggerConfetti();
+            }
+
+            document.getElementById('generate-bracket-btn').onclick = () => {
+                const presentStudents = appState.students.filter(s => s.isPresent);
+                if (presentStudents.length < 3) {
+                    alert("You need at least 3 present students for a double elimination tournament.");
+                    return;
+                }
+                
+                let players = [...presentStudents].sort(() => Math.random() - 0.5);
+                const numPlayers = players.length;
+                const rounds = Math.ceil(Math.log2(numPlayers));
+                const bracketSize = Math.pow(2, rounds);
+                
+                const numPlayInMatches = numPlayers - (bracketSize / 2);
+                const playersWithByes = numPlayers - (numPlayInMatches * 2);
+
+                let playersForPlayIn = players.slice(playersWithByes);
+                let byePlayers = players.slice(0, playersWithByes);
+
+                let playInRound = [];
+                for(let i=0; i < numPlayInMatches; i++) {
+                    playInRound.push({ players: [playersForPlayIn.shift(), playersForPlayIn.shift()], winner: null, id: `w-r0-m${i}` });
+                }
+
+                const newBracket = { winners: [playInRound], losers: [], final: [] };
+
+                // Pre-fill winners bracket structure
+                let numMatchesInRound = bracketSize / 4;
+                for (let r = 1; r < rounds; r++) {
+                    const nextRound = [];
+                    for (let i = 0; i < numMatchesInRound; i++) {
+                        nextRound.push({ players: [null, null], winner: null, id: `w-r${r}-m${i}` });
+                    }
+                    newBracket.winners.push(nextRound);
+                    numMatchesInRound /= 2;
+                }
+                
+                // Place bye players in round 2 (index 1)
+                for (let i = 0; i < byePlayers.length; i++) {
+                    const matchIndex = Math.floor(i / 2);
+                    const playerSlot = i % 2;
+                    newBracket.winners[1][matchIndex].players[playerSlot] = byePlayers[i];
+                }
+
+                // Pre-fill losers bracket structure
+                let loserRounds = (rounds - 1) * 2 - 1;
+                for(let r=0; r < loserRounds; r++) {
+                    let matchesInRound = 0;
+                    if (r % 2 === 0) {
+                        matchesInRound = Math.pow(2, rounds - 2) / Math.pow(2, r / 2);
+                    } else {
+                        matchesInRound = Math.pow(2, rounds - 2) / Math.pow(2, (r - 1) / 2);
+                    }
+                    const round = [];
+                    for (let i = 0; i < matchesInRound; i++) {
+                        round.push({ players: [null, null], winner: null, id: `l-r${r}-m${i}` });
+                    }
+                    newBracket.losers.push(round);
+                }
+                
+                // Pre-fill final match
+                newBracket.final.push({ players: [null, null], winner: null, id: 'final-match' });
+
+                appState.bracket = newBracket;
+                appState.podium = null;
+                renderTournamentBracket();
+            };
+            
+            if (document.getElementById('reset-bracket-btn')) {
+                document.getElementById('reset-bracket-btn').onclick = () => {
+                    appState.bracket = null;
+                    appState.podium = null;
+                    renderTournamentBracket();
+                };
+            }
+        }
+        
+        window.handleWinnerClick = (bracketType, roundIndex, matchIndex, winnerId) => {
+            const bracket = appState.bracket;
+            if (!bracket) return;
+
+            const match = (bracketType === 'final') 
+                ? bracket.final[matchIndex] 
+                : bracket[bracketType]?.[roundIndex]?.[matchIndex];
+
+            if (!match || match.winner || !match.players[0] || !match.players[1]) {
+                return; 
+            }
+
+            const winner = match.players.find(p => p.id === winnerId);
+            const loser = match.players.find(p => p.id !== winnerId);
+            match.winner = winner;
+
+            if (bracketType === 'winners') {
+                const isFinalWinnersMatch = roundIndex === bracket.winners.length - 1;
+
+                if (!isFinalWinnersMatch) {
+                    const nextRound = bracket.winners[roundIndex + 1];
+                    let nextMatchIndex, playerSlot;
+                    
+                    if(roundIndex === 0 && bracket.winners[0].length > 0 && bracket.winners[0].length !== (bracket.winners[1]?.length || 0) * 2) { // Play-in round
+                        const numByes = bracket.winners[1].reduce((count, currentMatch) => count + currentMatch.players.filter(p => p !== null).length, 0);
+                        nextMatchIndex = Math.floor(numByes / 2) + matchIndex;
+                        playerSlot = (numByes % 2);
+                    } else { // Standard advancement
+                        nextMatchIndex = Math.floor(matchIndex / 2);
+                        playerSlot = matchIndex % 2;
+                    }
+                    if (nextRound && nextRound[nextMatchIndex]) {
+                        nextRound[nextMatchIndex].players[playerSlot] = winner;
+                    }
+                } else {
+                    bracket.final[0].players[0] = winner;
+                }
+
+                if (loser && loser.name !== 'BYE') {
+                    const targetRoundIndex = isFinalWinnersMatch ? bracket.losers.length - 1 : roundIndex * 2;
+                    const targetMatchIndex = isFinalWinnersMatch ? 0 : matchIndex;
+                    const targetSlot = isFinalWinnersMatch ? 1 : 0;
+                    
+                    if (bracket.losers[targetRoundIndex] && bracket.losers[targetRoundIndex][targetMatchIndex]) {
+                        bracket.losers[targetRoundIndex][targetMatchIndex].players[targetSlot] = loser;
+                    }
+                }
+            } else if (bracketType === 'losers') {
+                const isFinalLosersMatch = roundIndex === bracket.losers.length - 1;
+
+                if (!isFinalLosersMatch) {
+                    const nextRound = bracket.losers[roundIndex + 1];
+                    let nextMatchIndex, playerSlot;
+                    if (roundIndex % 2 === 0) { // Winners advance to play drop-downs
+                        nextMatchIndex = matchIndex;
+                        playerSlot = 1;
+                    } else { // Winners advance to play each other
+                        nextMatchIndex = Math.floor(matchIndex / 2);
+                        playerSlot = matchIndex % 2;
+                    }
+                    if (nextRound && nextRound[nextMatchIndex]) {
+                        nextRound[nextMatchIndex].players[playerSlot] = winner;
+                    }
+                } else {
+                    bracket.final[0].players[1] = winner;
+                    appState.thirdPlace = loser;
+                }
+            } else if (bracketType === 'final') {
+                match.winner = winner;
+                appState.podium = {
+                    first: winner,
+                    second: loser,
+                    third: appState.thirdPlace,
+                };
+            }
+            
+            renderTournamentBracket();
+        };
+        
+        function triggerConfetti() {
+            const container = document.getElementById('confetti-container');
+            if (!container) return;
+            container.innerHTML = ''; // Clear old ones
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.animationDelay = `${Math.random() * 3}s`;
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                container.appendChild(confetti);
+            }
+            for (let i = 0; i < 10; i++) {
+                const firework = document.createElement('div');
+                firework.className = 'firework';
+                firework.style.left = `${Math.random() * 100}vw`;
+                firework.style.top = `${Math.random() * 100}vh`;
+                firework.style.width = `${Math.random() * 3 + 2}px`;
+                firework.style.height = firework.style.width;
+                firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                firework.style.animationDelay = `${Math.random() * 2}s`;
+                container.appendChild(firework);
+            }
+        }
+
+        // --- Tool: Hangman ---
+        function renderHangman(gameState = {}) {
+            const HANGMAN_WORDS = ["playground", "storybook", "friendship", "backpack", "butterfly", "dinosaur", "sunflower", "rainbow", "chocolate", "celebrate", "adventure", "discovery", "imagination", "school bus", "ice cream", "show and tell", "field trip", "story time", "happy birthday", "pencil case"];
+            const MAX_WRONG_GUESSES = 6;
+
+            let { secretWord, guessedLetters, gameStatus } = gameState;
+
+            if (!secretWord) {
+                secretWord = HANGMAN_WORDS[Math.floor(Math.random() * HANGMAN_WORDS.length)];
+                guessedLetters = [];
+                gameStatus = 'playing';
+            }
+            
+            const wrongGuesses = guessedLetters.filter(letter => !secretWord.includes(letter)).length;
+
+            if (gameStatus === 'playing') {
+                const isWinner = secretWord.split('').every(letter => guessedLetters.includes(letter) || letter === ' ');
+                if (wrongGuesses >= MAX_WRONG_GUESSES) gameStatus = 'lost';
+                else if (isWinner) gameStatus = 'won';
+            }
+
+            const head = `<div class="absolute w-12 h-12 border-4 border-black rounded-full top-[48px] right-[-22px]"></div>`;
+            const body = `<div class="absolute w-1 h-24 bg-black top-[96px] right-0"></div>`;
+            const rightArm = `<div class="absolute w-16 h-1 bg-black top-[120px] right-[-64px] rotate-[-30deg]"></div>`;
+            const leftArm = `<div class="absolute w-16 h-1 bg-black top-[120px] right-[0px] rotate-[30deg]"></div>`;
+            const rightLeg = `<div class="absolute w-16 h-1 bg-black top-[190px] right-[-56px] rotate-[60deg]"></div>`;
+            const leftLeg = `<div class="absolute w-16 h-1 bg-black top-[-8px] rotate-[-60deg]"></div>`;
+            const bodyParts = [head, body, rightArm, leftArm, rightLeg, leftLeg];
+            const drawingHtml = `
+                <div class="relative h-64 w-48 mx-auto mb-4">
+                    ${bodyParts.slice(0, wrongGuesses).join('')}
+                    <div class="absolute h-12 w-1 bg-black top-0 right-0"></div>
+                    <div class="h-1 w-48 bg-black ml-12"></div>
+                    <div class="h-64 w-1 bg-black ml-12"></div>
+                    <div class="h-1 w-64 bg-black"></div>
+                </div>`;
+
+            const wordDisplayHtml = secretWord.split('').map(letter => 
+                letter === ' ' ? `<div class="w-6 md:w-8"></div>` : 
+                `<span class="inline-block text-3xl md:text-5xl font-bold w-10 md:w-12 text-center border-b-4 border-gray-400 mx-1">
+                    ${guessedLetters.includes(letter) ? letter.toUpperCase() : '_'}
+                </span>`
+            ).join('');
+
+            const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+            const keyboardHtml = alphabet.map(letter => `
+                <button data-letter="${letter}" ${guessedLetters.includes(letter) || gameStatus !== 'playing' ? 'disabled' : ''} class="guess-btn w-10 h-10 md:w-12 md:h-12 text-xl font-bold rounded-md bg-cyan-200 hover:bg-cyan-300 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-all">
+                    ${letter.toUpperCase()}
+                </button>
+            `).join('');
+            
+            let statusMessage = '';
+            if (gameStatus === 'lost') {
+                statusMessage = `<div class="animate-fade-in my-4 text-center">
+                    <p class="text-2xl font-bold text-red-600">You lost!</p>
+                    <p class="text-lg text-gray-600">The word was: <span class="font-bold">${secretWord.toUpperCase()}</span></p>
+                </div>`;
+            } else if (gameStatus === 'won') {
+                statusMessage = `<div class="animate-fade-in my-4 text-center"><p class="text-2xl font-bold text-green-600">You won!</p></div>`;
+            }
+
+            toolDisplay.innerHTML = `
+                <div class="flex flex-col items-center text-center max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-700 mb-4">Hangman</h2>
+                    ${drawingHtml}
+                    ${statusMessage}
+                    <div class="flex justify-center flex-wrap items-center gap-2 my-4 tracking-widest">${wordDisplayHtml}</div>
+                    <div class="flex flex-wrap justify-center gap-2 mt-6">${keyboardHtml}</div>
+                    <button id="play-again-btn" class="mt-8 bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:opacity-90 transition-transform transform hover:scale-105">Play Again</button>
+                </div>
+            `;
+            
+            document.querySelectorAll('.guess-btn').forEach(button => {
+                button.onclick = () => {
+                    const letter = button.dataset.letter;
+                    renderHangman({ secretWord, guessedLetters: [...guessedLetters, letter], gameStatus });
+                };
+            });
+
+            document.getElementById('play-again-btn').onclick = () => renderHangman();
+        }
+        
+        // --- Initial Load ---
+        renderApp();
+
+    </script>
+</body>
+</html>
