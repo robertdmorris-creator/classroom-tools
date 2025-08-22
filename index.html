@@ -831,14 +831,9 @@
                 }
 
                 // Pre-fill losers bracket structure
-                let loserRounds = (rounds - 1) * 2 - 1;
+                let loserRounds = (rounds - 1) * 2;
                 for(let r=0; r < loserRounds; r++) {
-                    let matchesInRound = 0;
-                    if (r % 2 === 0) {
-                        matchesInRound = Math.pow(2, rounds - 2) / Math.pow(2, r / 2);
-                    } else {
-                        matchesInRound = Math.pow(2, rounds - 2) / Math.pow(2, (r - 1) / 2);
-                    }
+                     let matchesInRound = Math.pow(2, rounds - 2) / Math.pow(2, Math.floor(r / 2));
                     const round = [];
                     for (let i = 0; i < matchesInRound; i++) {
                         round.push({ players: [null, null], winner: null, id: `l-r${r}-m${i}` });
@@ -886,11 +881,11 @@
                     const nextRound = bracket.winners[roundIndex + 1];
                     let nextMatchIndex, playerSlot;
                     
-                    if(roundIndex === 0 && bracket.winners[0].length > 0 && bracket.winners[0].length !== (bracket.winners[1]?.length || 0) * 2) { // Play-in round
+                    if(roundIndex === 0 && bracket.winners[0].length > 0 && bracket.winners[0].length !== (bracket.winners[1]?.length || 0) * 2) { 
                         const numByes = bracket.winners[1].reduce((count, currentMatch) => count + currentMatch.players.filter(p => p !== null).length, 0);
                         nextMatchIndex = Math.floor(numByes / 2) + matchIndex;
                         playerSlot = (numByes % 2);
-                    } else { // Standard advancement
+                    } else { 
                         nextMatchIndex = Math.floor(matchIndex / 2);
                         playerSlot = matchIndex % 2;
                     }
@@ -902,10 +897,17 @@
                 }
 
                 if (loser && loser.name !== 'BYE') {
-                    const targetRoundIndex = isFinalWinnersMatch ? bracket.losers.length - 1 : roundIndex * 2;
-                    const targetMatchIndex = isFinalWinnersMatch ? 0 : matchIndex;
-                    const targetSlot = isFinalWinnersMatch ? 1 : 0;
-                    
+                    let targetRoundIndex, targetMatchIndex, targetSlot;
+                    if (roundIndex === 0) {
+                        targetRoundIndex = 0;
+                        targetMatchIndex = Math.floor(matchIndex / 2);
+                        targetSlot = matchIndex % 2;
+                    } else {
+                        targetRoundIndex = (roundIndex * 2) - 1;
+                        targetMatchIndex = matchIndex;
+                        targetSlot = 1;
+                    }
+
                     if (bracket.losers[targetRoundIndex] && bracket.losers[targetRoundIndex][targetMatchIndex]) {
                         bracket.losers[targetRoundIndex][targetMatchIndex].players[targetSlot] = loser;
                     }
@@ -916,10 +918,12 @@
                 if (!isFinalLosersMatch) {
                     const nextRound = bracket.losers[roundIndex + 1];
                     let nextMatchIndex, playerSlot;
-                    if (roundIndex % 2 === 0) { // Winners advance to play drop-downs
+
+                    if (roundIndex % 2 === 0) { 
                         nextMatchIndex = matchIndex;
-                        playerSlot = 1;
-                    } else { // Winners advance to play each other
+                        playerSlot = 0;
+                    } 
+                    else { 
                         nextMatchIndex = Math.floor(matchIndex / 2);
                         playerSlot = matchIndex % 2;
                     }
