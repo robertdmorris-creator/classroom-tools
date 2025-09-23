@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom CSS for animations and loaders */
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #0d9488; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #f97316; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -59,7 +59,7 @@
             width: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: #4a4a4a;
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb {
@@ -67,51 +67,40 @@
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #555;
+            background: #f97316;
         }
     </style>
 </head>
-<body class="h-screen bg-gradient-to-br from-cyan-200 via-sky-300 to-blue-400 min-h-screen font-sans antialiased flex flex-col">
+<body class="h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-orange-800 min-h-screen font-sans antialiased flex flex-col">
 
     <div id="app-container" class="bg-transparent flex flex-col flex-grow">
-        <!-- Header -->
-        <header class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-20 flex-shrink-0">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center py-4">
-                    <div class="w-12"></div> <!-- Spacer -->
-                    <h1 class="text-3xl font-bold text-slate-700 text-center">
-                        Classroom Tools Dashboard
-                    </h1>
-                    <button id="fullscreen-btn" title="Toggle Fullscreen" class="p-2 rounded-full text-slate-600 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
-                        <svg class="fullscreen-icon h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 0h-4m4 0l-5-5" />
-                        </svg>
-                        <svg class="exit-fullscreen-icon h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 4l-5 5m0 0l-5-5m5 5v11m5-16l-5 5m0 0l5 5m-5-5V3" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </header>
 
         <!-- Main Content -->
-        <main class="max-w-screen-2xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex-grow flex flex-col">
+        <main class="w-full mx-auto p-4 flex-grow flex flex-col">
             <!-- Navigation -->
-            <div class="bg-white/70 backdrop-blur-sm rounded-xl shadow-md p-2 mb-8 sticky top-[88px] z-20 flex-shrink-0">
-                <nav id="tool-nav" class="flex flex-wrap justify-center -mb-px">
+            <div class="bg-slate-800/70 backdrop-blur-sm rounded-xl shadow-lg shadow-black/20 p-2 mb-4 sticky top-4 z-20 flex-shrink-0 flex items-center">
+                <nav id="tool-nav" class="flex-grow flex flex-wrap justify-center -mb-px">
                     <!-- Nav buttons will be injected by JS -->
                 </nav>
+                <button id="fullscreen-btn" title="Toggle Fullscreen" class="ml-4 p-2 rounded-full text-slate-300 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                    <svg class="fullscreen-icon h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 0h-4m4 0l-5-5" />
+                    </svg>
+                    <svg class="exit-fullscreen-icon h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 4l-5 5m0 0l-5-5m5 5v11m5-16l-5 5m0 0l5 5m-5-5V3" />
+                    </svg>
+                </button>
             </div>
             <!-- Tool Display Area -->
-            <div id="tool-display" class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-6 relative flex-grow flex flex-col">
+            <div id="tool-display" class="bg-slate-800/70 text-slate-200 backdrop-blur-md rounded-2xl shadow-lg shadow-black/20 p-6 relative flex-grow flex flex-col">
                 <!-- Tools will be rendered here by JS -->
                  <div class="text-center p-8"><div class="loader"></div><p>Loading Tools...</p></div>
             </div>
         </main>
 
         <!-- Footer -->
-        <footer class="text-center py-4 text-slate-600 text-sm flex-shrink-0">
-            <p>Created with ❤️ by your awesome assistant</p>
+        <footer class="text-center py-2 text-slate-400 text-sm flex-shrink-0">
+            <p>Created with 👻 by your awesome assistant</p>
         </footer>
     </div>
 
@@ -191,13 +180,13 @@
                     fullscreenBtn.classList.add('is-fullscreen');
                     // Ensure background is applied for a seamless view
                     if (!appContainer.classList.contains('bg-gradient-to-br')) {
-                        appContainer.classList.add('bg-gradient-to-br', 'from-cyan-200', 'via-sky-300', 'to-blue-400');
+                        appContainer.classList.add('bg-gradient-to-br', 'from-slate-900', 'via-purple-900', 'to-orange-800');
                     }
                 } else {
                     fullscreenBtn.classList.remove('is-fullscreen');
                     appContainer.classList.remove('viewport-fullscreen'); // Make sure CSS fallback is removed
                     // When exiting, remove the background that was added
-                    appContainer.classList.remove('bg-gradient-to-br', 'from-cyan-200', 'via-sky-300', 'to-blue-400');
+                    appContainer.classList.remove('bg-gradient-to-br', 'from-slate-900', 'via-purple-900', 'to-orange-800');
                 }
             };
             
@@ -228,7 +217,7 @@
                 const tool = tools[toolId];
                 const isActive = appState.activeTool === toolId;
                 const button = document.createElement('button');
-                button.className = `flex items-center gap-2 whitespace-nowrap py-3 px-5 border-b-4 font-semibold text-sm focus:outline-none transition-all duration-300 ${isActive ? 'border-teal-500 text-teal-600 bg-teal-100 rounded-t-lg' : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'}`;
+                button.className = `flex items-center gap-2 whitespace-nowrap py-3 px-5 border-b-4 font-semibold text-sm focus:outline-none transition-all duration-300 ${isActive ? 'border-orange-500 text-orange-400 bg-slate-700 rounded-t-lg' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-500'}`;
                 button.innerHTML = `<span class="text-xl">${tool.icon}</span> ${tool.name}`;
                 button.onclick = () => {
                     appState.activeTool = toolId;
@@ -323,20 +312,20 @@
         // --- Tool: Class Roster ---
         function renderClassRoster() {
             let studentListHtml = appState.students.map(student => `
-                <div class="p-3 rounded-lg shadow-sm flex items-center justify-between bg-white hover:bg-slate-50">
-                    <p class="font-medium text-gray-800">${student.name}</p>
-                    <button data-id="${student.id}" class="remove-student-btn text-red-500 hover:text-red-700 font-bold">✕</button>
+                <div class="p-3 rounded-lg shadow-sm flex items-center justify-between bg-slate-700 hover:bg-slate-600">
+                    <p class="font-medium text-slate-200">${student.name}</p>
+                    <button data-id="${student.id}" class="remove-student-btn text-red-500 hover:text-red-400 font-bold">✕</button>
                 </div>
             `).join('');
 
             toolDisplay.innerHTML = `
                 <div class="flex flex-col items-center justify-center h-full">
                     <div class="w-full max-w-md">
-                        <h2 class="text-2xl font-bold text-slate-700 mb-4 text-center">Class Roster Management</h2>
-                        <p class="text-slate-600 mb-6 text-center">Add or remove students from your class list.</p>
+                        <h2 class="text-2xl font-bold text-orange-400 mb-4 text-center">Class Roster Management</h2>
+                        <p class="text-slate-400 mb-6 text-center">Add or remove students from your class list.</p>
                         <form id="add-student-form" class="flex gap-2 mb-4">
-                            <input type="text" id="new-student-name" placeholder="Add a new student's name" class="flex-grow p-2 border rounded-md focus:ring-teal-500 focus:border-teal-500" />
-                            <button type="submit" class="bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold py-2 px-4 rounded-md hover:opacity-90 transition-transform transform hover:scale-105">+</button>
+                            <input type="text" id="new-student-name" placeholder="Add a new student's name" class="flex-grow p-2 border rounded-md bg-slate-600 border-slate-500 text-white focus:ring-orange-500 focus:border-orange-500" />
+                            <button type="submit" class="bg-gradient-to-r from-orange-500 to-amber-600 text-white font-bold py-2 px-4 rounded-md hover:opacity-90 transition-transform transform hover:scale-105">+</button>
                         </form>
                         <div class="space-y-3" id="roster-list">${studentListHtml}</div>
                     </div>
@@ -376,9 +365,9 @@
         function renderStudentSelector() {
             const presentStudents = appState.students.filter(s => s.isPresent);
             let studentListHtml = appState.students.map(student => `
-                <div class="p-2 rounded-md flex items-center justify-between transition-colors ${student.isPresent ? 'bg-white' : 'bg-gray-200'}">
-                    <p class="font-medium ${student.isPresent ? 'text-gray-800' : 'text-gray-500 line-through'}">${student.name}</p>
-                    <button data-id="${student.id}" class="toggle-presence-btn relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${student.isPresent ? 'bg-teal-500' : 'bg-gray-400'}">
+                <div class="p-2 rounded-md flex items-center justify-between transition-colors ${student.isPresent ? 'bg-slate-700' : 'bg-slate-800'}">
+                    <p class="font-medium ${student.isPresent ? 'text-slate-200' : 'text-slate-500 line-through'}">${student.name}</p>
+                    <button data-id="${student.id}" class="toggle-presence-btn relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${student.isPresent ? 'bg-orange-500' : 'bg-slate-600'}">
                         <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${student.isPresent ? 'translate-x-6' : 'translate-x-1'}"></span>
                     </button>
                 </div>
@@ -386,27 +375,27 @@
 
             toolDisplay.innerHTML = `
                 <div class="flex flex-col h-full">
-                    <h2 class="text-2xl font-bold text-slate-700 mb-4 text-center flex-shrink-0">Student Selector</h2>
+                    <h2 class="text-2xl font-bold text-orange-400 mb-4 text-center flex-shrink-0">Student Selector</h2>
                     <div class="grid md:grid-cols-2 gap-8 flex-grow">
                         <div class="flex flex-col">
-                            <h3 class="font-semibold text-slate-600 mb-2 text-center">Daily Attendance</h3>
-                            <div class="border rounded-md p-2 bg-slate-50 space-y-2 flex-grow overflow-y-auto">${studentListHtml}</div>
+                            <h3 class="font-semibold text-slate-300 mb-2 text-center">Daily Attendance</h3>
+                            <div class="border rounded-md p-2 bg-slate-900/50 border-slate-700 space-y-2 flex-grow overflow-y-auto">${studentListHtml}</div>
                         </div>
-                        <div class="flex flex-col items-center justify-center bg-gradient-to-br from-sky-300 to-cyan-400 rounded-lg p-6 space-y-4">
+                        <div class="flex flex-col items-center justify-center bg-gradient-to-br from-purple-800 to-orange-700 rounded-lg p-6 space-y-4">
                             <div class="w-full my-auto">
-                                <button id="select-one-btn" ${presentStudents.length === 0 ? 'disabled' : ''} class="w-full bg-white text-teal-600 font-bold py-3 px-6 rounded-full text-lg shadow-lg hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-400 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-transform transform hover:scale-105">
+                                <button id="select-one-btn" ${presentStudents.length === 0 ? 'disabled' : ''} class="w-full bg-orange-500 text-white font-bold py-3 px-6 rounded-full text-lg shadow-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-400 disabled:bg-slate-600 disabled:text-slate-400 disabled:cursor-not-allowed transition-transform transform hover:scale-105">
                                     Select One Student
                                 </button>
                                 <div class="w-full text-center mt-6">
-                                    <p class="font-semibold text-sky-800 mb-2">Or Generate Groups:</p>
+                                    <p class="font-semibold text-orange-200 mb-2">Or Generate Groups:</p>
                                     <div class="flex justify-center gap-2">
-                                        ${[2,3,4].map(size => `<button data-size="${size}" ${presentStudents.length < size ? 'disabled' : ''} class="generate-groups-btn bg-white text-teal-600 font-bold py-2 px-4 rounded-full shadow-md hover:bg-teal-50 disabled:bg-gray-300 disabled:text-gray-500 transition-transform transform hover:scale-105">of ${size}</button>`).join('')}
+                                        ${[2,3,4].map(size => `<button data-size="${size}" ${presentStudents.length < size ? 'disabled' : ''} class="generate-groups-btn bg-orange-500 text-white font-bold py-2 px-4 rounded-full shadow-md hover:bg-orange-600 disabled:bg-slate-600 disabled:text-slate-400 transition-transform transform hover:scale-105">of ${size}</button>`).join('')}
                                     </div>
                                 </div>
                              </div>
                         </div>
                     </div>
-                    <div id="selector-results" class="mt-8 pt-6 border-t border-gray-200 flex-shrink-0"></div>
+                    <div id="selector-results" class="mt-8 pt-6 border-t border-slate-700 flex-shrink-0"></div>
                 </div>
             `;
             
@@ -431,9 +420,9 @@
                     const randomIndex = Math.floor(Math.random() * present.length);
                     const selected = present[randomIndex];
                     document.getElementById('selector-results').innerHTML = `
-                        <div class="text-center p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg animate-fade-in w-full max-w-md mx-auto pulse" style="--pulse-color: #0d9488;">
-                            <p class="text-slate-600">And the student is...</p>
-                            <p class="text-4xl font-bold text-teal-600 mt-2">${selected.name}!</p>
+                        <div class="text-center p-6 bg-slate-700/80 backdrop-blur-sm rounded-xl shadow-lg animate-fade-in w-full max-w-md mx-auto pulse" style="--pulse-color: #f97316;">
+                            <p class="text-slate-300">And the student is...</p>
+                            <p class="text-4xl font-bold text-orange-400 mt-2">${selected.name}!</p>
                         </div>`;
                 }
             };
@@ -448,10 +437,10 @@
                         groups.push(shuffled.slice(i, i + size));
                     }
                     const groupsHtml = groups.map((group, index) => `
-                        <div class="p-4 rounded-lg bg-gradient-to-br from-teal-200 to-cyan-300 shadow-md">
-                            <h4 class="font-bold text-teal-800 text-center mb-2">Group ${index + 1}</h4>
+                        <div class="p-4 rounded-lg bg-gradient-to-br from-purple-700 to-orange-600 shadow-md">
+                            <h4 class="font-bold text-orange-200 text-center mb-2">Group ${index + 1}</h4>
                             <ul class="space-y-1 text-center">
-                                ${group.map(student => `<li class="text-teal-700 bg-white/50 rounded-md py-1">${student.name}</li>`).join('')}
+                                ${group.map(student => `<li class="text-white bg-black/20 rounded-md py-1">${student.name}</li>`).join('')}
                             </ul>
                         </div>
                     `).join('');
@@ -474,14 +463,14 @@
             const columns = appState.lunchColumns;
             const menu = appState.lunchMenu;
 
-            const studentVisuals = ['🍎','🍊','🍋','🍏','🍇','🍓','🍑','🥥','🥝','🍍'];
-            const studentColorClasses = ['bg-red-200','bg-orange-200','bg-yellow-200','bg-green-200','bg-purple-200','bg-pink-200','bg-rose-200','bg-gray-200','bg-lime-200','bg-amber-200'];
+            const studentVisuals = ['🎃', '👻', '🦇', '🍁', '🍂', '🕷️', '🕸️', '💀', '🍬', '🦉'];
+            const studentColorClasses = ['bg-orange-300', 'bg-purple-300', 'bg-slate-300', 'bg-amber-300', 'bg-red-300', 'bg-lime-300', 'bg-yellow-300', 'bg-fuchsia-300', 'bg-indigo-300', 'bg-stone-300'];
 
             const getStudentHtml = (student, fromColumn) => {
                 const studentIndex = appState.students.findIndex(s => s.id === student.id);
                 const emoji = studentVisuals[studentIndex % studentVisuals.length];
                 const color = studentColorClasses[studentIndex % studentColorClasses.length];
-                return `<div id="student-${student.id}" draggable="true" data-student-id="${student.id}" data-from-column="${fromColumn}" class="student-draggable p-3 rounded-lg shadow-sm border cursor-move text-center font-medium flex items-center justify-center gap-2 ${color}">
+                return `<div id="student-${student.id}" draggable="true" data-student-id="${student.id}" data-from-column="${fromColumn}" class="student-draggable p-3 rounded-lg shadow-sm border border-black/10 cursor-move text-center font-medium flex items-center justify-center gap-2 text-slate-800 ${color}">
                             <span class="text-xl">${emoji}</span>
                             <span>${student.name}</span>
                         </div>`;
@@ -491,43 +480,43 @@
                 <div class="flex flex-col h-full">
                     <div class="flex justify-between items-center mb-6 flex-shrink-0">
                         <div>
-                            <h2 class="text-2xl font-bold text-slate-700">Daily Lunch Choice</h2>
-                            <p class="text-slate-500">Drag and drop students to make their lunch choice.</p>
+                            <h2 class="text-2xl font-bold text-orange-400">Daily Lunch Choice</h2>
+                            <p class="text-slate-400">Drag and drop students to make their lunch choice.</p>
                         </div>
-                        <button id="reset-lunch-btn" class="bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-2 px-4 rounded-md hover:opacity-90 transition-transform transform hover:scale-105">Reset Choices</button>
+                        <button id="reset-lunch-btn" class="bg-gradient-to-r from-red-600 to-orange-700 text-white font-bold py-2 px-4 rounded-md hover:opacity-90 transition-transform transform hover:scale-105">Reset Choices</button>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 flex-grow">
-                        <div id="dropzone-choice1" class="dropzone p-4 rounded-lg transition-colors bg-teal-100/70 flex flex-col">
+                        <div id="dropzone-choice1" class="dropzone p-4 rounded-lg transition-colors bg-slate-900/70 flex flex-col">
                             <div class="flex-shrink-0">
-                                <h3 class="font-bold text-teal-800 mb-2 text-center text-xl">Choice 1 (${columns.choice1.length})</h3>
+                                <h3 class="font-bold text-orange-400 mb-2 text-center text-xl">Choice 1 (${columns.choice1.length})</h3>
                                 <div class="text-center p-4">
-                                    <input type="text" id="choice1-menu" value="${menu.choice1Menu}" placeholder="Enter Lunch Choice 1" class="p-2 border rounded-md w-full text-center text-xl font-bold bg-white" />
+                                    <input type="text" id="choice1-menu" value="${menu.choice1Menu}" placeholder="Enter Lunch Choice 1" class="p-2 border rounded-md w-full text-center text-xl font-bold bg-slate-700 text-white border-slate-600" />
                                 </div>
                             </div>
                             <div class="space-y-2 flex-grow overflow-y-auto p-2 -m-2">${columns.choice1.map(s => getStudentHtml(s, 'choice1')).join('')}</div>
                         </div>
-                        <div id="dropzone-choice2" class="dropzone p-4 rounded-lg transition-colors bg-teal-100/70 flex flex-col">
+                        <div id="dropzone-choice2" class="dropzone p-4 rounded-lg transition-colors bg-slate-900/70 flex flex-col">
                              <div class="flex-shrink-0">
-                                <h3 class="font-bold text-teal-800 mb-2 text-center text-xl">Choice 2 (${columns.choice2.length})</h3>
+                                <h3 class="font-bold text-orange-400 mb-2 text-center text-xl">Choice 2 (${columns.choice2.length})</h3>
                                 <div class="text-center p-4">
-                                    <input type="text" id="choice2-menu" value="${menu.choice2Menu}" placeholder="Enter Lunch Choice 2" class="p-2 border rounded-md w-full text-center text-xl font-bold bg-white" />
+                                    <input type="text" id="choice2-menu" value="${menu.choice2Menu}" placeholder="Enter Lunch Choice 2" class="p-2 border rounded-md w-full text-center text-xl font-bold bg-slate-700 text-white border-slate-600" />
                                 </div>
                             </div>
                             <div class="space-y-2 flex-grow overflow-y-auto p-2 -m-2">${columns.choice2.map(s => getStudentHtml(s, 'choice2')).join('')}</div>
                         </div>
-                        <div id="dropzone-sackLunch" class="dropzone p-4 rounded-lg transition-colors bg-teal-100/70 flex flex-col">
+                        <div id="dropzone-sackLunch" class="dropzone p-4 rounded-lg transition-colors bg-slate-900/70 flex flex-col">
                              <div class="flex-shrink-0">
-                                <h3 class="font-bold text-teal-800 mb-2 text-center text-xl">Sack Lunch (${columns.sackLunch.length})</h3>
+                                <h3 class="font-bold text-orange-400 mb-2 text-center text-xl">Sack Lunch (${columns.sackLunch.length})</h3>
                              </div>
                             <div class="space-y-2 flex-grow overflow-y-auto p-2 -m-2 pt-16">${columns.sackLunch.map(s => getStudentHtml(s, 'sackLunch')).join('')}</div>
                         </div>
                     </div>
                     
-                    <div class="mt-8 pt-6 border-t border-gray-200 flex-shrink-0">
-                        <div id="dropzone-unselected" class="dropzone p-4 rounded-lg min-h-[120px] transition-colors bg-sky-100/70 border-2 border-dashed border-sky-300">
+                    <div class="mt-8 pt-6 border-t border-slate-700 flex-shrink-0">
+                        <div id="dropzone-unselected" class="dropzone p-4 rounded-lg min-h-[120px] transition-colors bg-slate-900/70 border-2 border-dashed border-slate-600">
                             <div class="flex flex-wrap gap-3 justify-center">
-                                ${columns.unselected.length > 0 ? columns.unselected.map(s => getStudentHtml(s, 'unselected')).join('') : `<p class="text-gray-500 p-4">All students have made their choice!</p>`}
+                                ${columns.unselected.length > 0 ? columns.unselected.map(s => getStudentHtml(s, 'unselected')).join('') : `<p class="text-slate-400 p-4">All students have made their choice!</p>`}
                             </div>
                         </div>
                     </div>
@@ -552,11 +541,11 @@
             });
 
             document.querySelectorAll('.dropzone').forEach(zone => {
-                zone.ondragover = (e) => { e.preventDefault(); zone.classList.add('bg-yellow-300'); };
-                zone.ondragleave = (e) => { zone.classList.remove('bg-yellow-300'); };
+                zone.ondragover = (e) => { e.preventDefault(); zone.classList.add('bg-purple-500'); };
+                zone.ondragleave = (e) => { zone.classList.remove('bg-purple-500'); };
                 zone.ondrop = (e) => {
                     e.preventDefault();
-                    zone.classList.remove('bg-yellow-300');
+                    zone.classList.remove('bg-purple-500');
                     const toColumnId = zone.id.replace('dropzone-', '');
                     
                     if (fromColumnId !== toColumnId) {
@@ -587,9 +576,9 @@
                 const elementUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
                 const dropzone = elementUnderTouch?.closest('.dropzone');
 
-                document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('bg-yellow-300'));
+                document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('bg-purple-500'));
                 if (dropzone) {
-                    dropzone.classList.add('bg-yellow-300');
+                    dropzone.classList.add('bg-purple-500');
                 }
             });
 
@@ -612,7 +601,7 @@
                     }
                 }
                 
-                document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('bg-yellow-300'));
+                document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('bg-purple-500'));
                 draggedElement.classList.remove('dragging');
                 draggedElement = null;
                 draggedItemId = null;
@@ -633,14 +622,14 @@
             const bracket = appState.bracket;
 
             const getPlayerHtml = (player, winner, clickHandler) => {
-                if (!player) return `<div class="p-2 my-1 rounded bg-slate-200 text-slate-400">TBD</div>`;
+                if (!player) return `<div class="p-2 my-1 rounded bg-slate-700 text-slate-400">TBD</div>`;
                 const isWinner = winner && player && winner.id === player.id;
                 const canSelect = !winner && player && player.name !== 'BYE' && clickHandler;
                 return `<div ${canSelect ? `onclick="${clickHandler}"` : ''}
-                             class="p-2 my-1 rounded transition-all 
-                                    ${canSelect ? 'cursor-pointer hover:bg-teal-100' : ''} 
-                                    ${isWinner ? 'bg-teal-300 font-bold text-teal-800' : 'bg-slate-100'} 
-                                    ${player.name === 'BYE' ? 'text-slate-400 italic' : ''}">
+                             class="p-2 my-1 rounded transition-all text-slate-800
+                                    ${canSelect ? 'cursor-pointer hover:bg-lime-300' : ''} 
+                                    ${isWinner ? 'bg-lime-400 font-bold text-lime-900' : 'bg-slate-300'} 
+                                    ${player.name === 'BYE' ? 'text-slate-500 italic' : ''}">
                           ${player.name}
                         </div>`;
             };
@@ -649,11 +638,11 @@
                 const [p1, p2] = match.players;
                 const p1ClickHandler = p1 && p2 && !match.winner ? `handleWinnerClick('${bracketType}', ${roundIndex}, ${matchIndex}, '${p1.id}')` : '';
                 const p2ClickHandler = p1 && p2 && !match.winner ? `handleWinnerClick('${bracketType}', ${roundIndex}, ${matchIndex}, '${p2.id}')` : '';
-                const bgColor = bracketType === 'winners' ? 'border-teal-300' : bracketType === 'losers' ? 'border-amber-300' : 'border-yellow-400';
+                const bgColor = bracketType === 'winners' ? 'border-lime-400' : bracketType === 'losers' ? 'border-orange-400' : 'border-yellow-400';
 
-                return `<div class="bg-white p-3 rounded-lg shadow-md border-2 ${bgColor} w-52">
+                return `<div class="bg-slate-800 p-3 rounded-lg shadow-md border-2 ${bgColor} w-52">
                           ${getPlayerHtml(p1, match.winner, p1ClickHandler)}
-                          <div class="text-center text-xs font-bold text-gray-400">VS</div>
+                          <div class="text-center text-xs font-bold text-slate-400">VS</div>
                           ${getPlayerHtml(p2, match.winner, p2ClickHandler)}
                         </div>`;
             };
@@ -662,9 +651,9 @@
             if (bracket) {
                 bracketHtml = `<div class="flex flex-col xl:flex-row justify-start items-start space-y-12 xl:space-y-0 xl:space-x-12">`;
                 // Winners Bracket
-                bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-teal-600">🏆 Winners Bracket</h3><div class="flex space-x-6 pb-4">`;
+                bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-lime-400">🏆 Winners Bracket</h3><div class="flex space-x-6 pb-4">`;
                 bracket.winners.forEach((round, roundIndex) => {
-                    bracketHtml += `<div class="flex flex-col space-y-8 justify-around min-w-max"><h4 class="text-center font-semibold text-gray-600">Round ${roundIndex + 1}</h4>`;
+                    bracketHtml += `<div class="flex flex-col space-y-8 justify-around min-w-max"><h4 class="text-center font-semibold text-slate-300">Round ${roundIndex + 1}</h4>`;
                     round.forEach((match, matchIndex) => {
                         bracketHtml += getMatchHtml(match, 'winners', roundIndex, matchIndex);
                     });
@@ -673,10 +662,10 @@
                 bracketHtml += `</div></div>`;
 
                 // Losers Bracket
-                bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-amber-500">🥈 Second Chance</h3><div class="flex space-x-6 pb-4">`;
+                bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-orange-400">🥈 Second Chance</h3><div class="flex space-x-6 pb-4">`;
                  bracket.losers.forEach((round, roundIndex) => {
                     if(round.length > 0) {
-                        bracketHtml += `<div class="flex flex-col space-y-8 justify-around min-w-max"><h4 class="text-center font-semibold text-gray-600">Round ${roundIndex + 1}</h4>`;
+                        bracketHtml += `<div class="flex flex-col space-y-8 justify-around min-w-max"><h4 class="text-center font-semibold text-slate-300">Round ${roundIndex + 1}</h4>`;
                         round.forEach((match, matchIndex) => {
                             bracketHtml += getMatchHtml(match, 'losers', roundIndex, matchIndex);
                         });
@@ -687,7 +676,7 @@
                 
                 // Final Match
                 if(bracket.final && bracket.final.length > 0) {
-                     bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-yellow-500">👑 Championship</h3><div class="flex space-x-6 pb-4">`;
+                     bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-yellow-400">👑 Championship</h3><div class="flex space-x-6 pb-4">`;
                      bracketHtml += `<div class="flex flex-col space-y-8 justify-around min-w-max">`;
                      bracket.final.forEach((match, matchIndex) => {
                         bracketHtml += getMatchHtml(match, 'final', 0, matchIndex);
@@ -703,20 +692,20 @@
                 const { first, second, third } = appState.podium;
                 podiumHtml = `<div id="confetti-container" class="absolute inset-0 overflow-hidden z-10 pointer-events-none"></div>
                               <div class="flex flex-col items-center justify-center h-full animate-fade-in">
-                                <div class="bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-2xl text-center relative z-20">
-                                    <h2 class="text-4xl font-bold text-slate-800 mb-6">Tournament Over!</h2>
+                                <div class="bg-slate-700/90 backdrop-blur-md p-8 rounded-2xl shadow-2xl text-center relative z-20">
+                                    <h2 class="text-4xl font-bold text-slate-200 mb-6">Tournament Over!</h2>
                                     <div class="flex items-end justify-center space-x-4">
                                         <div class="text-center">
-                                            <p class="text-2xl font-bold text-slate-600">🥈 ${second.name}</p>
-                                            <div class="bg-slate-300 text-slate-700 p-6 rounded-t-lg mt-2 h-24 flex items-center justify-center text-4xl font-bold">2nd</div>
+                                            <p class="text-2xl font-bold text-slate-300">🥈 ${second.name}</p>
+                                            <div class="bg-slate-500 text-slate-200 p-6 rounded-t-lg mt-2 h-24 flex items-center justify-center text-4xl font-bold">2nd</div>
                                         </div>
                                         <div class="text-center">
-                                            <p class="text-3xl font-bold text-yellow-500">🏆 ${first.name}</p>
-                                            <div class="bg-yellow-400 text-white p-8 rounded-t-lg mt-2 h-32 flex items-center justify-center text-5xl font-bold">1st</div>
+                                            <p class="text-3xl font-bold text-yellow-400">🏆 ${first.name}</p>
+                                            <div class="bg-yellow-500 text-white p-8 rounded-t-lg mt-2 h-32 flex items-center justify-center text-5xl font-bold">1st</div>
                                         </div>
                                         ${third ? `<div class="text-center">
-                                            <p class="text-xl font-bold text-amber-700">🥉 ${third.name}</p>
-                                            <div class="bg-amber-600 text-white p-4 rounded-t-lg mt-2 h-20 flex items-center justify-center text-3xl font-bold">3rd</div>
+                                            <p class="text-xl font-bold text-orange-400">🥉 ${third.name}</p>
+                                            <div class="bg-orange-600 text-white p-4 rounded-t-lg mt-2 h-20 flex items-center justify-center text-3xl font-bold">3rd</div>
                                         </div>` : ''}
                                     </div>
                                 </div>
@@ -724,13 +713,13 @@
             }
 
             toolDisplay.innerHTML = `
-                <div class="font-sans relative p-4 bg-sky-50/70 rounded-lg flex flex-col h-full">
-                    <h2 class="text-3xl font-bold text-slate-800 mb-6 text-center flex-shrink-0">Tournament Bracket</h2>
+                <div class="font-sans relative p-4 bg-slate-900/70 rounded-lg flex flex-col h-full">
+                    <h2 class="text-3xl font-bold text-orange-400 mb-6 text-center flex-shrink-0">Tournament Bracket</h2>
                     <div class="flex justify-center mb-6 relative z-30 flex-shrink-0">
-                        <button id="generate-bracket-btn" class="bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:opacity-90 transform hover:scale-105 transition-all">
+                        <button id="generate-bracket-btn" class="bg-gradient-to-r from-purple-600 to-orange-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:opacity-90 transform hover:scale-105 transition-all">
                             Generate Bracket
                         </button>
-                         ${bracket ? `<button id="reset-bracket-btn" class="ml-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:opacity-90 transform hover:scale-105 transition-all">Reset</button>` : ''}
+                         ${bracket ? `<button id="reset-bracket-btn" class="ml-4 bg-gradient-to-r from-red-600 to-orange-700 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:opacity-90 transform hover:scale-105 transition-all">Reset</button>` : ''}
                     </div>
                     ${podiumHtml}
                     <div id="bracket-container" class="overflow-auto flex-grow">${bracketHtml}</div>
@@ -923,7 +912,7 @@
 
         // --- Tool: Hangman ---
         function renderHangman(gameState = {}) {
-            const HANGMAN_WORDS = ["playground", "storybook", "friendship", "backpack", "butterfly", "dinosaur", "sunflower", "rainbow", "chocolate", "celebrate", "adventure", "discovery", "imagination", "school bus", "ice cream", "show and tell", "field trip", "story time", "happy birthday", "pencil case"];
+            const HANGMAN_WORDS = ["pumpkin", "ghost", "vampire", "witch", "spider", "cauldron", "haunted", "costume", "zombie", "werewolf", "frankenstein", "candy corn", "trick or treat", "black cat", "jack o lantern", "full moon", "spooky", "monster mash", "october", "autumn"];
             const MAX_WRONG_GUESSES = 6;
 
             let { secretWord, guessedLetters, gameStatus } = gameState;
@@ -942,32 +931,32 @@
                 else if (isWinner) gameStatus = 'won';
             }
 
-            const head = `<div class="absolute w-12 h-12 border-4 border-slate-700 rounded-full top-[48px] right-[-22px]"></div>`;
-            const body = `<div class="absolute w-1 h-24 bg-slate-700 top-[96px] right-0"></div>`;
-            const rightArm = `<div class="absolute w-16 h-1 bg-slate-700 top-[120px] right-[-64px] rotate-[-30deg]"></div>`;
-            const leftArm = `<div class="absolute w-16 h-1 bg-slate-700 top-[120px] right-[0px] rotate-[30deg]"></div>`;
-            const rightLeg = `<div class="absolute w-16 h-1 bg-slate-700 top-[190px] right-[-56px] rotate-[60deg]"></div>`;
-            const leftLeg = `<div class="absolute w-16 h-1 bg-slate-700 top-[190px] right-[-8px] rotate-[-60deg]"></div>`;
+            const head = `<div class="absolute w-12 h-12 border-4 border-slate-300 rounded-full top-[48px] right-[-22px]"></div>`;
+            const body = `<div class="absolute w-1 h-24 bg-slate-300 top-[96px] right-0"></div>`;
+            const rightArm = `<div class="absolute w-16 h-1 bg-slate-300 top-[120px] right-[-64px] rotate-[-30deg]"></div>`;
+            const leftArm = `<div class="absolute w-16 h-1 bg-slate-300 top-[120px] right-[0px] rotate-[30deg]"></div>`;
+            const rightLeg = `<div class="absolute w-16 h-1 bg-slate-300 top-[190px] right-[-56px] rotate-[60deg]"></div>`;
+            const leftLeg = `<div class="absolute w-16 h-1 bg-slate-300 top-[190px] right-[-8px] rotate-[-60deg]"></div>`;
             const bodyParts = [head, body, rightArm, leftArm, rightLeg, leftLeg];
             const drawingHtml = `
                 <div class="relative h-64 w-48 mx-auto mb-4">
                     ${bodyParts.slice(0, wrongGuesses).join('')}
-                    <div class="absolute h-12 w-1 bg-slate-700 top-0 right-0"></div>
-                    <div class="h-1 w-48 bg-slate-700 ml-12"></div>
-                    <div class="h-64 w-1 bg-slate-700 ml-12"></div>
-                    <div class="h-1 w-64 bg-slate-700"></div>
+                    <div class="absolute h-12 w-1 bg-slate-300 top-0 right-0"></div>
+                    <div class="h-1 w-48 bg-slate-300 ml-12"></div>
+                    <div class="h-64 w-1 bg-slate-300 ml-12"></div>
+                    <div class="h-1 w-64 bg-slate-300"></div>
                 </div>`;
 
             const wordDisplayHtml = secretWord.split('').map(letter => 
                 letter === ' ' ? `<div class="w-6 md:w-8"></div>` : 
-                `<span class="inline-block text-3xl md:text-5xl font-bold w-10 md:w-12 text-center border-b-4 border-slate-400 mx-1">
+                `<span class="inline-block text-3xl md:text-5xl font-bold w-10 md:w-12 text-center border-b-4 border-slate-500 mx-1">
                     ${guessedLetters.includes(letter) ? letter.toUpperCase() : '_'}
                 </span>`
             ).join('');
 
             const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
             const keyboardHtml = alphabet.map(letter => `
-                <button data-letter="${letter}" ${guessedLetters.includes(letter) || gameStatus !== 'playing' ? 'disabled' : ''} class="guess-btn w-10 h-10 md:w-12 md:h-12 text-xl font-bold rounded-md bg-cyan-200 hover:bg-cyan-300 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed transition-all">
+                <button data-letter="${letter}" ${guessedLetters.includes(letter) || gameStatus !== 'playing' ? 'disabled' : ''} class="guess-btn w-10 h-10 md:w-12 md:h-12 text-xl font-bold rounded-md bg-orange-500 text-white hover:bg-orange-600 disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed transition-all">
                     ${letter.toUpperCase()}
                 </button>
             `).join('');
@@ -975,21 +964,21 @@
             let statusMessage = '';
             if (gameStatus === 'lost') {
                 statusMessage = `<div class="animate-fade-in my-4 text-center">
-                    <p class="text-2xl font-bold text-red-600">You lost!</p>
-                    <p class="text-lg text-slate-600">The word was: <span class="font-bold">${secretWord.toUpperCase()}</span></p>
+                    <p class="text-2xl font-bold text-red-500">You lost!</p>
+                    <p class="text-lg text-slate-400">The word was: <span class="font-bold">${secretWord.toUpperCase()}</span></p>
                 </div>`;
             } else if (gameStatus === 'won') {
-                statusMessage = `<div class="animate-fade-in my-4 text-center"><p class="text-2xl font-bold text-green-600">You won!</p></div>`;
+                statusMessage = `<div class="animate-fade-in my-4 text-center"><p class="text-2xl font-bold text-green-500">You won!</p></div>`;
             }
 
             toolDisplay.innerHTML = `
                 <div class="flex flex-col items-center justify-center text-center h-full">
-                    <h2 class="text-3xl font-bold text-slate-700 mb-4">Hangman</h2>
+                    <h2 class="text-3xl font-bold text-orange-400 mb-4">Hangman</h2>
                     ${drawingHtml}
                     ${statusMessage}
                     <div class="flex justify-center flex-wrap items-center gap-2 my-4 tracking-widest">${wordDisplayHtml}</div>
                     <div class="flex flex-wrap justify-center gap-2 mt-6">${keyboardHtml}</div>
-                    <button id="play-again-btn" class="mt-8 bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:opacity-90 transition-transform transform hover:scale-105">Play Again</button>
+                    <button id="play-again-btn" class="mt-8 bg-gradient-to-r from-purple-600 to-orange-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:opacity-90 transition-transform transform hover:scale-105">Play Again</button>
                 </div>
             `;
             
