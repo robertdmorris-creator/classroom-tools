@@ -142,20 +142,52 @@
         // --- Fullscreen Logic ---
         function setupFullscreenButton() {
             fullscreenBtn.addEventListener('click', () => {
-                const isFullscreen = appContainer.classList.contains('viewport-fullscreen');
-                
-                if (isFullscreen) {
-                    appContainer.classList.remove('viewport-fullscreen');
-                    fullscreenBtn.classList.remove('is-fullscreen');
-                    // When exiting, remove the background that was added for fullscreen view
-                     appContainer.classList.remove('bg-gradient-to-br', 'from-cyan-200', 'via-sky-300', 'to-blue-400');
+                // If not currently in any fullscreen mode, try to enter.
+                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                    const requestFullscreen = appContainer.requestFullscreen || appContainer.webkitRequestFullscreen;
+                    if (requestFullscreen) {
+                        // Attempt to go native fullscreen
+                        requestFullscreen.call(appContainer).catch(err => {
+                            // If native fails, use the CSS fallback
+                            console.warn(`Native fullscreen failed, using CSS fallback: ${err.message}`);
+                            appContainer.classList.add('viewport-fullscreen');
+                            syncFullscreenState(); // Update UI for CSS mode
+                        });
+                    } else {
+                        // If API doesn't exist at all, just use CSS fallback
+                        appContainer.classList.add('viewport-fullscreen');
+                        syncFullscreenState();
+                    }
                 } else {
-                    appContainer.classList.add('viewport-fullscreen');
-                    fullscreenBtn.classList.add('is-fullscreen');
-                    // When entering, ensure the background is applied for a seamless view
-                    appContainer.classList.add('bg-gradient-to-br', 'from-cyan-200', 'via-sky-300', 'to-blue-400');
+                    // If already fullscreen, exit.
+                    const exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen;
+                    if (exitFullscreen) {
+                        exitFullscreen.call(document);
+                    }
                 }
             });
+
+            // Syncs button icon and background styles with the actual state
+            const syncFullscreenState = () => {
+                const isFullscreenNow = document.fullscreenElement || document.webkitFullscreenElement || appContainer.classList.contains('viewport-fullscreen');
+                
+                if (isFullscreenNow) {
+                    fullscreenBtn.classList.add('is-fullscreen');
+                    // Ensure background is applied for a seamless view
+                    if (!appContainer.classList.contains('bg-gradient-to-br')) {
+                        appContainer.classList.add('bg-gradient-to-br', 'from-cyan-200', 'via-sky-300', 'to-blue-400');
+                    }
+                } else {
+                    fullscreenBtn.classList.remove('is-fullscreen');
+                    appContainer.classList.remove('viewport-fullscreen'); // Make sure CSS fallback is removed
+                    // When exiting, remove the background that was added
+                    appContainer.classList.remove('bg-gradient-to-br', 'from-cyan-200', 'via-sky-300', 'to-blue-400');
+                }
+            };
+            
+            // Add listeners to react to browser UI changes (e.g., user pressing Esc)
+            document.addEventListener('fullscreenchange', syncFullscreenState);
+            document.addEventListener('webkitfullscreenchange', syncFullscreenState);
         }
         
         // --- Graceful Fallback for Local Files ---
