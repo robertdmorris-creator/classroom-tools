@@ -53,13 +53,29 @@
             flex-grow: 1;
             min-height: 0;
         }
+
+        /* Make scrollbars pretty */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-cyan-200 via-sky-300 to-blue-400 min-h-screen font-sans antialiased flex flex-col">
+<body class="h-screen bg-gradient-to-br from-cyan-200 via-sky-300 to-blue-400 min-h-screen font-sans antialiased flex flex-col">
 
     <div id="app-container" class="bg-transparent flex flex-col flex-grow">
         <!-- Header -->
-        <header class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-20">
+        <header class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-20 flex-shrink-0">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center py-4">
                     <div class="w-12"></div> <!-- Spacer -->
@@ -79,22 +95,22 @@
         </header>
 
         <!-- Main Content -->
-        <main class="max-w-screen-xl w-full mx-auto p-4 sm:p-6 lg:p-8 my-auto">
+        <main class="max-w-screen-2xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex-grow flex flex-col">
             <!-- Navigation -->
-            <div class="bg-white/70 backdrop-blur-sm rounded-xl shadow-md p-2 mb-8 sticky top-[88px] z-20">
+            <div class="bg-white/70 backdrop-blur-sm rounded-xl shadow-md p-2 mb-8 sticky top-[88px] z-20 flex-shrink-0">
                 <nav id="tool-nav" class="flex flex-wrap justify-center -mb-px">
                     <!-- Nav buttons will be injected by JS -->
                 </nav>
             </div>
             <!-- Tool Display Area -->
-            <div id="tool-display" class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-6 min-h-[600px] relative">
+            <div id="tool-display" class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-6 relative flex-grow flex flex-col">
                 <!-- Tools will be rendered here by JS -->
                  <div class="text-center p-8"><div class="loader"></div><p>Loading Tools...</p></div>
             </div>
         </main>
 
         <!-- Footer -->
-        <footer class="text-center py-4 text-slate-600 text-sm">
+        <footer class="text-center py-4 text-slate-600 text-sm flex-shrink-0">
             <p>Created with ❤️ by your awesome assistant</p>
         </footer>
     </div>
@@ -314,10 +330,10 @@
             `).join('');
 
             toolDisplay.innerHTML = `
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-700 mb-4">Class Roster Management</h2>
-                    <p class="text-slate-600 mb-6">Add or remove students from your class list.</p>
-                    <div class="max-w-md mx-auto">
+                <div class="flex flex-col items-center justify-center h-full">
+                    <div class="w-full max-w-md">
+                        <h2 class="text-2xl font-bold text-slate-700 mb-4 text-center">Class Roster Management</h2>
+                        <p class="text-slate-600 mb-6 text-center">Add or remove students from your class list.</p>
                         <form id="add-student-form" class="flex gap-2 mb-4">
                             <input type="text" id="new-student-name" placeholder="Add a new student's name" class="flex-grow p-2 border rounded-md focus:ring-teal-500 focus:border-teal-500" />
                             <button type="submit" class="bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold py-2 px-4 rounded-md hover:opacity-90 transition-transform transform hover:scale-105">+</button>
@@ -369,26 +385,28 @@
             `).join('');
 
             toolDisplay.innerHTML = `
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-700 mb-4 text-center">Student Selector</h2>
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div>
-                            <h3 class="font-semibold text-slate-600 mb-2">Daily Attendance</h3>
-                            <div class="h-64 overflow-y-auto border rounded-md p-2 bg-slate-50 space-y-2">${studentListHtml}</div>
+                <div class="flex flex-col h-full">
+                    <h2 class="text-2xl font-bold text-slate-700 mb-4 text-center flex-shrink-0">Student Selector</h2>
+                    <div class="grid md:grid-cols-2 gap-8 flex-grow">
+                        <div class="flex flex-col">
+                            <h3 class="font-semibold text-slate-600 mb-2 text-center">Daily Attendance</h3>
+                            <div class="border rounded-md p-2 bg-slate-50 space-y-2 flex-grow overflow-y-auto">${studentListHtml}</div>
                         </div>
                         <div class="flex flex-col items-center justify-center bg-gradient-to-br from-sky-300 to-cyan-400 rounded-lg p-6 space-y-4">
-                            <button id="select-one-btn" ${presentStudents.length === 0 ? 'disabled' : ''} class="w-full bg-white text-teal-600 font-bold py-3 px-6 rounded-full text-lg shadow-lg hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-400 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-transform transform hover:scale-105">
-                                Select One Student
-                            </button>
-                            <div class="w-full text-center">
-                                <p class="font-semibold text-sky-800 mb-2">Or Generate Groups:</p>
-                                <div class="flex justify-center gap-2">
-                                    ${[2,3,4].map(size => `<button data-size="${size}" ${presentStudents.length < size ? 'disabled' : ''} class="generate-groups-btn bg-white text-teal-600 font-bold py-2 px-4 rounded-full shadow-md hover:bg-teal-50 disabled:bg-gray-300 disabled:text-gray-500 transition-transform transform hover:scale-105">of ${size}</button>`).join('')}
+                            <div class="w-full my-auto">
+                                <button id="select-one-btn" ${presentStudents.length === 0 ? 'disabled' : ''} class="w-full bg-white text-teal-600 font-bold py-3 px-6 rounded-full text-lg shadow-lg hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-400 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-transform transform hover:scale-105">
+                                    Select One Student
+                                </button>
+                                <div class="w-full text-center mt-6">
+                                    <p class="font-semibold text-sky-800 mb-2">Or Generate Groups:</p>
+                                    <div class="flex justify-center gap-2">
+                                        ${[2,3,4].map(size => `<button data-size="${size}" ${presentStudents.length < size ? 'disabled' : ''} class="generate-groups-btn bg-white text-teal-600 font-bold py-2 px-4 rounded-full shadow-md hover:bg-teal-50 disabled:bg-gray-300 disabled:text-gray-500 transition-transform transform hover:scale-105">of ${size}</button>`).join('')}
+                                    </div>
                                 </div>
-                            </div>
+                             </div>
                         </div>
                     </div>
-                    <div id="selector-results" class="mt-8 pt-6 border-t border-gray-200"></div>
+                    <div id="selector-results" class="mt-8 pt-6 border-t border-gray-200 flex-shrink-0"></div>
                 </div>
             `;
             
@@ -413,7 +431,7 @@
                     const randomIndex = Math.floor(Math.random() * present.length);
                     const selected = present[randomIndex];
                     document.getElementById('selector-results').innerHTML = `
-                        <div class="text-center p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg animate-fade-in w-1/2 mx-auto pulse" style="--pulse-color: #0d9488;">
+                        <div class="text-center p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg animate-fade-in w-full max-w-md mx-auto pulse" style="--pulse-color: #0d9488;">
                             <p class="text-slate-600">And the student is...</p>
                             <p class="text-4xl font-bold text-teal-600 mt-2">${selected.name}!</p>
                         </div>`;
@@ -470,8 +488,8 @@
             };
 
             toolDisplay.innerHTML = `
-                <div>
-                    <div class="flex justify-between items-center mb-6">
+                <div class="flex flex-col h-full">
+                    <div class="flex justify-between items-center mb-6 flex-shrink-0">
                         <div>
                             <h2 class="text-2xl font-bold text-slate-700">Daily Lunch Choice</h2>
                             <p class="text-slate-500">Drag and drop students to make their lunch choice.</p>
@@ -479,28 +497,34 @@
                         <button id="reset-lunch-btn" class="bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-2 px-4 rounded-md hover:opacity-90 transition-transform transform hover:scale-105">Reset Choices</button>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div id="dropzone-choice1" class="dropzone p-4 rounded-lg min-h-[300px] transition-colors bg-teal-100/70">
-                            <h3 class="font-bold text-teal-800 mb-2 text-center text-xl">Choice 1 (${columns.choice1.length})</h3>
-                            <div class="text-center p-4">
-                                <input type="text" id="choice1-menu" value="${menu.choice1Menu}" placeholder="Enter Lunch Choice 1" class="p-2 border rounded-md w-full text-center text-xl font-bold bg-white" />
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 flex-grow">
+                        <div id="dropzone-choice1" class="dropzone p-4 rounded-lg transition-colors bg-teal-100/70 flex flex-col">
+                            <div class="flex-shrink-0">
+                                <h3 class="font-bold text-teal-800 mb-2 text-center text-xl">Choice 1 (${columns.choice1.length})</h3>
+                                <div class="text-center p-4">
+                                    <input type="text" id="choice1-menu" value="${menu.choice1Menu}" placeholder="Enter Lunch Choice 1" class="p-2 border rounded-md w-full text-center text-xl font-bold bg-white" />
+                                </div>
                             </div>
-                            <div class="space-y-2">${columns.choice1.map(s => getStudentHtml(s, 'choice1')).join('')}</div>
+                            <div class="space-y-2 flex-grow overflow-y-auto p-2 -m-2">${columns.choice1.map(s => getStudentHtml(s, 'choice1')).join('')}</div>
                         </div>
-                        <div id="dropzone-choice2" class="dropzone p-4 rounded-lg min-h-[300px] transition-colors bg-teal-100/70">
-                            <h3 class="font-bold text-teal-800 mb-2 text-center text-xl">Choice 2 (${columns.choice2.length})</h3>
-                            <div class="text-center p-4">
-                                <input type="text" id="choice2-menu" value="${menu.choice2Menu}" placeholder="Enter Lunch Choice 2" class="p-2 border rounded-md w-full text-center text-xl font-bold bg-white" />
+                        <div id="dropzone-choice2" class="dropzone p-4 rounded-lg transition-colors bg-teal-100/70 flex flex-col">
+                             <div class="flex-shrink-0">
+                                <h3 class="font-bold text-teal-800 mb-2 text-center text-xl">Choice 2 (${columns.choice2.length})</h3>
+                                <div class="text-center p-4">
+                                    <input type="text" id="choice2-menu" value="${menu.choice2Menu}" placeholder="Enter Lunch Choice 2" class="p-2 border rounded-md w-full text-center text-xl font-bold bg-white" />
+                                </div>
                             </div>
-                            <div class="space-y-2">${columns.choice2.map(s => getStudentHtml(s, 'choice2')).join('')}</div>
+                            <div class="space-y-2 flex-grow overflow-y-auto p-2 -m-2">${columns.choice2.map(s => getStudentHtml(s, 'choice2')).join('')}</div>
                         </div>
-                        <div id="dropzone-sackLunch" class="dropzone p-4 rounded-lg min-h-[300px] transition-colors bg-teal-100/70">
-                            <h3 class="font-bold text-teal-800 mb-2 text-center text-xl">Sack Lunch (${columns.sackLunch.length})</h3>
-                            <div class="space-y-2 pt-16">${columns.sackLunch.map(s => getStudentHtml(s, 'sackLunch')).join('')}</div>
+                        <div id="dropzone-sackLunch" class="dropzone p-4 rounded-lg transition-colors bg-teal-100/70 flex flex-col">
+                             <div class="flex-shrink-0">
+                                <h3 class="font-bold text-teal-800 mb-2 text-center text-xl">Sack Lunch (${columns.sackLunch.length})</h3>
+                             </div>
+                            <div class="space-y-2 flex-grow overflow-y-auto p-2 -m-2 pt-16">${columns.sackLunch.map(s => getStudentHtml(s, 'sackLunch')).join('')}</div>
                         </div>
                     </div>
                     
-                    <div class="mt-8 pt-6 border-t border-gray-200">
+                    <div class="mt-8 pt-6 border-t border-gray-200 flex-shrink-0">
                         <div id="dropzone-unselected" class="dropzone p-4 rounded-lg min-h-[120px] transition-colors bg-sky-100/70 border-2 border-dashed border-sky-300">
                             <div class="flex flex-wrap gap-3 justify-center">
                                 ${columns.unselected.length > 0 ? columns.unselected.map(s => getStudentHtml(s, 'unselected')).join('') : `<p class="text-gray-500 p-4">All students have made their choice!</p>`}
@@ -700,16 +724,16 @@
             }
 
             toolDisplay.innerHTML = `
-                <div class="font-sans relative overflow-hidden p-4 bg-sky-50/70 rounded-lg">
-                    <h2 class="text-3xl font-bold text-slate-800 mb-6 text-center">Tournament Bracket</h2>
-                    <div class="flex justify-center mb-6 relative z-30">
+                <div class="font-sans relative p-4 bg-sky-50/70 rounded-lg flex flex-col h-full">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-6 text-center flex-shrink-0">Tournament Bracket</h2>
+                    <div class="flex justify-center mb-6 relative z-30 flex-shrink-0">
                         <button id="generate-bracket-btn" class="bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:opacity-90 transform hover:scale-105 transition-all">
                             Generate Bracket
                         </button>
                          ${bracket ? `<button id="reset-bracket-btn" class="ml-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:opacity-90 transform hover:scale-105 transition-all">Reset</button>` : ''}
                     </div>
                     ${podiumHtml}
-                    <div id="bracket-container" class="overflow-x-auto">${bracketHtml}</div>
+                    <div id="bracket-container" class="overflow-auto flex-grow">${bracketHtml}</div>
                 </div>
             `;
             
@@ -959,7 +983,7 @@
             }
 
             toolDisplay.innerHTML = `
-                <div class="flex flex-col items-center text-center max-w-3xl mx-auto">
+                <div class="flex flex-col items-center justify-center text-center h-full">
                     <h2 class="text-3xl font-bold text-slate-700 mb-4">Hangman</h2>
                     ${drawingHtml}
                     ${statusMessage}
@@ -986,5 +1010,4 @@
     </script>
 </body>
 </html>
-
 
