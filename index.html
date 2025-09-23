@@ -7,29 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom CSS for animations and loaders */
-        html, body {
-            height: 100%;
-            overflow: hidden; /* Prevent scrolling on the body */
-        }
-        #app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh; /* Full viewport height */
-        }
-        main {
-            flex-grow: 1; /* Allow main to fill available space */
-            overflow-y: auto; /* Allow scrolling within main if needed, but layout should prevent it */
-            display: flex;
-            flex-direction: column;
-        }
-        #tool-display {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* Center the tool content vertically */
-        }
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #14b8a6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
-        .image-loader { border: 2px solid #f3f3f3; border-top: 2px solid #14b8a6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #0d9488; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -40,47 +18,83 @@
         @keyframes firework-burst { 0% { opacity: 1; } 100% { opacity: 0; transform: scale(2); } }
         @keyframes firework-spark { 0% { transform: scale(0); opacity: 1; } 50% { opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
         .pulse { animation: pulse-animation 2s infinite; }
-        @keyframes pulse-animation { 0% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(20, 184, 166, 0); } 100% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0); } }
+        @keyframes pulse-animation { 0% { box-shadow: 0 0 0 0 rgba(251, 146, 60, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(251, 146, 60, 0); } 100% { box-shadow: 0 0 0 0 rgba(251, 146, 60, 0); } }
         [draggable="true"] { cursor: move; }
         .dragging { opacity: 0.5; }
+        
+        /* Fullscreen button icon visibility */
+        .fullscreen-icon { display: block; }
+        .exit-fullscreen-icon { display: none; }
+        .is-fullscreen .fullscreen-icon { display: none; }
+        .is-fullscreen .exit-fullscreen-icon { display: block; }
+
+        /* CSS-based fullscreen mode */
+        .viewport-fullscreen {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            overflow-y: auto !important; /* Allow scrolling if content overflows */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Make content expand in fullscreen */
+        .viewport-fullscreen > main {
+            flex-grow: 1;
+            max-width: 100%;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .viewport-fullscreen #tool-display {
+            flex-grow: 1;
+            min-height: 0;
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-cyan-50 via-teal-50 to-blue-100 min-h-screen font-sans antialiased">
+<body class="bg-gradient-to-br from-cyan-200 via-sky-300 to-blue-400 min-h-screen font-sans antialiased">
 
-    <div id="app-container">
+    <div id="app-container" class="bg-transparent">
         <!-- Header -->
         <header class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center py-4">
-                    <div></div> <!-- Spacer -->
-                    <h1 class="text-3xl font-bold text-gray-800 bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-cyan-600">
+                    <div class="w-12"></div> <!-- Spacer -->
+                    <h1 class="text-3xl font-bold text-slate-700 text-center">
                         Classroom Tools Dashboard
                     </h1>
-                    <button id="fullscreen-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors" title="Toggle Fullscreen">
-                        <svg id="fullscreen-open-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-                        <svg id="fullscreen-close-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+                    <button id="fullscreen-btn" title="Toggle Fullscreen" class="p-2 rounded-full text-slate-600 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+                        <svg class="fullscreen-icon h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 0h-4m4 0l-5-5" />
+                        </svg>
+                        <svg class="exit-fullscreen-icon h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 4l-5 5m0 0l-5-5m5 5v11m5-16l-5 5m0 0l5 5m-5-5V3" />
+                        </svg>
                     </button>
                 </div>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+        <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
             <!-- Navigation -->
-            <div class="bg-white/70 backdrop-blur-sm rounded-xl shadow-md p-2 mb-4 sticky top-0 z-20">
+            <div class="bg-white/70 backdrop-blur-sm rounded-xl shadow-md p-2 mb-8 sticky top-[88px] z-20">
                 <nav id="tool-nav" class="flex flex-wrap justify-center -mb-px">
                     <!-- Nav buttons will be injected by JS -->
                 </nav>
             </div>
             <!-- Tool Display Area -->
-            <div id="tool-display" class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-6 relative">
+            <div id="tool-display" class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-6 min-h-[600px] relative">
                 <!-- Tools will be rendered here by JS -->
                  <div class="text-center p-8"><div class="loader"></div><p>Loading Tools...</p></div>
             </div>
         </main>
 
         <!-- Footer -->
-        <footer class="text-center py-2 text-gray-500 text-sm">
+        <footer class="text-center py-4 text-slate-600 text-sm">
             <p>Created with ❤️ by your awesome assistant</p>
         </footer>
     </div>
@@ -100,10 +114,7 @@
             students: [],
             // State for tools in local mode
             lunchColumns: null,
-            lunchMenu: { 
-                choice1: { text: '', imageUrl: '', emoji: '' }, 
-                choice2: { text: '', imageUrl: '', emoji: '' } 
-            },
+            lunchMenu: { choice1Menu: '', choice2Menu: '' },
             bracket: null,
             podium: null,
         };
@@ -117,6 +128,8 @@
 
         const toolDisplay = document.getElementById('tool-display');
         const toolNav = document.getElementById('tool-nav');
+        const appContainer = document.getElementById('app-container');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
 
         const tools = {
             classRoster: { name: 'Class Roster', icon: '📝', render: renderClassRoster },
@@ -126,16 +139,25 @@
             hangman: { name: 'Hangman', icon: '🤔', render: renderHangman },
         };
         
-        // --- Utility Functions ---
-        function debounce(func, delay) {
-            let timeout;
-            return function(...args) {
-                const context = this;
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(context, args), delay);
-            };
+        // --- Fullscreen Logic ---
+        function setupFullscreenButton() {
+            fullscreenBtn.addEventListener('click', () => {
+                const isFullscreen = appContainer.classList.contains('viewport-fullscreen');
+                
+                if (isFullscreen) {
+                    appContainer.classList.remove('viewport-fullscreen');
+                    fullscreenBtn.classList.remove('is-fullscreen');
+                    // When exiting, remove the background that was added for fullscreen view
+                     appContainer.classList.remove('bg-gradient-to-br', 'from-cyan-200', 'via-sky-300', 'to-blue-400');
+                } else {
+                    appContainer.classList.add('viewport-fullscreen');
+                    fullscreenBtn.classList.add('is-fullscreen');
+                    // When entering, ensure the background is applied for a seamless view
+                    appContainer.classList.add('bg-gradient-to-br', 'from-cyan-200', 'via-sky-300', 'to-blue-400');
+                }
+            });
         }
-
+        
         // --- Graceful Fallback for Local Files ---
         function initializeLocalMode() {
             console.warn("Authentication failed. Initializing in local-only mode. Data will not be saved.");
@@ -180,37 +202,6 @@
                 toolDisplay.innerHTML = `<p>Error: Tool not found.</p>`;
             }
         }
-        
-        // --- Fullscreen Logic ---
-        const fullscreenBtn = document.getElementById('fullscreen-btn');
-        const openIcon = document.getElementById('fullscreen-open-icon');
-        const closeIcon = document.getElementById('fullscreen-close-icon');
-
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-                });
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
-            }
-        }
-
-        function updateFullscreenIcons() {
-            if (document.fullscreenElement) {
-                openIcon.classList.add('hidden');
-                closeIcon.classList.remove('hidden');
-            } else {
-                openIcon.classList.remove('hidden');
-                closeIcon.classList.add('hidden');
-            }
-        }
-
-        fullscreenBtn.addEventListener('click', toggleFullscreen);
-        document.addEventListener('fullscreenchange', updateFullscreenIcons);
-
 
         // --- Firebase Logic ---
 
@@ -284,20 +275,20 @@
         // --- Tool: Class Roster ---
         function renderClassRoster() {
             let studentListHtml = appState.students.map(student => `
-                <div class="p-3 rounded-lg shadow-sm flex items-center justify-between bg-white">
+                <div class="p-3 rounded-lg shadow-sm flex items-center justify-between bg-white hover:bg-slate-50">
                     <p class="font-medium text-gray-800">${student.name}</p>
                     <button data-id="${student.id}" class="remove-student-btn text-red-500 hover:text-red-700 font-bold">✕</button>
                 </div>
             `).join('');
 
             toolDisplay.innerHTML = `
-                <div class="w-full max-w-md mx-auto">
-                    <h2 class="text-2xl font-bold text-gray-700 mb-4 text-center">Class Roster Management</h2>
-                    <p class="text-gray-600 mb-6 text-center">Add or remove students from your class list.</p>
-                    <div class="mx-auto">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-700 mb-4">Class Roster Management</h2>
+                    <p class="text-slate-600 mb-6">Add or remove students from your class list.</p>
+                    <div class="max-w-md mx-auto">
                         <form id="add-student-form" class="flex gap-2 mb-4">
                             <input type="text" id="new-student-name" placeholder="Add a new student's name" class="flex-grow p-2 border rounded-md focus:ring-teal-500 focus:border-teal-500" />
-                            <button type="submit" class="bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold py-2 px-4 rounded-md hover:opacity-90 transition-transform transform hover:scale-105">+</button>
+                            <button type="submit" class="bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold py-2 px-4 rounded-md hover:opacity-90 transition-transform transform hover:scale-105">+</button>
                         </form>
                         <div class="space-y-3" id="roster-list">${studentListHtml}</div>
                     </div>
@@ -338,34 +329,34 @@
             const presentStudents = appState.students.filter(s => s.isPresent);
             let studentListHtml = appState.students.map(student => `
                 <div class="p-2 rounded-md flex items-center justify-between transition-colors ${student.isPresent ? 'bg-white' : 'bg-gray-200'}">
-                    <p class="font-medium text-md ${student.isPresent ? 'text-gray-800' : 'text-gray-500 line-through'}">${student.name}</p>
-                    <button data-id="${student.id}" class="toggle-presence-btn relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${student.isPresent ? 'bg-green-500' : 'bg-gray-400'}">
+                    <p class="font-medium ${student.isPresent ? 'text-gray-800' : 'text-gray-500 line-through'}">${student.name}</p>
+                    <button data-id="${student.id}" class="toggle-presence-btn relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${student.isPresent ? 'bg-teal-500' : 'bg-gray-400'}">
                         <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${student.isPresent ? 'translate-x-6' : 'translate-x-1'}"></span>
                     </button>
                 </div>
             `).join('');
 
             toolDisplay.innerHTML = `
-                <div class="w-full h-full flex flex-col justify-center">
-                    <h2 class="text-2xl font-bold text-gray-700 mb-4 text-center">Student Selector</h2>
-                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-700 mb-4 text-center">Student Selector</h2>
+                    <div class="grid md:grid-cols-2 gap-8">
                         <div>
-                            <h3 class="font-semibold text-lg text-gray-600 mb-3 text-center">Daily Attendance</h3>
-                            <div class="border rounded-md p-2 bg-gray-50 grid grid-cols-2 gap-2">${studentListHtml}</div>
+                            <h3 class="font-semibold text-slate-600 mb-2">Daily Attendance</h3>
+                            <div class="h-64 overflow-y-auto border rounded-md p-2 bg-slate-50 space-y-2">${studentListHtml}</div>
                         </div>
-                        <div class="flex flex-col items-center justify-center bg-gradient-to-br from-yellow-200 to-orange-300 rounded-lg p-6 space-y-4">
-                            <button id="select-one-btn" ${presentStudents.length === 0 ? 'disabled' : ''} class="w-full bg-white text-teal-600 font-bold py-3 px-6 rounded-full text-xl shadow-lg hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-400 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-transform transform hover:scale-105">
+                        <div class="flex flex-col items-center justify-center bg-gradient-to-br from-sky-300 to-cyan-400 rounded-lg p-6 space-y-4">
+                            <button id="select-one-btn" ${presentStudents.length === 0 ? 'disabled' : ''} class="w-full bg-white text-teal-600 font-bold py-3 px-6 rounded-full text-lg shadow-lg hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-400 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-transform transform hover:scale-105">
                                 Select One Student
                             </button>
                             <div class="w-full text-center">
-                                <p class="font-semibold text-md text-orange-800 mb-2">Or Generate Groups:</p>
-                                <div class="flex justify-center gap-3">
-                                    ${[2,3,4].map(size => `<button data-size="${size}" ${presentStudents.length < size ? 'disabled' : ''} class="generate-groups-btn bg-white text-teal-600 font-bold py-2 px-4 rounded-full text-md shadow-md hover:bg-teal-50 disabled:bg-gray-300 disabled:text-gray-500 transition-transform transform hover:scale-105">of ${size}</button>`).join('')}
+                                <p class="font-semibold text-sky-800 mb-2">Or Generate Groups:</p>
+                                <div class="flex justify-center gap-2">
+                                    ${[2,3,4].map(size => `<button data-size="${size}" ${presentStudents.length < size ? 'disabled' : ''} class="generate-groups-btn bg-white text-teal-600 font-bold py-2 px-4 rounded-full shadow-md hover:bg-teal-50 disabled:bg-gray-300 disabled:text-gray-500 transition-transform transform hover:scale-105">of ${size}</button>`).join('')}
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div id="selector-results" class="mt-4 pt-4 border-t border-gray-200 min-h-[100px]"></div>
+                    <div id="selector-results" class="mt-8 pt-6 border-t border-gray-200"></div>
                 </div>
             `;
             
@@ -390,9 +381,9 @@
                     const randomIndex = Math.floor(Math.random() * present.length);
                     const selected = present[randomIndex];
                     document.getElementById('selector-results').innerHTML = `
-                        <div class="text-center p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg animate-fade-in w-1/2 mx-auto pulse">
-                            <p class="text-gray-600 text-lg">And the student is...</p>
-                            <p class="text-5xl font-bold text-teal-600 mt-2">${selected.name}!</p>
+                        <div class="text-center p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg animate-fade-in w-1/2 mx-auto pulse" style="--pulse-color: #0d9488;">
+                            <p class="text-slate-600">And the student is...</p>
+                            <p class="text-4xl font-bold text-teal-600 mt-2">${selected.name}!</p>
                         </div>`;
                 }
             };
@@ -407,10 +398,10 @@
                         groups.push(shuffled.slice(i, i + size));
                     }
                     const groupsHtml = groups.map((group, index) => `
-                        <div class="p-4 rounded-lg bg-gradient-to-br from-blue-200 to-cyan-200 shadow-md">
-                            <h4 class="font-bold text-blue-800 text-center mb-2">Group ${index + 1}</h4>
+                        <div class="p-4 rounded-lg bg-gradient-to-br from-teal-200 to-cyan-300 shadow-md">
+                            <h4 class="font-bold text-teal-800 text-center mb-2">Group ${index + 1}</h4>
                             <ul class="space-y-1 text-center">
-                                ${group.map(student => `<li class="text-blue-700 bg-white/50 rounded-md py-1">${student.name}</li>`).join('')}
+                                ${group.map(student => `<li class="text-teal-700 bg-white/50 rounded-md py-1">${student.name}</li>`).join('')}
                             </ul>
                         </div>
                     `).join('');
@@ -420,50 +411,8 @@
         }
 
         // --- Tool: Lunch Choice ---
-        const LUNCH_EMOJI_DB = {
-            "pizza": "🍕", "hamburger": "🍔", "burger": "🍔", "cheeseburger": "🍔",
-            "taco": "🌮", "burrito": "🌯", "salad": "🥗", "sandwich": "🥪",
-            "turkey wrap": "🌯", "wrap": "🌯", "hot dog": "🌭", "corndog": "🌭",
-            "chicken nuggets": "🍗", "nuggets": "🍗", "grilled cheese": "🧀",
-            "spaghetti": "🍝", "mac and cheese": "🧀", "soup": "🥣", "sushi": "🍣",
-            "apple": "🍎", "banana": "🍌", "orange": "🍊", "milk": "🥛"
-        };
-        
-        async function generateImageWithRetry(prompt, maxRetries = 3) {
-            const apiKey = ""; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
-            const payload = { instances: [{ prompt: `a simple, clear, cartoon-style icon of ${prompt} on a white background` }], parameters: { "sampleCount": 1 } };
-
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    const result = await response.json();
-                    if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
-                        return `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
-                    } else {
-                        throw new Error("Invalid response structure from API.");
-                    }
-                } catch (error) {
-                    console.error(`Attempt ${i + 1} failed:`, error);
-                    if (i === maxRetries - 1) {
-                        return null; // Failed after all retries
-                    }
-                    await new Promise(res => setTimeout(res, 1000 * Math.pow(2, i))); // Exponential backoff
-                }
-            }
-            return null;
-        }
-
         async function renderLunchChoice() {
+            // Initialize local state if it doesn't exist
             if (!appState.lunchColumns) {
                 appState.lunchColumns = {
                     unselected: [...appState.students.filter(s => s.isPresent)],
@@ -482,60 +431,45 @@
                 const studentIndex = appState.students.findIndex(s => s.id === student.id);
                 const emoji = studentVisuals[studentIndex % studentVisuals.length];
                 const color = studentColorClasses[studentIndex % studentColorClasses.length];
-                return `<div id="student-${student.id}" draggable="true" data-student-id="${student.id}" data-from-column="${fromColumn}" class="student-draggable p-4 rounded-lg shadow-sm border cursor-move text-center font-medium flex items-center justify-center gap-2 ${color}">
+                return `<div id="student-${student.id}" draggable="true" data-student-id="${student.id}" data-from-column="${fromColumn}" class="student-draggable p-3 rounded-lg shadow-sm border cursor-move text-center font-medium flex items-center justify-center gap-2 ${color}">
                             <span class="text-xl">${emoji}</span>
-                            <span class="text-lg">${student.name}</span>
+                            <span>${student.name}</span>
                         </div>`;
-            };
-            
-            const createMenuSection = (choiceId, choiceData) => {
-                const { text, imageUrl, emoji } = choiceData;
-                let imageContent = `<div class="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center text-3xl">${emoji || '?'}</div>`;
-                if (imageUrl) {
-                    imageContent = `<img src="${imageUrl}" class="w-16 h-16 object-cover rounded-md" alt="${text}">`;
-                }
-
-                return `
-                    <div class="text-center p-4 space-y-2">
-                        <div class="flex items-center justify-center gap-2">
-                            <input type="text" id="menu-input-${choiceId}" value="${text}" placeholder="Enter Lunch" class="p-3 text-lg border rounded-md w-full text-center font-bold bg-white" />
-                            <div id="image-container-${choiceId}" class="relative w-16 h-16">
-                               ${imageContent}
-                            </div>
-                        </div>
-                    </div>
-                `;
             };
 
             toolDisplay.innerHTML = `
-                <div class="w-full h-full flex flex-col">
-                    <div class="flex justify-between items-center mb-4">
+                <div>
+                    <div class="flex justify-between items-center mb-6">
                         <div>
-                            <h2 class="text-2xl font-bold text-gray-700">Daily Lunch Choice</h2>
-                            <p class="text-gray-500">Drag and drop students to make their lunch choice.</p>
+                            <h2 class="text-2xl font-bold text-slate-700">Daily Lunch Choice</h2>
+                            <p class="text-slate-500">Drag and drop students to make their lunch choice.</p>
                         </div>
                         <button id="reset-lunch-btn" class="bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-2 px-4 rounded-md hover:opacity-90 transition-transform transform hover:scale-105">Reset Choices</button>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 flex-grow">
-                        <div id="dropzone-choice1" class="dropzone p-4 rounded-lg flex flex-col transition-colors bg-yellow-100">
-                            <h3 class="font-bold text-yellow-800 mb-2 text-center text-2xl">Choice 1 (${columns.choice1.length})</h3>
-                            ${createMenuSection('choice1', menu.choice1)}
-                            <div class="space-y-2 flex-grow overflow-y-auto p-2">${columns.choice1.map(s => getStudentHtml(s, 'choice1')).join('')}</div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div id="dropzone-choice1" class="dropzone p-4 rounded-lg min-h-[300px] transition-colors bg-teal-100/70">
+                            <h3 class="font-bold text-teal-800 mb-2 text-center text-xl">Choice 1 (${columns.choice1.length})</h3>
+                            <div class="text-center p-4">
+                                <input type="text" id="choice1-menu" value="${menu.choice1Menu}" placeholder="Enter Lunch Choice 1" class="p-2 border rounded-md w-full text-center text-xl font-bold bg-white" />
+                            </div>
+                            <div class="space-y-2">${columns.choice1.map(s => getStudentHtml(s, 'choice1')).join('')}</div>
                         </div>
-                        <div id="dropzone-choice2" class="dropzone p-4 rounded-lg flex flex-col transition-colors bg-yellow-100">
-                            <h3 class="font-bold text-yellow-800 mb-2 text-center text-2xl">Choice 2 (${columns.choice2.length})</h3>
-                            ${createMenuSection('choice2', menu.choice2)}
-                            <div class="space-y-2 flex-grow overflow-y-auto p-2">${columns.choice2.map(s => getStudentHtml(s, 'choice2')).join('')}</div>
+                        <div id="dropzone-choice2" class="dropzone p-4 rounded-lg min-h-[300px] transition-colors bg-teal-100/70">
+                            <h3 class="font-bold text-teal-800 mb-2 text-center text-xl">Choice 2 (${columns.choice2.length})</h3>
+                            <div class="text-center p-4">
+                                <input type="text" id="choice2-menu" value="${menu.choice2Menu}" placeholder="Enter Lunch Choice 2" class="p-2 border rounded-md w-full text-center text-xl font-bold bg-white" />
+                            </div>
+                            <div class="space-y-2">${columns.choice2.map(s => getStudentHtml(s, 'choice2')).join('')}</div>
                         </div>
-                        <div id="dropzone-sackLunch" class="dropzone p-4 rounded-lg flex flex-col transition-colors bg-yellow-100">
-                            <h3 class="font-bold text-yellow-800 mb-2 text-center text-2xl">Sack Lunch (${columns.sackLunch.length})</h3>
-                            <div class="space-y-2 pt-4 flex-grow overflow-y-auto p-2">${columns.sackLunch.map(s => getStudentHtml(s, 'sackLunch')).join('')}</div>
+                        <div id="dropzone-sackLunch" class="dropzone p-4 rounded-lg min-h-[300px] transition-colors bg-teal-100/70">
+                            <h3 class="font-bold text-teal-800 mb-2 text-center text-xl">Sack Lunch (${columns.sackLunch.length})</h3>
+                            <div class="space-y-2 pt-16">${columns.sackLunch.map(s => getStudentHtml(s, 'sackLunch')).join('')}</div>
                         </div>
                     </div>
                     
-                    <div class="mt-4">
-                        <div id="dropzone-unselected" class="dropzone p-4 rounded-lg min-h-[150px] transition-colors bg-teal-100 border-2 border-dashed border-teal-300">
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                        <div id="dropzone-unselected" class="dropzone p-4 rounded-lg min-h-[120px] transition-colors bg-sky-100/70 border-2 border-dashed border-sky-300">
                             <div class="flex flex-wrap gap-3 justify-center">
                                 ${columns.unselected.length > 0 ? columns.unselected.map(s => getStudentHtml(s, 'unselected')).join('') : `<p class="text-gray-500 p-4">All students have made their choice!</p>`}
                             </div>
@@ -544,57 +478,12 @@
                 </div>
             `;
             
-            const setupMenuChoice = (choiceId) => {
-                const input = document.getElementById(`menu-input-${choiceId}`);
-                const imageContainer = document.getElementById(`image-container-${choiceId}`);
-
-                const handleImageGeneration = async () => {
-                    const prompt = appState.lunchMenu[choiceId].text;
-                    if (!prompt) return;
-                    
-                    appState.lunchMenu[choiceId].imageUrl = ''; // Clear old image
-                    imageContainer.innerHTML = `<div class="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center"><div class="image-loader"></div></div>`;
-                    
-                    const imageUrl = await generateImageWithRetry(prompt);
-                    
-                    if (imageUrl) {
-                        appState.lunchMenu[choiceId].imageUrl = imageUrl;
-                        imageContainer.innerHTML = `<img src="${imageUrl}" class="w-16 h-16 object-cover rounded-md" alt="${prompt}">`;
-                    } else {
-                         imageContainer.innerHTML = `<div class="w-16 h-16 bg-red-100 rounded-md flex items-center justify-center text-xl" title="Image generation failed">😢</div>`;
-                    }
-                };
-                
-                const debouncedImageGen = debounce(handleImageGeneration, 1000);
-
-                input.oninput = (e) => {
-                    const text = e.target.value.toLowerCase().trim();
-                    appState.lunchMenu[choiceId].text = e.target.value;
-                    appState.lunchMenu[choiceId].emoji = LUNCH_EMOJI_DB[text] || '';
-                    appState.lunchMenu[choiceId].imageUrl = ''; // Clear image when text changes
-                    imageContainer.innerHTML = `<div class="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center text-3xl">${appState.lunchMenu[choiceId].emoji || '?'}</div>`;
-                    
-                    if(appState.lunchMenu[choiceId].text.length > 2) {
-                        debouncedImageGen();
-                    }
-                };
-            };
-
-            setupMenuChoice('choice1');
-            setupMenuChoice('choice2');
-
             let draggedElement = null;
             let draggedItemId = null;
             let fromColumnId = null;
 
+            // Mouse Events
             document.querySelectorAll('.student-draggable').forEach(item => {
-                item.addEventListener('touchstart', (e) => {
-                    draggedElement = e.target.closest('.student-draggable');
-                    draggedItemId = draggedElement.dataset.studentId;
-                    fromColumnId = draggedElement.dataset.fromColumn;
-                    draggedElement.classList.add('dragging');
-                }, { passive: false });
-
                 item.ondragstart = (e) => {
                     draggedItemId = e.target.closest('.student-draggable').dataset.studentId;
                     fromColumnId = e.target.closest('.student-draggable').dataset.fromColumn;
@@ -605,6 +494,35 @@
                     e.target.classList.remove('dragging');
                 };
             });
+
+            document.querySelectorAll('.dropzone').forEach(zone => {
+                zone.ondragover = (e) => { e.preventDefault(); zone.classList.add('bg-yellow-300'); };
+                zone.ondragleave = (e) => { zone.classList.remove('bg-yellow-300'); };
+                zone.ondrop = (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('bg-yellow-300');
+                    const toColumnId = zone.id.replace('dropzone-', '');
+                    
+                    if (fromColumnId !== toColumnId) {
+                        const studentToMove = appState.lunchColumns[fromColumnId].find(s => s.id === draggedItemId);
+                        if (studentToMove) {
+                            appState.lunchColumns[fromColumnId] = appState.lunchColumns[fromColumnId].filter(s => s.id !== draggedItemId);
+                            appState.lunchColumns[toColumnId].push(studentToMove);
+                            renderLunchChoice();
+                        }
+                    }
+                };
+            });
+
+            // Touch Events
+            document.querySelectorAll('.student-draggable').forEach(item => {
+                item.addEventListener('touchstart', (e) => {
+                    draggedElement = e.target.closest('.student-draggable');
+                    draggedItemId = draggedElement.dataset.studentId;
+                    fromColumnId = draggedElement.dataset.fromColumn;
+                    draggedElement.classList.add('dragging');
+                });
+            });
             
             toolDisplay.addEventListener('touchmove', (e) => {
                 if (!draggedElement) return;
@@ -613,11 +531,11 @@
                 const elementUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
                 const dropzone = elementUnderTouch?.closest('.dropzone');
 
-                document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('bg-yellow-200'));
+                document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('bg-yellow-300'));
                 if (dropzone) {
-                    dropzone.classList.add('bg-yellow-200');
+                    dropzone.classList.add('bg-yellow-300');
                 }
-            }, { passive: false });
+            });
 
             toolDisplay.addEventListener('touchend', (e) => {
                 if (!draggedElement) return;
@@ -638,38 +556,18 @@
                     }
                 }
                 
-                document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('bg-yellow-200'));
+                document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('bg-yellow-300'));
                 draggedElement.classList.remove('dragging');
                 draggedElement = null;
                 draggedItemId = null;
                 fromColumnId = null;
             });
-
-            document.querySelectorAll('.dropzone').forEach(zone => {
-                zone.ondragover = (e) => { e.preventDefault(); zone.classList.add('bg-yellow-200'); };
-                zone.ondragleave = (e) => { zone.classList.remove('bg-yellow-200'); };
-                zone.ondrop = (e) => {
-                    e.preventDefault();
-                    zone.classList.remove('bg-yellow-200');
-                    const toColumnId = zone.id.replace('dropzone-', '');
-                    
-                    if (fromColumnId !== toColumnId) {
-                        const studentToMove = appState.lunchColumns[fromColumnId].find(s => s.id === draggedItemId);
-                        if (studentToMove) {
-                            appState.lunchColumns[fromColumnId] = appState.lunchColumns[fromColumnId].filter(s => s.id !== draggedItemId);
-                            appState.lunchColumns[toColumnId].push(studentToMove);
-                            renderLunchChoice();
-                        }
-                    }
-                };
-            });
             
+            document.getElementById('choice1-menu').oninput = (e) => { appState.lunchMenu.choice1Menu = e.target.value; };
+            document.getElementById('choice2-menu').oninput = (e) => { appState.lunchMenu.choice2Menu = e.target.value; };
             document.getElementById('reset-lunch-btn').onclick = () => {
-                appState.lunchColumns = null;
-                appState.lunchMenu = { 
-                    choice1: { text: '', imageUrl: '', emoji: '' }, 
-                    choice2: { text: '', imageUrl: '', emoji: '' } 
-                };
+                appState.lunchColumns = null; // This will trigger re-initialization on next render
+                appState.lunchMenu = { choice1Menu: '', choice2Menu: '' };
                 renderLunchChoice();
             };
         }
@@ -679,14 +577,14 @@
             const bracket = appState.bracket;
 
             const getPlayerHtml = (player, winner, clickHandler) => {
-                if (!player) return `<div class="p-2 my-1 rounded bg-gray-200 text-gray-400">TBD</div>`;
+                if (!player) return `<div class="p-2 my-1 rounded bg-slate-200 text-slate-400">TBD</div>`;
                 const isWinner = winner && player && winner.id === player.id;
                 const canSelect = !winner && player && player.name !== 'BYE' && clickHandler;
                 return `<div ${canSelect ? `onclick="${clickHandler}"` : ''}
                              class="p-2 my-1 rounded transition-all 
-                                    ${canSelect ? 'cursor-pointer hover:bg-green-100' : ''} 
-                                    ${isWinner ? 'bg-green-300 font-bold text-green-800' : 'bg-gray-100'} 
-                                    ${player.name === 'BYE' ? 'text-gray-400 italic' : ''}">
+                                    ${canSelect ? 'cursor-pointer hover:bg-teal-100' : ''} 
+                                    ${isWinner ? 'bg-teal-300 font-bold text-teal-800' : 'bg-slate-100'} 
+                                    ${player.name === 'BYE' ? 'text-slate-400 italic' : ''}">
                           ${player.name}
                         </div>`;
             };
@@ -695,7 +593,7 @@
                 const [p1, p2] = match.players;
                 const p1ClickHandler = p1 && p2 && !match.winner ? `handleWinnerClick('${bracketType}', ${roundIndex}, ${matchIndex}, '${p1.id}')` : '';
                 const p2ClickHandler = p1 && p2 && !match.winner ? `handleWinnerClick('${bracketType}', ${roundIndex}, ${matchIndex}, '${p2.id}')` : '';
-                const bgColor = bracketType === 'winners' ? 'border-green-300' : bracketType === 'losers' ? 'border-orange-300' : 'border-yellow-400';
+                const bgColor = bracketType === 'winners' ? 'border-teal-300' : bracketType === 'losers' ? 'border-amber-300' : 'border-yellow-400';
 
                 return `<div class="bg-white p-3 rounded-lg shadow-md border-2 ${bgColor} w-52">
                           ${getPlayerHtml(p1, match.winner, p1ClickHandler)}
@@ -708,7 +606,7 @@
             if (bracket) {
                 bracketHtml = `<div class="flex flex-col xl:flex-row justify-start items-start space-y-12 xl:space-y-0 xl:space-x-12">`;
                 // Winners Bracket
-                bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-green-600">🏆 Winners Bracket</h3><div class="flex space-x-6 pb-4">`;
+                bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-teal-600">🏆 Winners Bracket</h3><div class="flex space-x-6 pb-4">`;
                 bracket.winners.forEach((round, roundIndex) => {
                     bracketHtml += `<div class="flex flex-col space-y-8 justify-around min-w-max"><h4 class="text-center font-semibold text-gray-600">Round ${roundIndex + 1}</h4>`;
                     round.forEach((match, matchIndex) => {
@@ -719,7 +617,7 @@
                 bracketHtml += `</div></div>`;
 
                 // Losers Bracket
-                bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-orange-500">🥈 Second Chance</h3><div class="flex space-x-6 pb-4">`;
+                bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-amber-500">🥈 Second Chance</h3><div class="flex space-x-6 pb-4">`;
                  bracket.losers.forEach((round, roundIndex) => {
                     if(round.length > 0) {
                         bracketHtml += `<div class="flex flex-col space-y-8 justify-around min-w-max"><h4 class="text-center font-semibold text-gray-600">Round ${roundIndex + 1}</h4>`;
@@ -750,11 +648,11 @@
                 podiumHtml = `<div id="confetti-container" class="absolute inset-0 overflow-hidden z-10 pointer-events-none"></div>
                               <div class="flex flex-col items-center justify-center h-full animate-fade-in">
                                 <div class="bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-2xl text-center relative z-20">
-                                    <h2 class="text-4xl font-bold text-gray-800 mb-6">Tournament Over!</h2>
+                                    <h2 class="text-4xl font-bold text-slate-800 mb-6">Tournament Over!</h2>
                                     <div class="flex items-end justify-center space-x-4">
                                         <div class="text-center">
-                                            <p class="text-2xl font-bold text-gray-600">🥈 ${second.name}</p>
-                                            <div class="bg-gray-300 text-gray-700 p-6 rounded-t-lg mt-2 h-24 flex items-center justify-center text-4xl font-bold">2nd</div>
+                                            <p class="text-2xl font-bold text-slate-600">🥈 ${second.name}</p>
+                                            <div class="bg-slate-300 text-slate-700 p-6 rounded-t-lg mt-2 h-24 flex items-center justify-center text-4xl font-bold">2nd</div>
                                         </div>
                                         <div class="text-center">
                                             <p class="text-3xl font-bold text-yellow-500">🏆 ${first.name}</p>
@@ -770,10 +668,10 @@
             }
 
             toolDisplay.innerHTML = `
-                <div class="font-sans relative overflow-x-auto p-4 bg-teal-50 rounded-lg h-full">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Tournament Bracket</h2>
+                <div class="font-sans relative overflow-hidden p-4 bg-sky-50/70 rounded-lg">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-6 text-center">Tournament Bracket</h2>
                     <div class="flex justify-center mb-6 relative z-30">
-                        <button id="generate-bracket-btn" class="bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:opacity-90 transform hover:scale-105 transition-all">
+                        <button id="generate-bracket-btn" class="bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:opacity-90 transform hover:scale-105 transition-all">
                             Generate Bracket
                         </button>
                          ${bracket ? `<button id="reset-bracket-btn" class="ml-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:opacity-90 transform hover:scale-105 transition-all">Reset</button>` : ''}
@@ -831,9 +729,14 @@
                 }
 
                 // Pre-fill losers bracket structure
-                let loserRounds = (rounds - 1) * 2;
+                let loserRounds = (rounds - 1) * 2 - 1;
                 for(let r=0; r < loserRounds; r++) {
-                     let matchesInRound = Math.pow(2, rounds - 2) / Math.pow(2, Math.floor(r / 2));
+                    let matchesInRound = 0;
+                    if (r % 2 === 0) {
+                        matchesInRound = Math.pow(2, rounds - 2) / Math.pow(2, r / 2);
+                    } else {
+                        matchesInRound = Math.pow(2, rounds - 2) / Math.pow(2, (r - 1) / 2);
+                    }
                     const round = [];
                     for (let i = 0; i < matchesInRound; i++) {
                         round.push({ players: [null, null], winner: null, id: `l-r${r}-m${i}` });
@@ -881,11 +784,11 @@
                     const nextRound = bracket.winners[roundIndex + 1];
                     let nextMatchIndex, playerSlot;
                     
-                    if(roundIndex === 0 && bracket.winners[0].length > 0 && bracket.winners[0].length !== (bracket.winners[1]?.length || 0) * 2) { 
+                    if(roundIndex === 0 && bracket.winners[0].length > 0 && bracket.winners[0].length !== (bracket.winners[1]?.length || 0) * 2) { // Play-in round
                         const numByes = bracket.winners[1].reduce((count, currentMatch) => count + currentMatch.players.filter(p => p !== null).length, 0);
                         nextMatchIndex = Math.floor(numByes / 2) + matchIndex;
                         playerSlot = (numByes % 2);
-                    } else { 
+                    } else { // Standard advancement
                         nextMatchIndex = Math.floor(matchIndex / 2);
                         playerSlot = matchIndex % 2;
                     }
@@ -897,17 +800,10 @@
                 }
 
                 if (loser && loser.name !== 'BYE') {
-                    let targetRoundIndex, targetMatchIndex, targetSlot;
-                    if (roundIndex === 0) {
-                        targetRoundIndex = 0;
-                        targetMatchIndex = Math.floor(matchIndex / 2);
-                        targetSlot = matchIndex % 2;
-                    } else {
-                        targetRoundIndex = (roundIndex * 2) - 1;
-                        targetMatchIndex = matchIndex;
-                        targetSlot = 1;
-                    }
-
+                    const targetRoundIndex = isFinalWinnersMatch ? bracket.losers.length - 1 : roundIndex * 2;
+                    const targetMatchIndex = isFinalWinnersMatch ? 0 : matchIndex;
+                    const targetSlot = isFinalWinnersMatch ? 1 : 0;
+                    
                     if (bracket.losers[targetRoundIndex] && bracket.losers[targetRoundIndex][targetMatchIndex]) {
                         bracket.losers[targetRoundIndex][targetMatchIndex].players[targetSlot] = loser;
                     }
@@ -918,12 +814,10 @@
                 if (!isFinalLosersMatch) {
                     const nextRound = bracket.losers[roundIndex + 1];
                     let nextMatchIndex, playerSlot;
-
-                    if (roundIndex % 2 === 0) { 
+                    if (roundIndex % 2 === 0) { // Winners advance to play drop-downs
                         nextMatchIndex = matchIndex;
-                        playerSlot = 0;
-                    } 
-                    else { 
+                        playerSlot = 1;
+                    } else { // Winners advance to play each other
                         nextMatchIndex = Math.floor(matchIndex / 2);
                         playerSlot = matchIndex % 2;
                     }
@@ -992,32 +886,32 @@
                 else if (isWinner) gameStatus = 'won';
             }
 
-            const head = `<div class="absolute w-12 h-12 border-4 border-black rounded-full top-[48px] right-[-22px]"></div>`;
-            const body = `<div class="absolute w-1 h-24 bg-black top-[96px] right-0"></div>`;
-            const rightArm = `<div class="absolute w-16 h-1 bg-black top-[120px] right-[-64px] rotate-[-30deg]"></div>`;
-            const leftArm = `<div class="absolute w-16 h-1 bg-black top-[120px] right-[0px] rotate-[30deg]"></div>`;
-            const rightLeg = `<div class="absolute w-16 h-1 bg-black top-[190px] right-[-56px] rotate-[60deg]"></div>`;
-            const leftLeg = `<div class="absolute w-16 h-1 bg-black top-[-8px] rotate-[-60deg]"></div>`;
+            const head = `<div class="absolute w-12 h-12 border-4 border-slate-700 rounded-full top-[48px] right-[-22px]"></div>`;
+            const body = `<div class="absolute w-1 h-24 bg-slate-700 top-[96px] right-0"></div>`;
+            const rightArm = `<div class="absolute w-16 h-1 bg-slate-700 top-[120px] right-[-64px] rotate-[-30deg]"></div>`;
+            const leftArm = `<div class="absolute w-16 h-1 bg-slate-700 top-[120px] right-[0px] rotate-[30deg]"></div>`;
+            const rightLeg = `<div class="absolute w-16 h-1 bg-slate-700 top-[190px] right-[-56px] rotate-[60deg]"></div>`;
+            const leftLeg = `<div class="absolute w-16 h-1 bg-slate-700 top-[190px] right-[-8px] rotate-[-60deg]"></div>`;
             const bodyParts = [head, body, rightArm, leftArm, rightLeg, leftLeg];
             const drawingHtml = `
                 <div class="relative h-64 w-48 mx-auto mb-4">
                     ${bodyParts.slice(0, wrongGuesses).join('')}
-                    <div class="absolute h-12 w-1 bg-black top-0 right-0"></div>
-                    <div class="h-1 w-48 bg-black ml-12"></div>
-                    <div class="h-64 w-1 bg-black ml-12"></div>
-                    <div class="h-1 w-64 bg-black"></div>
+                    <div class="absolute h-12 w-1 bg-slate-700 top-0 right-0"></div>
+                    <div class="h-1 w-48 bg-slate-700 ml-12"></div>
+                    <div class="h-64 w-1 bg-slate-700 ml-12"></div>
+                    <div class="h-1 w-64 bg-slate-700"></div>
                 </div>`;
 
             const wordDisplayHtml = secretWord.split('').map(letter => 
                 letter === ' ' ? `<div class="w-6 md:w-8"></div>` : 
-                `<span class="inline-block text-3xl md:text-5xl font-bold w-10 md:w-12 text-center border-b-4 border-gray-400 mx-1">
+                `<span class="inline-block text-3xl md:text-5xl font-bold w-10 md:w-12 text-center border-b-4 border-slate-400 mx-1">
                     ${guessedLetters.includes(letter) ? letter.toUpperCase() : '_'}
                 </span>`
             ).join('');
 
             const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
             const keyboardHtml = alphabet.map(letter => `
-                <button data-letter="${letter}" ${guessedLetters.includes(letter) || gameStatus !== 'playing' ? 'disabled' : ''} class="guess-btn w-10 h-10 md:w-12 md:h-12 text-xl font-bold rounded-md bg-cyan-200 hover:bg-cyan-300 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-all">
+                <button data-letter="${letter}" ${guessedLetters.includes(letter) || gameStatus !== 'playing' ? 'disabled' : ''} class="guess-btn w-10 h-10 md:w-12 md:h-12 text-xl font-bold rounded-md bg-cyan-200 hover:bg-cyan-300 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed transition-all">
                     ${letter.toUpperCase()}
                 </button>
             `).join('');
@@ -1026,7 +920,7 @@
             if (gameStatus === 'lost') {
                 statusMessage = `<div class="animate-fade-in my-4 text-center">
                     <p class="text-2xl font-bold text-red-600">You lost!</p>
-                    <p class="text-lg text-gray-600">The word was: <span class="font-bold">${secretWord.toUpperCase()}</span></p>
+                    <p class="text-lg text-slate-600">The word was: <span class="font-bold">${secretWord.toUpperCase()}</span></p>
                 </div>`;
             } else if (gameStatus === 'won') {
                 statusMessage = `<div class="animate-fade-in my-4 text-center"><p class="text-2xl font-bold text-green-600">You won!</p></div>`;
@@ -1034,12 +928,12 @@
 
             toolDisplay.innerHTML = `
                 <div class="flex flex-col items-center text-center max-w-3xl mx-auto">
-                    <h2 class="text-3xl font-bold text-gray-700 mb-4">Hangman</h2>
+                    <h2 class="text-3xl font-bold text-slate-700 mb-4">Hangman</h2>
                     ${drawingHtml}
                     ${statusMessage}
                     <div class="flex justify-center flex-wrap items-center gap-2 my-4 tracking-widest">${wordDisplayHtml}</div>
                     <div class="flex flex-wrap justify-center gap-2 mt-6">${keyboardHtml}</div>
-                    <button id="play-again-btn" class="mt-8 bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:opacity-90 transition-transform transform hover:scale-105">Play Again</button>
+                    <button id="play-again-btn" class="mt-8 bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:opacity-90 transition-transform transform hover:scale-105">Play Again</button>
                 </div>
             `;
             
@@ -1055,7 +949,9 @@
         
         // --- Initial Load ---
         renderApp();
+        setupFullscreenButton();
 
     </script>
 </body>
 </html>
+
