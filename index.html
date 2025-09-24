@@ -470,7 +470,8 @@
                 const studentIndex = appState.students.findIndex(s => s.id === student.id);
                 const emoji = studentVisuals[studentIndex % studentVisuals.length];
                 const color = studentColorClasses[studentIndex % studentColorClasses.length];
-                return `<div id="student-${student.id}" draggable="true" data-student-id="${student.id}" data-from-column="${fromColumn}" class="student-draggable p-3 rounded-lg shadow-sm border border-black/10 cursor-move text-center font-medium flex items-center justify-center gap-2 text-slate-800 ${color}">
+                const scaleClass = fromColumn !== 'unselected' ? 'scale-75' : '';
+                return `<div id="student-${student.id}" draggable="true" data-student-id="${student.id}" data-from-column="${fromColumn}" class="student-draggable p-3 rounded-lg shadow-sm border border-black/10 cursor-move text-center font-medium flex items-center justify-center gap-2 text-slate-800 transition-transform duration-200 ${color} ${scaleClass}">
                             <span class="text-xl">${emoji}</span>
                             <span>${student.name}</span>
                         </div>`;
@@ -494,7 +495,7 @@
                                     <input type="text" id="choice1-menu" value="${menu.choice1Menu}" placeholder="Enter Lunch Choice 1" class="p-2 border rounded-md w-full text-center text-xl font-bold bg-slate-700 text-white border-slate-600" />
                                 </div>
                             </div>
-                            <div class="space-y-2 flex-grow overflow-y-auto p-2 -m-2">${columns.choice1.map(s => getStudentHtml(s, 'choice1')).join('')}</div>
+                            <div class="flex flex-wrap gap-2 content-start flex-grow overflow-y-auto p-2 -m-2">${columns.choice1.map(s => getStudentHtml(s, 'choice1')).join('')}</div>
                         </div>
                         <div id="dropzone-choice2" class="dropzone p-4 rounded-lg transition-colors bg-slate-900/70 flex flex-col">
                              <div class="flex-shrink-0">
@@ -503,13 +504,13 @@
                                     <input type="text" id="choice2-menu" value="${menu.choice2Menu}" placeholder="Enter Lunch Choice 2" class="p-2 border rounded-md w-full text-center text-xl font-bold bg-slate-700 text-white border-slate-600" />
                                 </div>
                             </div>
-                            <div class="space-y-2 flex-grow overflow-y-auto p-2 -m-2">${columns.choice2.map(s => getStudentHtml(s, 'choice2')).join('')}</div>
+                            <div class="flex flex-wrap gap-2 content-start flex-grow overflow-y-auto p-2 -m-2">${columns.choice2.map(s => getStudentHtml(s, 'choice2')).join('')}</div>
                         </div>
                         <div id="dropzone-sackLunch" class="dropzone p-4 rounded-lg transition-colors bg-slate-900/70 flex flex-col">
                              <div class="flex-shrink-0">
                                 <h3 class="font-bold text-orange-400 mb-2 text-center text-xl">Sack Lunch (${columns.sackLunch.length})</h3>
                              </div>
-                            <div class="space-y-2 flex-grow overflow-y-auto p-2 -m-2 pt-16">${columns.sackLunch.map(s => getStudentHtml(s, 'sackLunch')).join('')}</div>
+                            <div class="flex flex-wrap gap-2 content-start flex-grow overflow-y-auto p-2 -m-2 pt-16">${columns.sackLunch.map(s => getStudentHtml(s, 'sackLunch')).join('')}</div>
                         </div>
                     </div>
                     
