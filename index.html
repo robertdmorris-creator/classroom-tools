@@ -3,129 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classroom Tools Dashboard</title>
+    <title>Classroom Tools: 5th Grade Edition</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts: Nunito for a friendly, rounded look -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                    },
+                    colors: {
+                        paper: '#ffffff',
+                        crayon: {
+                            blue: '#3b82f6',
+                            yellow: '#fbbf24',
+                            green: '#22c55e',
+                            red: '#ef4444',
+                            purple: '#a855f7',
+                            orange: '#f97316'
+                        }
+                    },
+                    boxShadow: {
+                        'cartoon': '4px 4px 0px 0px rgba(0,0,0,0.15)',
+                        'cartoon-hover': '6px 6px 0px 0px rgba(0,0,0,0.2)',
+                        'cartoon-active': '2px 2px 0px 0px rgba(0,0,0,0.2)',
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                        'pop-in': 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                    },
+                    keyframes: {
+                        wiggle: {
+                            '0%, 100%': { transform: 'rotate(-3deg)' },
+                            '50%': { transform: 'rotate(3deg)' },
+                        },
+                        popIn: {
+                            '0%': { transform: 'scale(0.5)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        /* Custom CSS for animations and loaders */
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #f97316; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .confetti { position: absolute; width: 10px; height: 20px; background: #f00; top: -20px; animation: confetti-fall 3s linear infinite; z-index: 100; }
-        @keyframes confetti-fall { 0% { transform: translateY(0) rotate(0); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
-        .firework { position: absolute; border-radius: 50%; animation: firework-burst 1.5s ease-out forwards; z-index: 100;}
-        .firework::before { content: ''; position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: radial-gradient(circle, #fff, #fff0, #fff0); transform: scale(0); animation: firework-spark 1.5s ease-out forwards; }
-        @keyframes firework-burst { 0% { opacity: 1; } 100% { opacity: 0; transform: scale(2); } }
-        @keyframes firework-spark { 0% { transform: scale(0); opacity: 1; } 50% { opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
-        .pulse { animation: pulse-animation 2s infinite; }
-        @keyframes pulse-animation { 0% { box-shadow: 0 0 0 0 rgba(251, 146, 60, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(251, 146, 60, 0); } 100% { box-shadow: 0 0 0 0 rgba(251, 146, 60, 0); } }
-        [draggable="true"] { cursor: move; }
-        .dragging { opacity: 0.5; }
+        body {
+            background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 100%); /* Sky to Sun gradient */
+            color: #1e293b;
+        }
         
-        /* Fullscreen button icon visibility */
-        .fullscreen-icon { display: block; }
-        .exit-fullscreen-icon { display: none; }
-        .is-fullscreen .fullscreen-icon { display: none; }
-        .is-fullscreen .exit-fullscreen-icon { display: block; }
+        /* Fun Panel Style */
+        .fun-panel {
+            background: white;
+            border-radius: 24px;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        }
 
-        /* CSS-based fullscreen mode */
+        /* Big Cartoon Buttons */
+        .btn-cartoon {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+        }
+        .btn-cartoon:hover {
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 0px 0px rgba(0,0,0,0.1);
+        }
+        .btn-cartoon:active {
+            transform: translateY(2px);
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.1);
+        }
+
+        /* Custom Scrollbar for big screens */
+        ::-webkit-scrollbar { width: 12px; height: 12px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 20px; border: 3px solid transparent; background-clip: content-box; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
+
+        /* Loader */
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Dragging visuals */
+        .dragging { opacity: 0.5; transform: scale(1.05) rotate(3deg); z-index: 50; }
+        .dropzone-active { 
+            background-color: #f0f9ff !important;
+            border-color: #3b82f6 !important;
+            border-width: 4px !important;
+            transform: scale(1.01);
+        }
+
+        /* Smartboard Fullscreen overrides */
         .viewport-fullscreen {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            z-index: 9999 !important;
-            overflow-y: auto !important; /* Allow scrolling if content overflows */
-            display: flex;
-            flex-direction: column;
+            position: fixed !important; top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 9999;
+            background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 100%);
+            display: flex; flex-direction: column;
         }
-
-        /* Make content expand in fullscreen */
-        .viewport-fullscreen > main {
-            flex-grow: 1;
-            max-width: 100%;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-        }
-        .viewport-fullscreen #tool-display {
-            flex-grow: 1;
-            min-height: 0;
-        }
-
-        /* Make scrollbars pretty */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #4a4a4a;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #f97316;
-        }
+        .viewport-fullscreen #tool-display { border-radius: 0; border: none; box-shadow: none; background: rgba(255,255,255,0.8); }
+        
+        .student-card-emoji { font-size: 3rem; line-height: 1; }
+        .student-list-emoji { font-size: 2rem; }
     </style>
 </head>
-<body class="h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-orange-800 min-h-screen font-sans antialiased flex flex-col">
+<body class="h-screen min-h-screen font-sans antialiased overflow-hidden text-slate-800">
 
-    <div id="app-container" class="bg-transparent flex flex-col flex-grow">
+    <div id="app-container" class="relative flex flex-col h-full z-10">
 
-        <!-- Main Content -->
-        <main class="w-full mx-auto p-4 flex-grow flex flex-col">
-            <!-- Navigation -->
-            <div class="bg-slate-800/70 backdrop-blur-sm rounded-xl shadow-lg shadow-black/20 p-2 mb-4 sticky top-4 z-20 flex-shrink-0 flex items-center">
-                <nav id="tool-nav" class="flex-grow flex flex-wrap justify-center -mb-px">
-                    <!-- Nav buttons will be injected by JS -->
+        <!-- Header / Nav -->
+        <header class="flex-shrink-0 px-6 pt-6 pb-2">
+            <div class="fun-panel px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-4 px-2">
+                    <div class="p-3 bg-crayon-blue rounded-2xl shadow-cartoon text-white transform -rotate-3">
+                        <i data-lucide="backpack" class="w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-black text-2xl md:text-3xl tracking-tight text-slate-700 leading-none">Classroom<span class="text-crayon-blue">Tools</span></h1>
+                        <span class="text-sm font-bold text-slate-400">5th Grade Edition</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs - BIG BUTTONS -->
+                <nav id="tool-nav" class="flex gap-3 overflow-x-auto no-scrollbar mx-4">
+                    <!-- Buttons injected via JS -->
                 </nav>
-                <button id="fullscreen-btn" title="Toggle Fullscreen" class="ml-4 p-2 rounded-full text-slate-300 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-                    <svg class="fullscreen-icon h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 0h-4m4 0l-5-5" />
-                    </svg>
-                    <svg class="exit-fullscreen-icon h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 4l-5 5m0 0l-5-5m5 5v11m5-16l-5 5m0 0l5 5m-5-5V3" />
-                    </svg>
-                </button>
+
+                <div class="flex items-center gap-2">
+                    <button id="fullscreen-btn" class="p-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors" title="Toggle Fullscreen">
+                        <i data-lucide="maximize" class="w-8 h-8"></i>
+                    </button>
+                </div>
             </div>
-            <!-- Tool Display Area -->
-            <div id="tool-display" class="bg-slate-800/70 text-slate-200 backdrop-blur-md rounded-2xl shadow-lg shadow-black/20 p-6 relative flex-grow flex flex-col">
-                <!-- Tools will be rendered here by JS -->
-                 <div class="text-center p-8"><div class="loader"></div><p>Loading Tools...</p></div>
+        </header>
+
+        <!-- Main Tool Area -->
+        <main class="flex-grow p-6 min-h-0">
+            <div id="tool-display" class="fun-panel h-full w-full relative overflow-hidden flex flex-col bg-white/60 backdrop-blur-sm">
+                <!-- Tool content renders here -->
+                 <div class="flex flex-col items-center justify-center h-full text-center">
+                     <span class="loader mb-6"></span>
+                     <p class="text-2xl font-bold text-slate-400 animate-pulse">Loading Class Data...</p>
+                 </div>
             </div>
         </main>
-
-        <!-- Footer -->
-        <footer class="text-center py-2 text-slate-400 text-sm flex-shrink-0">
-            <p>Created with 👻 by your awesome assistant</p>
-        </footer>
     </div>
 
-    <!-- Firebase and App Logic -->
+    <!-- Firebase and Logic -->
     <script type="module">
-        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- App State and Configuration ---
+        // --- Configuration & State ---
         const appState = {
             userId: null,
             isAuthReady: false,
             activeTool: 'classRoster',
             students: [],
-            // State for tools in local mode
             lunchColumns: null,
             lunchMenu: { choice1Menu: '', choice2Menu: '' },
             bracket: null,
             podium: null,
+            lastTriggeredFood: null
         };
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "DEMO", authDomain: "DEMO", projectId: "DEMO" };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-classroom-tools-html';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'classroom-tools-5th-grade';
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -133,871 +190,1139 @@
 
         const toolDisplay = document.getElementById('tool-display');
         const toolNav = document.getElementById('tool-nav');
-        const appContainer = document.getElementById('app-container');
-        const fullscreenBtn = document.getElementById('fullscreen-btn');
-
-        const tools = {
-            classRoster: { name: 'Class Roster', icon: '📝', render: renderClassRoster },
-            studentSelector: { name: 'Student Selector', icon: '🎯', render: renderStudentSelector },
-            lunchChoice: { name: 'Lunch Choice', icon: '🍔', render: renderLunchChoice },
-            tournamentBracket: { name: 'Tournament Bracket', icon: '🏆', render: renderTournamentBracket },
-            hangman: { name: 'Hangman', icon: '🤔', render: renderHangman },
-        };
         
-        // --- Fullscreen Logic ---
-        function setupFullscreenButton() {
-            fullscreenBtn.addEventListener('click', () => {
-                // If not currently in any fullscreen mode, try to enter.
-                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                    const requestFullscreen = appContainer.requestFullscreen || appContainer.webkitRequestFullscreen;
-                    if (requestFullscreen) {
-                        // Attempt to go native fullscreen
-                        requestFullscreen.call(appContainer).catch(err => {
-                            // If native fails, use the CSS fallback
-                            console.warn(`Native fullscreen failed, using CSS fallback: ${err.message}`);
-                            appContainer.classList.add('viewport-fullscreen');
-                            syncFullscreenState(); // Update UI for CSS mode
-                        });
-                    } else {
-                        // If API doesn't exist at all, just use CSS fallback
-                        appContainer.classList.add('viewport-fullscreen');
-                        syncFullscreenState();
-                    }
-                } else {
-                    // If already fullscreen, exit.
-                    const exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen;
-                    if (exitFullscreen) {
-                        exitFullscreen.call(document);
-                    }
+        // Kid-friendly Emojis
+        const AVATARS = [
+            '🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🦄','🐞','🦖','🐳','🐙','🦋',
+            '🐝','🐢','🦎','🦒','🦓','🐘','🦛','🦏','🐪','🦙','🦘','🦡','🦢','🦜','🦩','🦚','🦉','🐊','🦈','🐬'
+        ];
+
+        // Food Emoji Dictionary
+        const FOOD_EMOJIS = {
+            'pizza': '🍕',
+            'burger': '🍔', 'hamburger': '🍔', 'cheeseburger': '🍔',
+            'hotdog': '🌭', 'hot dog': '🌭', 'frank': '🌭',
+            'fries': '🍟', 'french fries': '🍟',
+            'taco': '🌮', 'tacos': '🌮',
+            'burrito': '🌯',
+            'sandwich': '🥪', 'sub': '🥪',
+            'salad': '🥗',
+            'spaghetti': '🍝', 'pasta': '🍝', 'noodles': '🍝',
+            'sushi': '🍣',
+            'chicken': '🍗', 'nuggets': '🍗', 'wings': '🍗',
+            'steak': '🥩', 'meat': '🥩',
+            'egg': '🍳', 'eggs': '🍳',
+            'pancake': '🥞', 'waffle': '🧇',
+            'bacon': '🥓',
+            'pretzel': '🥨',
+            'bagel': '🥯',
+            'cheese': '🧀',
+            'soup': '🥣',
+            'popcorn': '🍿',
+            'cookie': '🍪', 'cookies': '🍪',
+            'cake': '🍰', 'cupcake': '🧁',
+            'donut': '🍩', 'doughnut': '🍩',
+            'ice cream': '🍦', 'icecream': '🍦',
+            'chocolate': '🍫',
+            'candy': '🍬', 'lollipop': '🍭',
+            'apple': '🍎',
+            'banana': '🍌',
+            'grapes': '🍇',
+            'watermelon': '🍉',
+            'orange': '🍊',
+            'lemon': '🍋',
+            'strawberry': '🍓',
+            'cherry': '🍒',
+            'peach': '🍑',
+            'pineapple': '🍍',
+            'corn': '🌽',
+            'carrot': '🥕',
+            'potato': '🥔',
+            'broccoli': '🥦',
+            'bread': '🍞', 'toast': '🍞',
+            'milk': '🥛',
+            'juice': '🧃',
+            'water': '💧'
+        };
+
+        // Helper to get deterministic emoji from name
+        function getStudentEmoji(name) {
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return AVATARS[Math.abs(hash) % AVATARS.length];
+        }
+
+        // Tool Definitions
+        const tools = {
+            classRoster: { name: 'Class Roster', icon: 'users', color: 'bg-crayon-blue', render: renderClassRoster },
+            studentSelector: { name: 'Picker', icon: 'dices', color: 'bg-crayon-purple', render: renderStudentSelector },
+            lunchChoice: { name: 'Lunch', icon: 'utensils', color: 'bg-crayon-green', render: renderLunchChoice },
+            tournamentBracket: { name: 'Bracket', icon: 'trophy', color: 'bg-crayon-yellow', render: renderTournamentBracket },
+            hangman: { name: 'Hangman', icon: 'gamepad-2', color: 'bg-crayon-orange', render: renderHangman },
+        };
+
+        // --- Initialization ---
+
+        function init() {
+            renderNav();
+            setupFullscreen();
+            
+            // Auth Flow
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    appState.userId = user.uid;
+                    appState.isAuthReady = true;
+                    await initializeRosterIfNeeded();
+                    setupStudentListener();
+                    renderActiveTool();
                 }
             });
 
-            // Syncs button icon and background styles with the actual state
-            const syncFullscreenState = () => {
-                const isFullscreenNow = document.fullscreenElement || document.webkitFullscreenElement || appContainer.classList.contains('viewport-fullscreen');
-                
-                if (isFullscreenNow) {
-                    fullscreenBtn.classList.add('is-fullscreen');
-                    // Ensure background is applied for a seamless view
-                    if (!appContainer.classList.contains('bg-gradient-to-br')) {
-                        appContainer.classList.add('bg-gradient-to-br', 'from-slate-900', 'via-purple-900', 'to-orange-800');
+            // Initial Sign In
+            (async () => {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
                     }
-                } else {
-                    fullscreenBtn.classList.remove('is-fullscreen');
-                    appContainer.classList.remove('viewport-fullscreen'); // Make sure CSS fallback is removed
-                    // When exiting, remove the background that was added
-                    appContainer.classList.remove('bg-gradient-to-br', 'from-slate-900', 'via-purple-900', 'to-orange-800');
+                } catch (error) {
+                    console.error("Auth failed:", error);
+                    fallbackToLocal();
                 }
-            };
-            
-            // Add listeners to react to browser UI changes (e.g., user pressing Esc)
-            document.addEventListener('fullscreenchange', syncFullscreenState);
-            document.addEventListener('webkitfullscreenchange', syncFullscreenState);
+            })();
+
+            // Safety timeout
+            setTimeout(() => { if (!appState.isAuthReady) fallbackToLocal(); }, 3500);
         }
-        
-        // --- Graceful Fallback for Local Files ---
-        function initializeLocalMode() {
-            console.warn("Authentication failed. Initializing in local-only mode. Data will not be saved.");
+
+        function fallbackToLocal() {
+            if (appState.isAuthReady) return;
+            console.warn("Using local mode");
             appState.isAuthReady = true;
-            appState.students = ['Skylar', 'Terrell', 'DJ', 'Joshua', 'Cody', 'Leon', 'Alisha', 'Miracle'].map((name, index) => ({ id: `local-${index}`, name, isPresent: true }));
-            renderApp();
-        }
-
-
-        // --- Main App Logic ---
-
-        function renderApp() {
-            renderNav();
+            appState.students = ['Skylar', 'Terrell', 'DJ', 'Joshua', 'Cody', 'Leon', 'Alisha', 'Miracle'].map((n, i) => ({ id: `loc-${i}`, name: n, isPresent: true }));
             renderActiveTool();
         }
 
-        function renderNav() {
-            toolNav.innerHTML = '';
-            for (const toolId in tools) {
-                const tool = tools[toolId];
-                const isActive = appState.activeTool === toolId;
-                const button = document.createElement('button');
-                button.className = `flex items-center gap-2 whitespace-nowrap py-3 px-5 border-b-4 font-semibold text-sm focus:outline-none transition-all duration-300 ${isActive ? 'border-orange-500 text-orange-400 bg-slate-700 rounded-t-lg' : 'border-transparent text-slate-400 hover:text-white hover:border-slate-500'}`;
-                button.innerHTML = `<span class="text-xl">${tool.icon}</span> ${tool.name}`;
-                button.onclick = () => {
-                    appState.activeTool = toolId;
-                    renderApp();
-                };
-                toolNav.appendChild(button);
-            }
-        }
-        
-        function renderActiveTool() {
-            if (!appState.isAuthReady) {
-                toolDisplay.innerHTML = `<div class="text-center p-8"><div class="loader"></div><p>Authenticating...</p></div>`;
-                return;
-            }
-            const tool = tools[appState.activeTool];
-            if (tool && typeof tool.render === 'function') {
-                tool.render();
-            } else {
-                toolDisplay.innerHTML = `<p>Error: Tool not found.</p>`;
-            }
-        }
-
-        // --- Firebase Logic ---
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                appState.userId = user.uid;
-                appState.isAuthReady = true;
-                await initializeRosterIfNeeded();
-                setupStudentListener();
-                renderApp();
-            }
-        });
-        
-        // Attempt to sign in
-        (async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                initializeLocalMode();
-            }
-        })();
-
-        // Failsafe timer. If auth state is not ready after a few seconds, assume it failed silently.
-        setTimeout(() => {
-            if (!appState.isAuthReady) {
-                initializeLocalMode();
-            }
-        }, 3000);
-        
-        
         async function initializeRosterIfNeeded() {
             if (!appState.userId) return;
-            const settingsDocRef = doc(db, `artifacts/${appId}/users/${appState.userId}/settings`, 'roster');
+            const settingsRef = doc(db, `artifacts/${appId}/users/${appState.userId}/settings`, 'roster');
             try {
-                const settingsDoc = await getDoc(settingsDocRef);
-                if (!settingsDoc.exists() || !settingsDoc.data().initialized) {
-                    const studentsCollectionRef = collection(db, `artifacts/${appId}/users/${appState.userId}/students`);
-                    const existingDocs = await getDocs(studentsCollectionRef);
-                    for (const docSnap of existingDocs.docs) {
-                        await deleteDoc(docSnap.ref);
-                    }
-                    const defaultRoster = ['Skylar', 'Terrell', 'DJ', 'Joshua', 'Cody', 'Leon', 'Alisha', 'Miracle'];
-                    for (const name of defaultRoster) {
-                        await addDoc(studentsCollectionRef, { name, isPresent: true });
-                    }
-                    await setDoc(settingsDocRef, { initialized: true });
+                const snap = await getDoc(settingsRef);
+                if (!snap.exists() || !snap.data().initialized) {
+                    const studentsRef = collection(db, `artifacts/${appId}/users/${appState.userId}/students`);
+                    // Clear existing (if any weird state)
+                    const existing = await getDocs(studentsRef);
+                    existing.forEach(d => deleteDoc(d.ref));
+                    
+                    const defaults = ['Skylar', 'Terrell', 'DJ', 'Joshua', 'Cody', 'Leon', 'Alisha', 'Miracle'];
+                    await Promise.all(defaults.map(name => addDoc(studentsRef, { name, isPresent: true })));
+                    await setDoc(settingsRef, { initialized: true });
                 }
-            } catch (error) {
-                console.error("Error initializing roster:", error);
-            }
+            } catch (e) { console.error("Roster init error", e); }
         }
 
         function setupStudentListener() {
             if (!appState.userId) return;
-            const studentsCollectionRef = collection(db, `artifacts/${appId}/users/${appState.userId}/students`);
-            onSnapshot(studentsCollectionRef, (snapshot) => {
-                appState.students = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                if (['classRoster', 'studentSelector', 'lunchChoice', 'tournamentBracket'].includes(appState.activeTool)) {
-                    renderActiveTool();
-                }
-            }, (error) => {
-                console.error("Error fetching students:", error);
-                toolDisplay.innerHTML = `<p class="text-red-500 text-center">Could not load student data.</p>`;
-            });
+            const q = collection(db, `artifacts/${appId}/users/${appState.userId}/students`);
+            onSnapshot(q, (snap) => {
+                appState.students = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => a.name.localeCompare(b.name));
+                refreshCurrentView();
+            }, (err) => console.error("Snapshot error", err));
         }
-        
+
+        function refreshCurrentView() {
+            if (['classRoster', 'studentSelector', 'lunchChoice'].includes(appState.activeTool)) {
+                renderActiveTool();
+            }
+        }
+
+        // --- Core UI Functions ---
+
+        function renderNav() {
+            toolNav.innerHTML = '';
+            Object.entries(tools).forEach(([id, tool]) => {
+                const btn = document.createElement('button');
+                const isActive = appState.activeTool === id;
+                // BIG BUTTONS for Smartboard
+                btn.className = `
+                    btn-cartoon flex flex-col md:flex-row items-center justify-center gap-2 px-6 py-3 rounded-2xl text-lg font-bold transition-all
+                    ${isActive 
+                        ? `${tool.color} text-white shadow-cartoon` 
+                        : 'bg-white text-slate-500 hover:bg-slate-50'}
+                `;
+                btn.innerHTML = `<i data-lucide="${tool.icon}" class="w-6 h-6 md:w-8 md:h-8"></i> <span>${tool.name}</span>`;
+                btn.onclick = () => {
+                    appState.activeTool = id;
+                    renderNav();
+                    renderActiveTool();
+                };
+                toolNav.appendChild(btn);
+            });
+            lucide.createIcons();
+        }
+
+        function renderActiveTool() {
+            if (!appState.isAuthReady) return;
+            const tool = tools[appState.activeTool];
+            if (tool) tool.render();
+            lucide.createIcons();
+        }
+
         // --- Tool: Class Roster ---
+        
         function renderClassRoster() {
-            let studentListHtml = appState.students.map(student => `
-                <div class="p-3 rounded-lg shadow-sm flex items-center justify-between bg-slate-700 hover:bg-slate-600">
-                    <p class="font-medium text-slate-200">${student.name}</p>
-                    <button data-id="${student.id}" class="remove-student-btn text-red-500 hover:text-red-400 font-bold">✕</button>
+            const listHtml = appState.students.map(s => `
+                <div class="relative bg-white border-2 border-slate-200 p-4 rounded-3xl shadow-sm hover:shadow-cartoon hover:border-crayon-blue transition-all group flex flex-col items-center justify-center h-48">
+                    <div class="student-card-emoji mb-2 transform transition-transform group-hover:scale-125 group-hover:rotate-12">
+                        ${getStudentEmoji(s.name)}
+                    </div>
+                    <span class="font-extrabold text-2xl text-slate-700 text-center leading-tight">${s.name}</span>
+                    
+                    <button data-id="${s.id}" class="remove-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 p-3 bg-red-100 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition-all shadow-sm" title="Remove">
+                        <i data-lucide="trash-2" class="w-6 h-6"></i>
+                    </button>
                 </div>
             `).join('');
 
             toolDisplay.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-full">
-                    <div class="w-full max-w-md">
-                        <h2 class="text-2xl font-bold text-orange-400 mb-4 text-center">Class Roster Management</h2>
-                        <p class="text-slate-400 mb-6 text-center">Add or remove students from your class list.</p>
-                        <form id="add-student-form" class="flex gap-2 mb-4">
-                            <input type="text" id="new-student-name" placeholder="Add a new student's name" class="flex-grow p-2 border rounded-md bg-slate-600 border-slate-500 text-white focus:ring-orange-500 focus:border-orange-500" />
-                            <button type="submit" class="bg-gradient-to-r from-orange-500 to-amber-600 text-white font-bold py-2 px-4 rounded-md hover:opacity-90 transition-transform transform hover:scale-105">+</button>
+                <div class="h-full flex flex-col p-4 md:p-8 animate-pop-in w-full">
+                    <div class="flex flex-col lg:flex-row justify-between items-center mb-8 gap-6">
+                        <div class="text-center lg:text-left">
+                            <h2 class="text-4xl font-black text-slate-800">Class Roster</h2>
+                            <p class="text-slate-500 text-xl font-semibold mt-1">Total Students: <span class="text-crayon-blue">${appState.students.length}</span></p>
+                        </div>
+                        <form id="add-student-form" class="flex gap-4 w-full lg:w-auto">
+                            <input type="text" id="new-name" placeholder="Student Name" class="flex-grow lg:w-80 border-4 border-slate-200 rounded-2xl px-6 py-4 text-2xl font-bold text-slate-700 focus:outline-none focus:border-crayon-blue transition-colors placeholder-slate-300">
+                            <button type="submit" class="btn-cartoon bg-crayon-green text-white px-8 py-4 rounded-2xl text-2xl font-black flex items-center gap-3 whitespace-nowrap">
+                                <i data-lucide="plus-circle" class="w-8 h-8"></i> Add
+                            </button>
                         </form>
-                        <div class="space-y-3" id="roster-list">${studentListHtml}</div>
+                    </div>
+                    
+                    <div class="flex-grow overflow-y-auto pr-4 pb-4">
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                            ${listHtml}
+                        </div>
+                        ${appState.students.length === 0 ? '<div class="flex flex-col items-center justify-center h-64 text-slate-400"><i data-lucide="ghost" class="w-16 h-16 mb-4"></i><p class="text-2xl font-bold">No students yet!</p></div>' : ''}
                     </div>
                 </div>
             `;
 
             document.getElementById('add-student-form').onsubmit = async (e) => {
                 e.preventDefault();
-                const input = document.getElementById('new-student-name');
-                const newName = input.value.trim();
-                if (newName) {
-                    if (!appState.userId) { // Local mode
-                        appState.students.push({ id: `local-${Date.now()}`, name: newName, isPresent: true });
-                        renderClassRoster();
-                    } else { // Online mode
-                        const studentsCollectionRef = collection(db, `artifacts/${appId}/users/${appState.userId}/students`);
-                        await addDoc(studentsCollectionRef, { name: newName, isPresent: true });
-                    }
-                    input.value = '';
+                const input = document.getElementById('new-name');
+                const name = input.value.trim();
+                if (!name) return;
+                
+                if (appState.userId) {
+                    await addDoc(collection(db, `artifacts/${appId}/users/${appState.userId}/students`), { name, isPresent: true });
+                } else {
+                    appState.students.push({ id: `loc-${Date.now()}`, name, isPresent: true });
+                    renderClassRoster();
                 }
+                input.value = '';
+                input.focus();
             };
-            
-            document.querySelectorAll('.remove-student-btn').forEach(button => {
-                button.onclick = async () => {
-                    const studentId = button.dataset.id;
-                    if (!appState.userId) { // Local mode
-                        appState.students = appState.students.filter(s => s.id !== studentId);
-                        renderClassRoster();
-                    } else { // Online mode
-                        await deleteDoc(doc(db, `artifacts/${appId}/users/${appState.userId}/students`, studentId));
+
+            toolDisplay.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.onclick = async () => {
+                    if (confirm('Remove student from class?')) {
+                        if (appState.userId) {
+                            await deleteDoc(doc(db, `artifacts/${appId}/users/${appState.userId}/students`, btn.dataset.id));
+                        } else {
+                            appState.students = appState.students.filter(s => s.id !== btn.dataset.id);
+                            renderClassRoster();
+                        }
                     }
                 };
             });
         }
 
-        // --- Tool: Random Student Selector ---
+        // --- Tool: Student Selector ---
+
         function renderStudentSelector() {
-            const presentStudents = appState.students.filter(s => s.isPresent);
-            let studentListHtml = appState.students.map(student => `
-                <div class="p-2 rounded-md flex items-center justify-between transition-colors ${student.isPresent ? 'bg-slate-700' : 'bg-slate-800'}">
-                    <p class="font-medium ${student.isPresent ? 'text-slate-200' : 'text-slate-500 line-through'}">${student.name}</p>
-                    <button data-id="${student.id}" class="toggle-presence-btn relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${student.isPresent ? 'bg-orange-500' : 'bg-slate-600'}">
-                        <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${student.isPresent ? 'translate-x-6' : 'translate-x-1'}"></span>
+            const listHtml = appState.students.map(s => `
+                <div class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">${getStudentEmoji(s.name)}</span>
+                        <span class="text-lg font-bold ${s.isPresent ? 'text-slate-700' : 'text-slate-400 line-through opacity-60'}">${s.name}</span>
+                    </div>
+                    <button data-id="${s.id}" class="toggle-btn w-16 h-8 rounded-full relative transition-colors border-2 ${s.isPresent ? 'bg-crayon-green border-green-600' : 'bg-slate-200 border-slate-300'}">
+                        <div class="w-6 h-6 bg-white rounded-full absolute top-0.5 shadow-sm transition-all ${s.isPresent ? 'left-8' : 'left-1'}"></div>
                     </button>
                 </div>
             `).join('');
 
             toolDisplay.innerHTML = `
-                <div class="flex flex-col h-full">
-                    <h2 class="text-2xl font-bold text-orange-400 mb-4 text-center flex-shrink-0">Student Selector</h2>
-                    <div class="grid md:grid-cols-2 gap-8 flex-grow">
-                        <div class="flex flex-col">
-                            <h3 class="font-semibold text-slate-300 mb-2 text-center">Daily Attendance</h3>
-                            <div class="border rounded-md p-2 bg-slate-900/50 border-slate-700 space-y-2 flex-grow overflow-y-auto">${studentListHtml}</div>
+                <div class="h-full flex flex-col md:flex-row p-6 animate-pop-in gap-8">
+                    <!-- Sidebar: Attendance -->
+                    <div class="w-full md:w-80 flex-shrink-0 flex flex-col bg-white rounded-3xl border-2 border-slate-200 shadow-sm overflow-hidden h-full">
+                        <div class="p-4 bg-slate-50 border-b border-slate-200">
+                            <h3 class="font-black text-xl text-slate-700 flex items-center gap-2">
+                                <i data-lucide="check-circle-2" class="w-6 h-6 text-crayon-green"></i> Who's Here?
+                            </h3>
                         </div>
-                        <div class="flex flex-col items-center justify-center bg-gradient-to-br from-purple-800 to-orange-700 rounded-lg p-6 space-y-4">
-                            <div class="w-full my-auto">
-                                <button id="select-one-btn" ${presentStudents.length === 0 ? 'disabled' : ''} class="w-full bg-orange-500 text-white font-bold py-3 px-6 rounded-full text-lg shadow-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-400 disabled:bg-slate-600 disabled:text-slate-400 disabled:cursor-not-allowed transition-transform transform hover:scale-105">
-                                    Select One Student
-                                </button>
-                                <div class="w-full text-center mt-6">
-                                    <p class="font-semibold text-orange-200 mb-2">Or Generate Groups:</p>
-                                    <div class="flex justify-center gap-2">
-                                        ${[2,3,4].map(size => `<button data-size="${size}" ${presentStudents.length < size ? 'disabled' : ''} class="generate-groups-btn bg-orange-500 text-white font-bold py-2 px-4 rounded-full shadow-md hover:bg-orange-600 disabled:bg-slate-600 disabled:text-slate-400 transition-transform transform hover:scale-105">of ${size}</button>`).join('')}
-                                    </div>
-                                </div>
-                             </div>
+                        <div class="overflow-y-auto flex-grow p-2">
+                            ${listHtml}
                         </div>
                     </div>
-                    <div id="selector-results" class="mt-8 pt-6 border-t border-slate-700 flex-shrink-0"></div>
+
+                    <!-- Main: Action Area -->
+                    <div class="flex-grow flex flex-col items-center justify-center relative">
+                        
+                        <div id="selector-display" class="w-full max-w-2xl bg-white rounded-[3rem] border-8 border-slate-100 shadow-xl flex flex-col items-center justify-center p-12 mb-10 aspect-video relative overflow-hidden">
+                            <!-- Background Pattern -->
+                            <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(#6366f1 2px, transparent 2px); background-size: 20px 20px;"></div>
+                            
+                            <div id="result-content" class="text-center relative z-10 w-full">
+                                <i data-lucide="sparkles" class="w-24 h-24 text-crayon-yellow mx-auto mb-6"></i>
+                                <h2 class="text-4xl font-black text-slate-800 mb-2">Ready to Pick!</h2>
+                                <p class="text-slate-500 text-xl">Tap a button below to start</p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-4 justify-center w-full">
+                            <button id="pick-one-btn" class="btn-cartoon bg-crayon-purple text-white px-10 py-5 rounded-3xl font-black text-2xl shadow-cartoon flex items-center gap-3 transform active:scale-95">
+                                <i data-lucide="wand-2" class="w-8 h-8"></i> PICK RANDOM
+                            </button>
+                            
+                            <div class="w-px bg-slate-300 mx-4 hidden xl:block"></div>
+                            
+                            <button data-size="2" class="group-btn btn-cartoon bg-white border-2 border-slate-200 text-slate-600 px-6 py-4 rounded-2xl font-bold text-xl hover:text-crayon-blue hover:border-crayon-blue">Pairs</button>
+                            <button data-size="3" class="group-btn btn-cartoon bg-white border-2 border-slate-200 text-slate-600 px-6 py-4 rounded-2xl font-bold text-xl hover:text-crayon-blue hover:border-crayon-blue">Threes</button>
+                            <button data-size="4" class="group-btn btn-cartoon bg-white border-2 border-slate-200 text-slate-600 px-6 py-4 rounded-2xl font-bold text-xl hover:text-crayon-blue hover:border-crayon-blue">Fours</button>
+                        </div>
+                    </div>
                 </div>
             `;
             
-            document.querySelectorAll('.toggle-presence-btn').forEach(button => {
-                button.onclick = async () => {
-                    const studentId = button.dataset.id;
-                    const student = appState.students.find(s => s.id === studentId);
-                    if (student) {
-                        student.isPresent = !student.isPresent;
-                        if (appState.userId) { // Online mode
-                            const studentDoc = doc(db, `artifacts/${appId}/users/${appState.userId}/students`, student.id);
-                            await updateDoc(studentDoc, { isPresent: student.isPresent });
-                        }
-                        renderStudentSelector(); // Re-render for local mode
-                    }
+            // Logic
+            toolDisplay.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.onclick = async () => {
+                    const s = appState.students.find(st => st.id === btn.dataset.id);
+                    if (appState.userId) await updateDoc(doc(db, `artifacts/${appId}/users/${appState.userId}/students`, s.id), { isPresent: !s.isPresent });
+                    else { s.isPresent = !s.isPresent; renderStudentSelector(); }
                 };
             });
 
-            document.getElementById('select-one-btn').onclick = () => {
-                const present = appState.students.filter(s => s.isPresent);
-                if (present.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * present.length);
-                    const selected = present[randomIndex];
-                    document.getElementById('selector-results').innerHTML = `
-                        <div class="text-center p-6 bg-slate-700/80 backdrop-blur-sm rounded-xl shadow-lg animate-fade-in w-full max-w-md mx-auto pulse" style="--pulse-color: #f97316;">
-                            <p class="text-slate-300">And the student is...</p>
-                            <p class="text-4xl font-bold text-orange-400 mt-2">${selected.name}!</p>
-                        </div>`;
-                }
-            };
-            
-            document.querySelectorAll('.generate-groups-btn').forEach(button => {
-                button.onclick = () => {
-                    const size = parseInt(button.dataset.size, 10);
-                    const present = appState.students.filter(s => s.isPresent);
-                    const shuffled = [...present].sort(() => 0.5 - Math.random());
-                    const groups = [];
-                    for (let i = 0; i < shuffled.length; i += size) {
-                        groups.push(shuffled.slice(i, i + size));
+            document.getElementById('pick-one-btn').onclick = () => {
+                const candidates = appState.students.filter(s => s.isPresent);
+                if (candidates.length === 0) return alert("No students present!");
+                
+                // Fix: Restore display if it was overwritten by Group Generator
+                let display = document.getElementById('result-content');
+                if (!display) {
+                    const selectorDisplay = document.getElementById('selector-display');
+                    if (selectorDisplay) {
+                        selectorDisplay.innerHTML = `
+                            <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(#6366f1 2px, transparent 2px); background-size: 20px 20px;"></div>
+                            <div id="result-content" class="text-center relative z-10 w-full"></div>
+                        `;
+                        display = document.getElementById('result-content');
                     }
-                    const groupsHtml = groups.map((group, index) => `
-                        <div class="p-4 rounded-lg bg-gradient-to-br from-purple-700 to-orange-600 shadow-md">
-                            <h4 class="font-bold text-orange-200 text-center mb-2">Group ${index + 1}</h4>
-                            <ul class="space-y-1 text-center">
-                                ${group.map(student => `<li class="text-white bg-black/20 rounded-md py-1">${student.name}</li>`).join('')}
-                            </ul>
+                }
+                
+                if (!display) return; 
+
+                const btn = document.getElementById('pick-one-btn');
+                btn.disabled = true;
+                
+                // Animation loop
+                let i = 0;
+                const duration = 2000; // Longer suspense
+                const interval = 100;
+                const startTime = Date.now();
+                
+                const timer = setInterval(() => {
+                    // Fix: Stop if user navigated away
+                    if (!document.getElementById('result-content')) {
+                        clearInterval(timer);
+                        return;
+                    }
+
+                    const r = candidates[Math.floor(Math.random() * candidates.length)];
+                    display.innerHTML = `
+                        <div class="transform scale-90 opacity-70 transition-all">
+                            <div class="text-6xl mb-4">${getStudentEmoji(r.name)}</div>
+                            <h2 class="text-5xl font-black text-slate-300">${r.name}</h2>
+                        </div>
+                    `;
+                    
+                    if (Date.now() - startTime > duration) {
+                        clearInterval(timer);
+                        const winner = candidates[Math.floor(Math.random() * candidates.length)];
+                        display.innerHTML = `
+                            <div class="animate-pop-in transform scale-110">
+                                <div class="text-sm font-black text-crayon-purple uppercase tracking-widest mb-4 bg-purple-100 inline-block px-4 py-1 rounded-full">The Winner Is</div>
+                                <div class="text-8xl mb-6 animate-bounce-slow">${getStudentEmoji(winner.name)}</div>
+                                <h2 class="text-7xl font-black text-crayon-blue pb-2">${winner.name}</h2>
+                            </div>
+                        `;
+                        btn.disabled = false;
+                        // Confetti
+                        for(let k=0; k<3; k++) setTimeout(triggerConfetti, k*300);
+                    }
+                }, interval);
+            };
+
+            toolDisplay.querySelectorAll('.group-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const size = parseInt(btn.dataset.size);
+                    const candidates = appState.students.filter(s => s.isPresent).sort(() => Math.random() - 0.5);
+                    const groups = [];
+                    while(candidates.length) groups.push(candidates.splice(0, size));
+                    
+                    const groupsHtml = groups.map((g, i) => `
+                        <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
+                            <div class="text-center font-black text-slate-400 mb-3 uppercase tracking-wider text-sm">Group ${i+1}</div>
+                            <div class="space-y-2">
+                                ${g.map(s => `
+                                    <div class="flex items-center gap-3 bg-white p-2 rounded-lg border border-slate-100 shadow-sm">
+                                        <span class="text-2xl">${getStudentEmoji(s.name)}</span>
+                                        <span class="font-bold text-slate-700 text-lg">${s.name}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
                         </div>
                     `).join('');
-                    document.getElementById('selector-results').innerHTML = `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fade-in">${groupsHtml}</div>`;
+                    
+                    document.getElementById('selector-display').innerHTML = `
+                        <div class="w-full h-full overflow-y-auto p-2">
+                            <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 w-full">${groupsHtml}</div>
+                        </div>
+                    `;
                 };
             });
         }
 
         // --- Tool: Lunch Choice ---
-        async function renderLunchChoice() {
-            // Initialize local state if it doesn't exist
+
+        function renderLunchChoice() {
             if (!appState.lunchColumns) {
                 appState.lunchColumns = {
                     unselected: [...appState.students.filter(s => s.isPresent)],
-                    choice1: [],
-                    choice2: [],
-                    sackLunch: [],
+                    choice1: [], choice2: [], choice3: []
                 };
             }
-            const columns = appState.lunchColumns;
+            const cols = appState.lunchColumns;
             const menu = appState.lunchMenu;
 
-            const studentVisuals = ['🎃', '👻', '🦇', '🍁', '🍂', '🕷️', '🕸️', '💀', '🍬', '🦉'];
-            const studentColorClasses = ['bg-orange-300', 'bg-purple-300', 'bg-slate-300', 'bg-amber-300', 'bg-red-300', 'bg-lime-300', 'bg-yellow-300', 'bg-fuchsia-300', 'bg-indigo-300', 'bg-stone-300'];
-
-            const getStudentHtml = (student, fromColumn) => {
-                const studentIndex = appState.students.findIndex(s => s.id === student.id);
-                const emoji = studentVisuals[studentIndex % studentVisuals.length];
-                const color = studentColorClasses[studentIndex % studentColorClasses.length];
-                const scaleClass = fromColumn !== 'unselected' ? 'scale-75' : '';
-                return `<div id="student-${student.id}" draggable="true" data-student-id="${student.id}" data-from-column="${fromColumn}" class="student-draggable p-3 rounded-lg shadow-sm border border-black/10 cursor-move text-center font-medium flex items-center justify-center gap-2 text-slate-800 transition-transform duration-200 ${color} ${scaleClass}">
-                            <span class="text-xl">${emoji}</span>
-                            <span>${student.name}</span>
-                        </div>`;
+            const makeDraggable = (student, colId) => {
+                return `
+                <div id="st-${student.id}" draggable="true" 
+                     data-id="${student.id}" data-col="${colId}"
+                     class="draggable-item bg-white border-2 border-slate-200 p-2 md:p-3 rounded-xl cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md hover:border-crayon-blue flex flex-col items-center w-24 md:w-28 transition-all animate-pop-in">
+                    <div class="text-4xl mb-1 pointer-events-none select-none">${getStudentEmoji(student.name)}</div>
+                    <div class="font-bold text-slate-700 text-sm md:text-base text-center leading-tight pointer-events-none select-none truncate w-full">${student.name}</div>
+                </div>`;
             };
 
+            const colTemplate = (id, colorClass, title, items, isInput = false, placeholder = "") => {
+                // Determine if there is already a food emoji for the current menu text
+                let currentEmoji = '';
+                if (isInput) {
+                    const text = menu[id+'Menu'] || '';
+                    const words = text.toLowerCase().split(/\s+/);
+                    // Find the last known food word
+                    for (let i = words.length - 1; i >= 0; i--) {
+                        if (FOOD_EMOJIS[words[i]]) {
+                            currentEmoji = FOOD_EMOJIS[words[i]];
+                            break;
+                        }
+                    }
+                }
+
+                return `
+                <div id="drop-${id}" class="dropzone flex flex-col h-full bg-white rounded-3xl border-4 ${colorClass} overflow-hidden shadow-sm transition-all duration-200">
+                    <div class="p-4 ${colorClass.replace('border-', 'bg-')} bg-opacity-10 text-center">
+                        ${isInput 
+                            ? `
+                            <div class="relative w-full">
+                                <input id="input-${id}" value="${menu[id+'Menu'] || ''}" placeholder="${placeholder}" class="w-full bg-white/60 border-2 border-white/50 focus:border-white rounded-2xl py-3 pl-4 pr-16 text-center font-black text-2xl text-slate-700 focus:outline-none placeholder-slate-400/70 shadow-sm">
+                                <div id="emoji-display-${id}" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-4xl transition-all duration-300 ${currentEmoji ? 'scale-100 opacity-100' : 'scale-50 opacity-0'} pointer-events-none filter drop-shadow-sm">${currentEmoji}</div>
+                            </div>
+                            `
+                            : `<h3 class="font-black text-2xl text-slate-700 uppercase tracking-wide">${title}</h3>`
+                        }
+                        <div class="inline-block bg-white px-3 py-1 rounded-full text-sm font-bold text-slate-500 mt-3 shadow-sm">${items.length}</div>
+                    </div>
+                    <div class="flex-grow p-4 bg-slate-50/50 flex flex-wrap content-start gap-3 overflow-y-auto">
+                        ${items.map(s => makeDraggable(s, id)).join('')}
+                    </div>
+                </div>
+            `};
+
             toolDisplay.innerHTML = `
-                <div class="flex flex-col h-full">
-                    <div class="flex justify-between items-center mb-6 flex-shrink-0">
-                        <div>
-                            <h2 class="text-2xl font-bold text-orange-400">Daily Lunch Choice</h2>
-                            <p class="text-slate-400">Drag and drop students to make their lunch choice.</p>
-                        </div>
-                        <button id="reset-lunch-btn" class="bg-gradient-to-r from-red-600 to-orange-700 text-white font-bold py-2 px-4 rounded-md hover:opacity-90 transition-transform transform hover:scale-105">Reset Choices</button>
+                <div class="h-full flex flex-col p-4 md:p-8 overflow-hidden gap-6">
+                    <div class="flex justify-between items-center flex-shrink-0">
+                        <h2 class="text-4xl font-black text-slate-800 flex items-center gap-3">
+                            <span class="bg-orange-100 p-2 rounded-xl text-orange-500"><i data-lucide="utensils"></i></span> 
+                            Lunch Count
+                        </h2>
+                        <button id="reset-lunch" class="text-lg font-bold text-red-500 hover:text-white hover:bg-red-500 border-2 border-red-500 px-6 py-2 rounded-xl transition-all">Reset Board</button>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 flex-grow">
-                        <div id="dropzone-choice1" class="dropzone p-4 rounded-lg transition-colors bg-slate-900/70 flex flex-col">
-                            <div class="flex-shrink-0">
-                                <h3 class="font-bold text-orange-400 mb-2 text-center text-xl">Choice 1 (${columns.choice1.length})</h3>
-                                <div class="text-center p-4">
-                                    <input type="text" id="choice1-menu" value="${menu.choice1Menu}" placeholder="Enter Lunch Choice 1" class="p-2 border rounded-md w-full text-center text-xl font-bold bg-slate-700 text-white border-slate-600" />
-                                </div>
-                            </div>
-                            <div class="flex flex-wrap gap-2 content-start flex-grow overflow-y-auto p-2 -m-2">${columns.choice1.map(s => getStudentHtml(s, 'choice1')).join('')}</div>
-                        </div>
-                        <div id="dropzone-choice2" class="dropzone p-4 rounded-lg transition-colors bg-slate-900/70 flex flex-col">
-                             <div class="flex-shrink-0">
-                                <h3 class="font-bold text-orange-400 mb-2 text-center text-xl">Choice 2 (${columns.choice2.length})</h3>
-                                <div class="text-center p-4">
-                                    <input type="text" id="choice2-menu" value="${menu.choice2Menu}" placeholder="Enter Lunch Choice 2" class="p-2 border rounded-md w-full text-center text-xl font-bold bg-slate-700 text-white border-slate-600" />
-                                </div>
-                            </div>
-                            <div class="flex flex-wrap gap-2 content-start flex-grow overflow-y-auto p-2 -m-2">${columns.choice2.map(s => getStudentHtml(s, 'choice2')).join('')}</div>
-                        </div>
-                        <div id="dropzone-sackLunch" class="dropzone p-4 rounded-lg transition-colors bg-slate-900/70 flex flex-col">
-                             <div class="flex-shrink-0">
-                                <h3 class="font-bold text-orange-400 mb-2 text-center text-xl">Sack Lunch (${columns.sackLunch.length})</h3>
-                             </div>
-                            <div class="flex flex-wrap gap-2 content-start flex-grow overflow-y-auto p-2 -m-2 pt-16">${columns.sackLunch.map(s => getStudentHtml(s, 'sackLunch')).join('')}</div>
-                        </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 flex-grow min-h-0">
+                        ${colTemplate('choice1', 'border-crayon-blue', 'Option A', cols.choice1, true, 'Pizza 🍕')}
+                        ${colTemplate('choice2', 'border-crayon-green', 'Option B', cols.choice2, true, 'Salad 🥗')}
+                        ${colTemplate('choice3', 'border-crayon-orange', 'Home Lunch 🥪', cols.choice3, false)}
                     </div>
-                    
-                    <div class="mt-8 pt-6 border-t border-slate-700 flex-shrink-0">
-                        <div id="dropzone-unselected" class="dropzone p-4 rounded-lg min-h-[120px] transition-colors bg-slate-900/70 border-2 border-dashed border-slate-600">
-                            <div class="flex flex-wrap gap-3 justify-center">
-                                ${columns.unselected.length > 0 ? columns.unselected.map(s => getStudentHtml(s, 'unselected')).join('') : `<p class="text-slate-400 p-4">All students have made their choice!</p>`}
-                            </div>
+
+                    <div class="flex-shrink-0 min-h-[140px] bg-slate-100 rounded-3xl p-4 border-4 border-slate-300 border-dashed relative">
+                        <div class="absolute -top-5 left-6 bg-slate-300 text-white px-4 py-1 rounded-full font-bold uppercase text-sm tracking-wider">Waiting to Choose</div>
+                        <div id="drop-unselected" class="dropzone flex flex-wrap gap-3 mt-2 h-full items-center pl-2">
+                            ${cols.unselected.length > 0 ? cols.unselected.map(s => makeDraggable(s, 'unselected')).join('') : '<div class="w-full text-center text-slate-400 font-bold italic">All done!</div>'}
                         </div>
                     </div>
                 </div>
             `;
-            
-            let draggedElement = null;
-            let draggedItemId = null;
-            let fromColumnId = null;
 
-            // Mouse Events
-            document.querySelectorAll('.student-draggable').forEach(item => {
-                item.ondragstart = (e) => {
-                    draggedItemId = e.target.closest('.student-draggable').dataset.studentId;
-                    fromColumnId = e.target.closest('.student-draggable').dataset.fromColumn;
-                    e.dataTransfer.effectAllowed = 'move';
-                    e.target.classList.add('dragging');
-                };
-                item.ondragend = (e) => {
-                    e.target.classList.remove('dragging');
-                };
-            });
+            // Drag Logic
+            let draggedItem = null;
+            let sourceCol = null;
 
-            document.querySelectorAll('.dropzone').forEach(zone => {
-                zone.ondragover = (e) => { e.preventDefault(); zone.classList.add('bg-purple-500'); };
-                zone.ondragleave = (e) => { zone.classList.remove('bg-purple-500'); };
-                zone.ondrop = (e) => {
-                    e.preventDefault();
-                    zone.classList.remove('bg-purple-500');
-                    const toColumnId = zone.id.replace('dropzone-', '');
-                    
-                    if (fromColumnId !== toColumnId) {
-                        const studentToMove = appState.lunchColumns[fromColumnId].find(s => s.id === draggedItemId);
-                        if (studentToMove) {
-                            appState.lunchColumns[fromColumnId] = appState.lunchColumns[fromColumnId].filter(s => s.id !== draggedItemId);
-                            appState.lunchColumns[toColumnId].push(studentToMove);
-                            renderLunchChoice();
-                        }
-                    }
-                };
-            });
+            const handleDragStart = (e) => {
+                draggedItem = e.target;
+                sourceCol = e.target.dataset.col;
+                e.target.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            };
 
-            // Touch Events
-            document.querySelectorAll('.student-draggable').forEach(item => {
-                item.addEventListener('touchstart', (e) => {
-                    draggedElement = e.target.closest('.student-draggable');
-                    draggedItemId = draggedElement.dataset.studentId;
-                    fromColumnId = draggedElement.dataset.fromColumn;
-                    draggedElement.classList.add('dragging');
-                });
-            });
-            
-            toolDisplay.addEventListener('touchmove', (e) => {
-                if (!draggedElement) return;
+            const handleDragEnd = (e) => {
+                if(e.target) e.target.classList.remove('dragging');
+                document.querySelectorAll('.dropzone').forEach(d => d.classList.remove('dropzone-active'));
+            };
+
+            const handleDragOver = (e) => {
                 e.preventDefault();
-                const touch = e.touches[0];
-                const elementUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
-                const dropzone = elementUnderTouch?.closest('.dropzone');
+                const zone = e.target.closest('.dropzone');
+                if (zone) zone.classList.add('dropzone-active');
+            };
+            
+            const handleDragLeave = (e) => {
+                const zone = e.target.closest('.dropzone');
+                if (zone) zone.classList.remove('dropzone-active');
+            };
 
-                document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('bg-purple-500'));
-                if (dropzone) {
-                    dropzone.classList.add('bg-purple-500');
+            const handleDrop = (e) => {
+                e.preventDefault();
+                const zone = e.target.closest('.dropzone');
+                if (!zone || !draggedItem) return;
+                
+                const targetId = zone.id.replace('drop-', '');
+                if (targetId === sourceCol) return;
+
+                const studentId = draggedItem.dataset.id;
+                const student = appState.lunchColumns[sourceCol].find(s => s.id === studentId);
+                
+                appState.lunchColumns[sourceCol] = appState.lunchColumns[sourceCol].filter(s => s.id !== studentId);
+                appState.lunchColumns[targetId].push(student);
+                
+                renderLunchChoice();
+            };
+
+            // Touch Support
+            let touchItem = null;
+            const handleTouchStart = (e) => {
+                touchItem = e.target.closest('.draggable-item');
+                if(touchItem) {
+                    sourceCol = touchItem.dataset.col;
+                    touchItem.classList.add('dragging');
                 }
+            };
+
+            toolDisplay.querySelectorAll('.draggable-item').forEach(el => {
+                el.addEventListener('dragstart', handleDragStart);
+                el.addEventListener('dragend', handleDragEnd);
             });
 
-            toolDisplay.addEventListener('touchend', (e) => {
-                if (!draggedElement) return;
-                
-                const touch = e.changedTouches[0];
-                const elementUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
-                const dropzone = elementUnderTouch?.closest('.dropzone');
-                
-                if (dropzone) {
-                    const toColumnId = dropzone.id.replace('dropzone-', '');
-                    if (fromColumnId !== toColumnId) {
-                         const studentToMove = appState.lunchColumns[fromColumnId].find(s => s.id === draggedItemId);
-                        if (studentToMove) {
-                            appState.lunchColumns[fromColumnId] = appState.lunchColumns[fromColumnId].filter(s => s.id !== draggedItemId);
-                            appState.lunchColumns[toColumnId].push(studentToMove);
-                            renderLunchChoice();
-                        }
-                    }
-                }
-                
-                document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('bg-purple-500'));
-                draggedElement.classList.remove('dragging');
-                draggedElement = null;
-                draggedItemId = null;
-                fromColumnId = null;
+            toolDisplay.querySelectorAll('.dropzone').forEach(el => {
+                el.addEventListener('dragover', handleDragOver);
+                el.addEventListener('dragleave', handleDragLeave);
+                el.addEventListener('drop', handleDrop);
             });
             
-            document.getElementById('choice1-menu').oninput = (e) => { appState.lunchMenu.choice1Menu = e.target.value; };
-            document.getElementById('choice2-menu').oninput = (e) => { appState.lunchMenu.choice2Menu = e.target.value; };
-            document.getElementById('reset-lunch-btn').onclick = () => {
-                appState.lunchColumns = null; // This will trigger re-initialization on next render
-                appState.lunchMenu = { choice1Menu: '', choice2Menu: '' };
+            ['choice1', 'choice2'].forEach(key => {
+                const input = document.getElementById(`input-${key}`);
+                const emojiDisplay = document.getElementById(`emoji-display-${key}`);
+                
+                if (input) {
+                    input.oninput = (e) => {
+                        const val = e.target.value;
+                        appState.lunchMenu[`${key}Menu`] = val;
+                        
+                        // Find emoji logic
+                        const words = val.toLowerCase().split(/\s+/);
+                        let foundEmoji = '';
+                        for (let i = words.length - 1; i >= 0; i--) {
+                            if (FOOD_EMOJIS[words[i]]) {
+                                foundEmoji = FOOD_EMOJIS[words[i]];
+                                break;
+                            }
+                        }
+
+                        // Update Visual Aid
+                        if (emojiDisplay) {
+                            emojiDisplay.textContent = foundEmoji;
+                            if (foundEmoji) {
+                                emojiDisplay.classList.remove('scale-50');
+                                emojiDisplay.classList.remove('opacity-0');
+                                emojiDisplay.classList.add('scale-100');
+                                emojiDisplay.classList.add('opacity-100');
+                            } else {
+                                emojiDisplay.classList.remove('scale-100');
+                                emojiDisplay.classList.remove('opacity-100');
+                                emojiDisplay.classList.add('scale-50');
+                                emojiDisplay.classList.add('opacity-0');
+                            }
+                        }
+                    };
+                }
+            });
+
+            document.getElementById('reset-lunch').onclick = () => {
+                appState.lunchColumns = null;
+                appState.lunchMenu = {};
                 renderLunchChoice();
             };
         }
 
-        // --- Tool: Tournament Bracket ---
+        // --- Tool: Tournament Bracket (Double Elimination) ---
+
         function renderTournamentBracket() {
             const bracket = appState.bracket;
 
-            const getPlayerHtml = (player, winner, clickHandler) => {
-                if (!player) return `<div class="p-2 my-1 rounded bg-slate-700 text-slate-400">TBD</div>`;
-                const isWinner = winner && player && winner.id === player.id;
-                const canSelect = !winner && player && player.name !== 'BYE' && clickHandler;
-                return `<div ${canSelect ? `onclick="${clickHandler}"` : ''}
-                             class="p-2 my-1 rounded transition-all text-slate-800
-                                    ${canSelect ? 'cursor-pointer hover:bg-lime-300' : ''} 
-                                    ${isWinner ? 'bg-lime-400 font-bold text-lime-900' : 'bg-slate-300'} 
-                                    ${player.name === 'BYE' ? 'text-slate-500 italic' : ''}">
-                          ${player.name}
-                        </div>`;
+            const renderMatch = (match, type) => {
+                const p1 = match.players[0];
+                const p2 = match.players[1];
+                const wId = match.winner?.id;
+
+                const renderPlayer = (p, isTop) => {
+                    if (!p) return '<div class="h-10 bg-slate-100/50 rounded-lg mb-1"></div>';
+                    const isWin = wId === p.id;
+                    const isLose = wId && wId !== p.id;
+                    
+                    // Interaction: Only allow click if no winner set yet and not a bye
+                    const onClick = (!wId && p.name !== 'BYE') 
+                        ? `onclick="window.advanceBracket('${match.id}', '${p.id}')"` 
+                        : '';
+                        
+                    return `
+                        <div ${onClick} class="
+                            h-12 flex items-center justify-between px-3 rounded-lg text-lg font-bold transition-all cursor-pointer mb-1 border-2 select-none
+                            ${isWin ? 'bg-green-100 text-green-700 border-green-500' : ''}
+                            ${isLose ? 'bg-slate-50 text-slate-400 border-slate-200' : ''}
+                            ${!wId && p.name !== 'BYE' ? 'bg-white hover:bg-yellow-50 border-slate-300 hover:border-yellow-400 shadow-sm' : ''}
+                            ${p.name === 'BYE' ? 'bg-transparent border-transparent text-slate-400/50' : ''}
+                        ">
+                            <div class="flex items-center gap-2 overflow-hidden w-full">
+                                <span class="text-xl">${p.name !== 'BYE' ? getStudentEmoji(p.name) : ''}</span>
+                                <span class="truncate">${p.name}</span>
+                            </div>
+                        </div>
+                    `;
+                };
+
+                return `
+                    <div class="relative flex flex-col justify-center mb-6 w-[320px] flex-shrink-0">
+                        <div class="bg-slate-200/40 p-2 rounded-xl border-l-8 ${type === 'winner' ? 'border-crayon-blue' : (type === 'loser' ? 'border-crayon-orange' : 'border-yellow-400')}">
+                            ${renderPlayer(p1, true)}
+                            <div class="h-px bg-slate-300/50 my-1 mx-2"></div>
+                            ${renderPlayer(p2, false)}
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase text-right px-2 tracking-widest">Match ${match.id}</div>
+                    </div>
+                `;
             };
+
+            let content = '';
             
-            const getMatchHtml = (match, bracketType, roundIndex, matchIndex) => {
-                const [p1, p2] = match.players;
-                const p1ClickHandler = p1 && p2 && !match.winner ? `handleWinnerClick('${bracketType}', ${roundIndex}, ${matchIndex}, '${p1.id}')` : '';
-                const p2ClickHandler = p1 && p2 && !match.winner ? `handleWinnerClick('${bracketType}', ${roundIndex}, ${matchIndex}, '${p2.id}')` : '';
-                const bgColor = bracketType === 'winners' ? 'border-lime-400' : bracketType === 'losers' ? 'border-orange-400' : 'border-yellow-400';
+            if (!bracket) {
+                content = `
+                    <div class="flex flex-col items-center justify-center h-full animate-pop-in">
+                        <div class="p-10 bg-yellow-100 rounded-full mb-8 animate-wiggle">
+                            <i data-lucide="trophy" class="w-24 h-24 text-yellow-500"></i>
+                        </div>
+                        <h2 class="text-5xl font-black text-slate-800 mb-4">Double Elimination</h2>
+                        <p class="text-slate-500 text-2xl mb-12 max-w-md text-center">Ready to find out who the classroom champion is?</p>
+                        <button id="gen-bracket" class="btn-cartoon bg-crayon-blue text-white px-12 py-6 rounded-3xl font-black text-2xl flex items-center gap-4">
+                            <i data-lucide="zap" class="w-8 h-8"></i> GENERATE BRACKET
+                        </button>
+                    </div>
+                `;
+            } else if (appState.podium) {
+                 const { first, second } = appState.podium;
+                content = `
+                    <div class="flex flex-col items-center justify-center h-full animate-pop-in text-center relative z-10">
+                        <h2 class="text-6xl font-black text-slate-800 mb-16 tracking-tight">🏆 CHAMPIONS 🏆</h2>
+                        <div class="flex items-end justify-center gap-8">
+                             <!-- 2nd -->
+                            <div class="flex flex-col items-center animate-pop-in" style="animation-delay: 0.2s">
+                                <div class="text-6xl mb-4 transform -rotate-6">${getStudentEmoji(second.name)}</div>
+                                <div class="text-slate-600 font-bold mb-2 text-2xl">${second.name}</div>
+                                <div class="w-32 h-48 bg-slate-300 rounded-t-2xl border-4 border-slate-400 flex items-center justify-center text-6xl font-black text-white shadow-lg">2</div>
+                            </div>
+                            <!-- 1st -->
+                            <div class="flex flex-col items-center animate-pop-in z-10">
+                                <i data-lucide="crown" class="w-16 h-16 text-yellow-500 mb-2 animate-bounce-slow"></i>
+                                <div class="text-8xl mb-4 transform rotate-6">${getStudentEmoji(first.name)}</div>
+                                <div class="text-slate-800 font-black mb-2 text-4xl">${first.name}</div>
+                                <div class="w-48 h-64 bg-yellow-400 rounded-t-2xl border-4 border-yellow-500 flex items-center justify-center text-8xl font-black text-white shadow-xl">1</div>
+                            </div>
+                        </div>
+                        <button id="reset-bracket" class="mt-16 bg-white text-slate-500 hover:text-red-500 border-2 border-slate-200 hover:border-red-400 px-8 py-4 rounded-2xl font-bold text-xl transition-all">Start New Tournament</button>
+                    </div>
+                `;
+            } else {
+                // Bracket View with Scroll
+                const renderRound = (matches, title) => `
+                    <div class="flex flex-col gap-4">
+                        <div class="text-center font-black text-slate-400 uppercase tracking-widest bg-slate-100 rounded-full py-1 text-sm mb-4 sticky top-0 z-10 shadow-sm">${title}</div>
+                        <div class="flex flex-col gap-6 justify-center flex-grow">
+                             ${matches.map(m => renderMatch(m, m.type)).join('')}
+                        </div>
+                    </div>
+                `;
 
-                return `<div class="bg-slate-800 p-3 rounded-lg shadow-md border-2 ${bgColor} w-52">
-                          ${getPlayerHtml(p1, match.winner, p1ClickHandler)}
-                          <div class="text-center text-xs font-bold text-slate-400">VS</div>
-                          ${getPlayerHtml(p2, match.winner, p2ClickHandler)}
-                        </div>`;
-            };
-
-            let bracketHtml = '';
-            if (bracket) {
-                bracketHtml = `<div class="flex flex-col xl:flex-row justify-start items-start space-y-12 xl:space-y-0 xl:space-x-12">`;
-                // Winners Bracket
-                bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-lime-400">🏆 Winners Bracket</h3><div class="flex space-x-6 pb-4">`;
-                bracket.winners.forEach((round, roundIndex) => {
-                    bracketHtml += `<div class="flex flex-col space-y-8 justify-around min-w-max"><h4 class="text-center font-semibold text-slate-300">Round ${roundIndex + 1}</h4>`;
-                    round.forEach((match, matchIndex) => {
-                        bracketHtml += getMatchHtml(match, 'winners', roundIndex, matchIndex);
-                    });
-                    bracketHtml += `</div>`;
-                });
-                bracketHtml += `</div></div>`;
-
-                // Losers Bracket
-                bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-orange-400">🥈 Second Chance</h3><div class="flex space-x-6 pb-4">`;
-                 bracket.losers.forEach((round, roundIndex) => {
-                    if(round.length > 0) {
-                        bracketHtml += `<div class="flex flex-col space-y-8 justify-around min-w-max"><h4 class="text-center font-semibold text-slate-300">Round ${roundIndex + 1}</h4>`;
-                        round.forEach((match, matchIndex) => {
-                            bracketHtml += getMatchHtml(match, 'losers', roundIndex, matchIndex);
-                        });
-                        bracketHtml += `</div>`;
-                    }
-                });
-                bracketHtml += `</div></div>`;
-                
-                // Final Match
-                if(bracket.final && bracket.final.length > 0) {
-                     bracketHtml += `<div><h3 class="text-2xl font-bold text-center mb-4 text-yellow-400">👑 Championship</h3><div class="flex space-x-6 pb-4">`;
-                     bracketHtml += `<div class="flex flex-col space-y-8 justify-around min-w-max">`;
-                     bracket.final.forEach((match, matchIndex) => {
-                        bracketHtml += getMatchHtml(match, 'final', 0, matchIndex);
-                     });
-                     bracketHtml += `</div></div></div>`;
+                // Group matches by round for rendering
+                // WB Rounds
+                const wbRounds = [];
+                let r = 1;
+                while(true) {
+                    const matches = bracket.matches.filter(m => m.type === 'winner' && m.round === r);
+                    if(matches.length === 0) break;
+                    wbRounds.push(matches);
+                    r++;
                 }
 
-                bracketHtml += `</div>`;
-            }
-            
-            let podiumHtml = '';
-            if (appState.podium) {
-                const { first, second, third } = appState.podium;
-                podiumHtml = `<div id="confetti-container" class="absolute inset-0 overflow-hidden z-10 pointer-events-none"></div>
-                              <div class="flex flex-col items-center justify-center h-full animate-fade-in">
-                                <div class="bg-slate-700/90 backdrop-blur-md p-8 rounded-2xl shadow-2xl text-center relative z-20">
-                                    <h2 class="text-4xl font-bold text-slate-200 mb-6">Tournament Over!</h2>
-                                    <div class="flex items-end justify-center space-x-4">
-                                        <div class="text-center">
-                                            <p class="text-2xl font-bold text-slate-300">🥈 ${second.name}</p>
-                                            <div class="bg-slate-500 text-slate-200 p-6 rounded-t-lg mt-2 h-24 flex items-center justify-center text-4xl font-bold">2nd</div>
-                                        </div>
-                                        <div class="text-center">
-                                            <p class="text-3xl font-bold text-yellow-400">🏆 ${first.name}</p>
-                                            <div class="bg-yellow-500 text-white p-8 rounded-t-lg mt-2 h-32 flex items-center justify-center text-5xl font-bold">1st</div>
-                                        </div>
-                                        ${third ? `<div class="text-center">
-                                            <p class="text-xl font-bold text-orange-400">🥉 ${third.name}</p>
-                                            <div class="bg-orange-600 text-white p-4 rounded-t-lg mt-2 h-20 flex items-center justify-center text-3xl font-bold">3rd</div>
-                                        </div>` : ''}
+                // LB Rounds
+                const lbRounds = [];
+                r = 1;
+                while(true) {
+                    const matches = bracket.matches.filter(m => m.type === 'loser' && m.round === r);
+                    if(matches.length === 0) break;
+                    lbRounds.push(matches);
+                    r++;
+                }
+                
+                // Final
+                const finalRound = bracket.matches.filter(m => m.type === 'final');
+
+                content = `
+                    <div class="h-full flex flex-col overflow-hidden">
+                        <div class="flex justify-between items-center p-4 bg-slate-50 border-b-2 border-slate-200 shrink-0">
+                            <h3 class="font-black text-2xl text-slate-700 flex items-center gap-3"><i data-lucide="git-branch" class="text-crayon-blue"></i> Tournament Bracket</h3>
+                            <button id="reset-bracket-mini" class="text-red-400 font-bold hover:text-red-600">Reset</button>
+                        </div>
+                        
+                        <div class="flex-grow overflow-x-auto overflow-y-auto p-8 custom-scrollbar bg-slate-50/30">
+                            <div class="flex flex-col gap-12 min-w-max">
+                                
+                                <!-- Winners Section -->
+                                <div class="flex gap-12">
+                                    <div class="flex flex-col justify-center mr-4"><div class="p-4 bg-crayon-blue/10 text-crayon-blue font-black rounded-xl rotate-180" style="writing-mode: vertical-rl;">WINNERS BRACKET</div></div>
+                                    ${wbRounds.map((roundMatches, i) => renderRound(roundMatches, `WB Round ${i+1}`)).join('')}
+                                    <div class="flex flex-col justify-center ml-12 gap-8">
+                                         ${renderRound(finalRound, "GRAND FINAL")}
                                     </div>
                                 </div>
-                            </div>`;
-            }
 
-            toolDisplay.innerHTML = `
-                <div class="font-sans relative p-4 bg-slate-900/70 rounded-lg flex flex-col h-full">
-                    <h2 class="text-3xl font-bold text-orange-400 mb-6 text-center flex-shrink-0">Tournament Bracket</h2>
-                    <div class="flex justify-center mb-6 relative z-30 flex-shrink-0">
-                        <button id="generate-bracket-btn" class="bg-gradient-to-r from-purple-600 to-orange-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:opacity-90 transform hover:scale-105 transition-all">
-                            Generate Bracket
-                        </button>
-                         ${bracket ? `<button id="reset-bracket-btn" class="ml-4 bg-gradient-to-r from-red-600 to-orange-700 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:opacity-90 transform hover:scale-105 transition-all">Reset</button>` : ''}
+                                <!-- Divider -->
+                                <div class="h-2 w-full bg-slate-200 rounded-full"></div>
+
+                                <!-- Losers Section -->
+                                <div class="flex gap-12">
+                                    <div class="flex flex-col justify-center mr-4"><div class="p-4 bg-crayon-orange/10 text-crayon-orange font-black rounded-xl rotate-180" style="writing-mode: vertical-rl;">LOSERS BRACKET</div></div>
+                                    ${lbRounds.map((roundMatches, i) => renderRound(roundMatches, `LB Round ${i+1}`)).join('')}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    ${podiumHtml}
-                    <div id="bracket-container" class="overflow-auto flex-grow">${bracketHtml}</div>
-                </div>
-            `;
-            
-            if(appState.podium) {
-                triggerConfetti();
+                `;
             }
 
-            document.getElementById('generate-bracket-btn').onclick = () => {
-                const presentStudents = appState.students.filter(s => s.isPresent);
-                if (presentStudents.length < 3) {
-                    alert("You need at least 3 present students for a double elimination tournament.");
-                    return;
-                }
-                
-                let players = [...presentStudents].sort(() => Math.random() - 0.5);
-                const numPlayers = players.length;
-                const rounds = Math.ceil(Math.log2(numPlayers));
-                const bracketSize = Math.pow(2, rounds);
-                
-                const numPlayInMatches = numPlayers - (bracketSize / 2);
-                const playersWithByes = numPlayers - (numPlayInMatches * 2);
+            toolDisplay.innerHTML = content;
+            lucide.createIcons();
 
-                let playersForPlayIn = players.slice(playersWithByes);
-                let byePlayers = players.slice(0, playersWithByes);
+            const genBtn = document.getElementById('gen-bracket');
+            if (genBtn) genBtn.onclick = generateBracketData;
 
-                let playInRound = [];
-                for(let i=0; i < numPlayInMatches; i++) {
-                    playInRound.push({ players: [playersForPlayIn.shift(), playersForPlayIn.shift()], winner: null, id: `w-r0-m${i}` });
-                }
-
-                const newBracket = { winners: [playInRound], losers: [], final: [] };
-
-                // Pre-fill winners bracket structure
-                let numMatchesInRound = bracketSize / 4;
-                for (let r = 1; r < rounds; r++) {
-                    const nextRound = [];
-                    for (let i = 0; i < numMatchesInRound; i++) {
-                        nextRound.push({ players: [null, null], winner: null, id: `w-r${r}-m${i}` });
-                    }
-                    newBracket.winners.push(nextRound);
-                    numMatchesInRound /= 2;
-                }
-                
-                // Place bye players in round 2 (index 1)
-                for (let i = 0; i < byePlayers.length; i++) {
-                    const matchIndex = Math.floor(i / 2);
-                    const playerSlot = i % 2;
-                    newBracket.winners[1][matchIndex].players[playerSlot] = byePlayers[i];
-                }
-
-                // Pre-fill losers bracket structure
-                let loserRounds = (rounds - 1) * 2 - 1;
-                for(let r=0; r < loserRounds; r++) {
-                    let matchesInRound = 0;
-                    if (r % 2 === 0) {
-                        matchesInRound = Math.pow(2, rounds - 2) / Math.pow(2, r / 2);
-                    } else {
-                        matchesInRound = Math.pow(2, rounds - 2) / Math.pow(2, (r - 1) / 2);
-                    }
-                    const round = [];
-                    for (let i = 0; i < matchesInRound; i++) {
-                        round.push({ players: [null, null], winner: null, id: `l-r${r}-m${i}` });
-                    }
-                    newBracket.losers.push(round);
-                }
-                
-                // Pre-fill final match
-                newBracket.final.push({ players: [null, null], winner: null, id: 'final-match' });
-
-                appState.bracket = newBracket;
-                appState.podium = null;
-                renderTournamentBracket();
-            };
-            
-            if (document.getElementById('reset-bracket-btn')) {
-                document.getElementById('reset-bracket-btn').onclick = () => {
-                    appState.bracket = null;
-                    appState.podium = null;
-                    renderTournamentBracket();
-                };
-            }
+            const resetBtns = [document.getElementById('reset-bracket'), document.getElementById('reset-bracket-mini')];
+            resetBtns.forEach(b => { if(b) b.onclick = () => { appState.bracket = null; appState.podium = null; renderTournamentBracket(); } });
         }
-        
-        window.handleWinnerClick = (bracketType, roundIndex, matchIndex, winnerId) => {
-            const bracket = appState.bracket;
-            if (!bracket) return;
 
-            const match = (bracketType === 'final') 
-                ? bracket.final[matchIndex] 
-                : bracket[bracketType]?.[roundIndex]?.[matchIndex];
+        // --- Double Elimination Generation Logic ---
 
-            if (!match || match.winner || !match.players[0] || !match.players[1]) {
-                return; 
+        function generateBracketData() {
+            const players = appState.students.filter(s => s.isPresent).sort(() => Math.random() - 0.5);
+            if (players.length < 3) return alert("Need at least 3 players!");
+
+            // Pad to power of 2
+            let size = 2;
+            while(size < players.length) size *= 2;
+            while(players.length < size) players.push({ name: 'BYE', id: 'bye' });
+
+            const matches = [];
+            
+            // --- Winners Bracket Generation ---
+            // Round 1
+            const totalRounds = Math.log2(size);
+            let currentRoundMatches = [];
+            
+            for(let i=0; i<size/2; i++) {
+                const id = `w-1-${i}`;
+                const m = { id, type: 'winner', round: 1, players: [players[i], players[size-1-i]], winner: null, nextWin: null, nextLose: null };
+                matches.push(m);
+                currentRoundMatches.push(m);
             }
+
+            // Subsequent Winners Rounds
+            let prevRoundMatches = currentRoundMatches;
+            for(let r=2; r<=totalRounds; r++) {
+                currentRoundMatches = [];
+                for(let i=0; i<prevRoundMatches.length/2; i++) {
+                    const id = `w-${r}-${i}`;
+                    const m = { id, type: 'winner', round: r, players: [null, null], winner: null, nextWin: null, nextLose: null };
+                    matches.push(m);
+                    currentRoundMatches.push(m);
+                    
+                    // Link previous winners
+                    prevRoundMatches[i*2].nextWin = { id, slot: 0 };
+                    prevRoundMatches[i*2+1].nextWin = { id, slot: 1 };
+                }
+                prevRoundMatches = currentRoundMatches;
+            }
+            const wbFinalMatch = prevRoundMatches[0];
+
+            // --- Losers Bracket Generation ---
+            // LB Round 1: Fed by WB Round 1 Losers
+            // LB has (2 * totalRounds - 2) rounds roughly.
+            // Simplified standard mapping for up to 32 players
+            
+            let lbMatchesByRound = {};
+            const createLBMatch = (r, idx) => {
+                const id = `l-${r}-${idx}`;
+                const m = { id, type: 'loser', round: r, players: [null, null], winner: null, nextWin: null };
+                matches.push(m);
+                if(!lbMatchesByRound[r]) lbMatchesByRound[r] = [];
+                lbMatchesByRound[r].push(m);
+                return m;
+            };
+
+            // Calculate LB structure
+            // LB R1 (N/4 matches): Fed by WB R1 losers
+            for(let i=0; i<size/4; i++) createLBMatch(1, i);
+            
+            // LB R2 (N/4 matches): Fed by LB R1 winners + WB R2 losers
+            for(let i=0; i<size/4; i++) createLBMatch(2, i);
+
+            // LB R3 (N/8 matches): Fed by LB R2 winners
+            for(let i=0; i<size/8; i++) createLBMatch(3, i);
+
+            // LB R4 (N/8 matches): Fed by LB R3 winners + WB R3 losers
+            for(let i=0; i<size/8; i++) createLBMatch(4, i);
+
+            // ... continue pattern until 1 match left
+            // Pattern: odd LB rounds (1, 3, 5...) are pure LB. Even LB rounds (2, 4, 6...) take drop-ins from WB.
+            
+            let lbRound = 5;
+            let count = size/16;
+            while(count >= 1) {
+                // Odd round (Internal LB)
+                for(let i=0; i<count; i++) createLBMatch(lbRound, i);
+                lbRound++;
+                // Even round (Drop in)
+                for(let i=0; i<count; i++) createLBMatch(lbRound, i);
+                count /= 2;
+                lbRound++;
+            }
+            
+            const maxLbRound = lbRound - 1; // Last round generated
+            
+            // --- Wiring Losers Logic ---
+            
+            // Link WB Losers to LB
+            // WB R1 -> LB R1
+            const wbR1 = matches.filter(m => m.type === 'winner' && m.round === 1);
+            const lbR1 = matches.filter(m => m.type === 'loser' && m.round === 1);
+            // Standard cross mapping: Top half of WB losers go to Top half of LB?
+            // Simple mapping: 
+            for(let i=0; i<wbR1.length; i++) {
+                const targetMatch = lbR1[Math.floor(i/2)];
+                wbR1[i].nextLose = { id: targetMatch.id, slot: i%2 };
+            }
+
+            // WB R2 -> LB R2
+            // LB R2 takes: Slot 0 from LB R1 Winner, Slot 1 from WB R2 Loser
+            const wbR2 = matches.filter(m => m.type === 'winner' && m.round === 2);
+            const lbR2 = matches.filter(m => m.type === 'loser' && m.round === 2);
+            const lbR1Matches = matches.filter(m => m.type === 'loser' && m.round === 1);
+            
+            // Wire LB R1 Winners -> LB R2
+            for(let i=0; i<lbR1Matches.length; i++) lbR1Matches[i].nextWin = { id: lbR2[i].id, slot: 0 };
+            // Wire WB R2 Losers -> LB R2
+            for(let i=0; i<wbR2.length; i++) wbR2[i].nextLose = { id: lbR2[i].id, slot: 1 };
+
+            // Generalize remaining LB wiring
+            let currentLbR = 2;
+            let currentWbR = 3;
+            
+            while(currentLbR < maxLbRound) {
+                // Step 1: LB R(n) -> LB R(n+1) [Internal fight]
+                const sourceMatches = matches.filter(m => m.type === 'loser' && m.round === currentLbR);
+                const targetMatches = matches.filter(m => m.type === 'loser' && m.round === currentLbR+1);
+                for(let i=0; i<sourceMatches.length; i++) {
+                    targetMatches[Math.floor(i/2)].players[i%2] = null; // Placeholder logic handled by nextWin
+                    sourceMatches[i].nextWin = { id: targetMatches[Math.floor(i/2)].id, slot: i%2 };
+                }
+                currentLbR++;
+
+                // Step 2: LB R(n+1) + WB R(k) -> LB R(n+2) [Drop in]
+                if (currentLbR >= maxLbRound) break;
+                
+                const internalSource = matches.filter(m => m.type === 'loser' && m.round === currentLbR);
+                const dropSource = matches.filter(m => m.type === 'winner' && m.round === currentWbR);
+                const destMatches = matches.filter(m => m.type === 'loser' && m.round === currentLbR+1);
+
+                if(destMatches.length > 0) {
+                    // Wire Internal Winners
+                    for(let i=0; i<internalSource.length; i++) internalSource[i].nextWin = { id: destMatches[i].id, slot: 0 };
+                    // Wire Drop-ins
+                    for(let i=0; i<dropSource.length; i++) dropSource[i].nextLose = { id: destMatches[i].id, slot: 1 };
+                }
+                
+                currentLbR++;
+                currentWbR++;
+            }
+
+            // --- Grand Final ---
+            const finalId = 'grand-final';
+            const grandFinal = { id: finalId, type: 'final', round: 1, players: [null, null], winner: null };
+            matches.push(grandFinal);
+            
+            // Wire WB Final Winner
+            wbFinalMatch.nextWin = { id: finalId, slot: 0 };
+            // Wire LB Final Winner
+            const lbFinalMatch = matches.filter(m => m.type === 'loser' && m.round === maxLbRound)[0];
+            if(lbFinalMatch) lbFinalMatch.nextWin = { id: finalId, slot: 1 };
+            // Note: WB Final Loser drops to LB Final? 
+            // In simplified DE, WB Final Loser drops to the match BEFORE the Grand Final.
+            // My loop above might miss the last drop if counts don't match perfectly.
+            // Correction for 5th grade simplicity: WB Final Loser -> LB Final. 
+            // My loop handled standard drops. Let's ensure the WB Final Loser goes to the LB Final match.
+            // LB Final is maxLbRound. It needs a drop in from WB Final (totalRounds).
+            if(lbFinalMatch) {
+               // Usually LB Final is: Winner of prev LB vs Loser of WB Final.
+               // My loop logic wires drop-ins to EVEN LB rounds.
+               // If maxLbRound is even, it got a drop in. If odd, it didn't.
+               // Let's force wire the last WB loser to the last LB match to be safe.
+               wbFinalMatch.nextLose = { id: lbFinalMatch.id, slot: 1 };
+               // And ensure the previous LB winner goes to slot 0
+               const prevLb = matches.filter(m => m.type === 'loser' && m.round === maxLbRound-1);
+               if(prevLb.length === 1) prevLb[0].nextWin = { id: lbFinalMatch.id, slot: 0 };
+            }
+
+            appState.bracket = { matches };
+            
+            // Auto-advance BYEs
+            matches.forEach(m => {
+                const byeIdx = m.players.findIndex(p => p && p.id === 'bye');
+                if (byeIdx !== -1) {
+                    const realPlayerIdx = byeIdx === 0 ? 1 : 0;
+                    if(m.players[realPlayerIdx] && m.players[realPlayerIdx].id !== 'bye') {
+                       window.advanceBracket(m.id, m.players[realPlayerIdx].id); 
+                    }
+                }
+            });
+            
+            renderTournamentBracket();
+        }
+
+        window.advanceBracket = (matchId, winnerId) => {
+            const matches = appState.bracket.matches;
+            const match = matches.find(m => m.id === matchId);
+            if (!match || match.winner) return;
 
             const winner = match.players.find(p => p.id === winnerId);
             const loser = match.players.find(p => p.id !== winnerId);
             match.winner = winner;
 
-            if (bracketType === 'winners') {
-                const isFinalWinnersMatch = roundIndex === bracket.winners.length - 1;
-
-                if (!isFinalWinnersMatch) {
-                    const nextRound = bracket.winners[roundIndex + 1];
-                    let nextMatchIndex, playerSlot;
-                    
-                    if(roundIndex === 0 && bracket.winners[0].length > 0 && bracket.winners[0].length !== (bracket.winners[1]?.length || 0) * 2) { // Play-in round
-                        const numByes = bracket.winners[1].reduce((count, currentMatch) => count + currentMatch.players.filter(p => p !== null).length, 0);
-                        nextMatchIndex = Math.floor(numByes / 2) + matchIndex;
-                        playerSlot = (numByes % 2);
-                    } else { // Standard advancement
-                        nextMatchIndex = Math.floor(matchIndex / 2);
-                        playerSlot = matchIndex % 2;
-                    }
-                    if (nextRound && nextRound[nextMatchIndex]) {
-                        nextRound[nextMatchIndex].players[playerSlot] = winner;
-                    }
-                } else {
-                    bracket.final[0].players[0] = winner;
-                }
-
-                if (loser && loser.name !== 'BYE') {
-                    const targetRoundIndex = isFinalWinnersMatch ? bracket.losers.length - 1 : roundIndex * 2;
-                    const targetMatchIndex = isFinalWinnersMatch ? 0 : matchIndex;
-                    const targetSlot = isFinalWinnersMatch ? 1 : 0;
-                    
-                    if (bracket.losers[targetRoundIndex] && bracket.losers[targetRoundIndex][targetMatchIndex]) {
-                        bracket.losers[targetRoundIndex][targetMatchIndex].players[targetSlot] = loser;
+            // Move Winner
+            if (match.nextWin) {
+                const nextM = matches.find(m => m.id === match.nextWin.id);
+                if (nextM) {
+                    nextM.players[match.nextWin.slot] = winner;
+                    // Check for auto-advance against existing BYE
+                    if (nextM.players.some(p => p && p.id === 'bye')) {
+                         // wait for render or trigger recursion? recursion is safer for state consistency
+                         // but let's let the user click to keep it simple, or auto-click next render
                     }
                 }
-            } else if (bracketType === 'losers') {
-                const isFinalLosersMatch = roundIndex === bracket.losers.length - 1;
+            } else if (match.type === 'final') {
+                appState.podium = { first: winner, second: loser };
+            }
 
-                if (!isFinalLosersMatch) {
-                    const nextRound = bracket.losers[roundIndex + 1];
-                    let nextMatchIndex, playerSlot;
-                    if (roundIndex % 2 === 0) { // Winners advance to play drop-downs
-                        nextMatchIndex = matchIndex;
-                        playerSlot = 1;
-                    } else { // Winners advance to play each other
-                        nextMatchIndex = Math.floor(matchIndex / 2);
-                        playerSlot = matchIndex % 2;
-                    }
-                    if (nextRound && nextRound[nextMatchIndex]) {
-                        nextRound[nextMatchIndex].players[playerSlot] = winner;
-                    }
-                } else {
-                    bracket.final[0].players[1] = winner;
-                    appState.thirdPlace = loser;
+            // Move Loser
+            if (match.nextLose) {
+                const nextM = matches.find(m => m.id === match.nextLose.id);
+                if (nextM) {
+                    nextM.players[match.nextLose.slot] = loser;
                 }
-            } else if (bracketType === 'final') {
-                match.winner = winner;
-                appState.podium = {
-                    first: winner,
-                    second: loser,
-                    third: appState.thirdPlace,
+            } else if (match.type === 'final') {
+                // Done
+            }
+
+            renderTournamentBracket();
+        };
+
+        // --- Tool: Hangman ---
+
+        function renderHangman(state) {
+            const WORDS = ["DINOSAUR", "ASTRONAUT", "BUTTERFLY", "RAINBOW", "VACATION", "CUPCAKE", "ADVENTURE", "LIBRARY", "SOCCER"];
+            
+            if (!state) {
+                state = {
+                    word: WORDS[Math.floor(Math.random() * WORDS.length)],
+                    guesses: [],
+                    status: 'playing' 
                 };
             }
             
-            renderTournamentBracket();
-        };
-        
-        function triggerConfetti() {
-            const container = document.getElementById('confetti-container');
-            if (!container) return;
-            container.innerHTML = ''; // Clear old ones
-            for (let i = 0; i < 50; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = `${Math.random() * 100}vw`;
-                confetti.style.animationDelay = `${Math.random() * 3}s`;
-                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                container.appendChild(confetti);
-            }
-            for (let i = 0; i < 10; i++) {
-                const firework = document.createElement('div');
-                firework.className = 'firework';
-                firework.style.left = `${Math.random() * 100}vw`;
-                firework.style.top = `${Math.random() * 100}vh`;
-                firework.style.width = `${Math.random() * 3 + 2}px`;
-                firework.style.height = firework.style.width;
-                firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                firework.style.animationDelay = `${Math.random() * 2}s`;
-                container.appendChild(firework);
-            }
-        }
-
-        // --- Tool: Hangman ---
-        function renderHangman(gameState = {}) {
-            const HANGMAN_WORDS = ["pumpkin", "ghost", "vampire", "witch", "spider", "cauldron", "haunted", "costume", "zombie", "werewolf", "frankenstein", "candy corn", "trick or treat", "black cat", "jack o lantern", "full moon", "spooky", "monster mash", "october", "autumn"];
-            const MAX_WRONG_GUESSES = 6;
-
-            let { secretWord, guessedLetters, gameStatus } = gameState;
-
-            if (!secretWord) {
-                secretWord = HANGMAN_WORDS[Math.floor(Math.random() * HANGMAN_WORDS.length)];
-                guessedLetters = [];
-                gameStatus = 'playing';
-            }
+            const wrongs = state.guesses.filter(l => !state.word.includes(l)).length;
+            const maxWrongs = 6;
             
-            const wrongGuesses = guessedLetters.filter(letter => !secretWord.includes(letter)).length;
-
-            if (gameStatus === 'playing') {
-                const isWinner = secretWord.split('').every(letter => guessedLetters.includes(letter) || letter === ' ');
-                if (wrongGuesses >= MAX_WRONG_GUESSES) gameStatus = 'lost';
-                else if (isWinner) gameStatus = 'won';
+            if (state.status === 'playing') {
+                if (wrongs >= maxWrongs) state.status = 'lost';
+                else if (state.word.split('').every(l => state.guesses.includes(l))) state.status = 'won';
             }
 
-            const head = `<div class="absolute w-12 h-12 border-4 border-slate-300 rounded-full top-[48px] right-[-22px]"></div>`;
-            const body = `<div class="absolute w-1 h-24 bg-slate-300 top-[96px] right-0"></div>`;
-            const rightArm = `<div class="absolute w-16 h-1 bg-slate-300 top-[120px] right-[-64px] rotate-[-30deg]"></div>`;
-            const leftArm = `<div class="absolute w-16 h-1 bg-slate-300 top-[120px] right-[0px] rotate-[30deg]"></div>`;
-            const rightLeg = `<div class="absolute w-16 h-1 bg-slate-300 top-[190px] right-[-56px] rotate-[60deg]"></div>`;
-            const leftLeg = `<div class="absolute w-16 h-1 bg-slate-300 top-[190px] right-[-8px] rotate-[-60deg]"></div>`;
-            const bodyParts = [head, body, rightArm, leftArm, rightLeg, leftLeg];
-            const drawingHtml = `
-                <div class="relative h-64 w-48 mx-auto mb-4">
-                    ${bodyParts.slice(0, wrongGuesses).join('')}
-                    <div class="absolute h-12 w-1 bg-slate-300 top-0 right-0"></div>
-                    <div class="h-1 w-48 bg-slate-300 ml-12"></div>
-                    <div class="h-64 w-1 bg-slate-300 ml-12"></div>
-                    <div class="h-1 w-64 bg-slate-300"></div>
-                </div>`;
+            const drawPath = (d, show) => `<path d="${d}" stroke="#334155" stroke-width="6" stroke-linecap="round" fill="none" class="transition-all duration-500 ${show ? 'opacity-100' : 'opacity-0 dashed-line'}" />`;
+            const parts = [
+                "M140,100 A20,20 0 1,1 100,100 A20,20 0 1,1 140,100", 
+                "M120,120 L120,200", 
+                "M120,140 L90,180", 
+                "M120,140 L150,180", 
+                "M120,200 L90,250", 
+                "M120,200 L150,250"
+            ];
 
-            const wordDisplayHtml = secretWord.split('').map(letter => 
-                letter === ' ' ? `<div class="w-6 md:w-8"></div>` : 
-                `<span class="inline-block text-3xl md:text-5xl font-bold w-10 md:w-12 text-center border-b-4 border-slate-500 mx-1">
-                    ${guessedLetters.includes(letter) ? letter.toUpperCase() : '_'}
-                </span>`
-            ).join('');
+            const keyboard = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').map(char => {
+                const used = state.guesses.includes(char);
+                const isCorrect = state.word.includes(char);
+                let color = "bg-white border-b-4 border-slate-300 text-slate-700 hover:bg-slate-50";
+                if (used && isCorrect) color = "bg-green-500 border-green-700 text-white transform translate-y-1 border-b-0";
+                if (used && !isCorrect) color = "bg-slate-200 border-slate-200 text-slate-400 transform translate-y-1 border-b-0";
 
-            const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
-            const keyboardHtml = alphabet.map(letter => `
-                <button data-letter="${letter}" ${guessedLetters.includes(letter) || gameStatus !== 'playing' ? 'disabled' : ''} class="guess-btn w-10 h-10 md:w-12 md:h-12 text-xl font-bold rounded-md bg-orange-500 text-white hover:bg-orange-600 disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed transition-all">
-                    ${letter.toUpperCase()}
-                </button>
-            `).join('');
-            
-            let statusMessage = '';
-            if (gameStatus === 'lost') {
-                statusMessage = `<div class="animate-fade-in my-4 text-center">
-                    <p class="text-2xl font-bold text-red-500">You lost!</p>
-                    <p class="text-lg text-slate-400">The word was: <span class="font-bold">${secretWord.toUpperCase()}</span></p>
-                </div>`;
-            } else if (gameStatus === 'won') {
-                statusMessage = `<div class="animate-fade-in my-4 text-center"><p class="text-2xl font-bold text-green-500">You won!</p></div>`;
-            }
+                return `<button class="w-12 h-16 md:w-16 md:h-20 rounded-xl font-black text-2xl transition-all ${color}" data-char="${char}" ${used || state.status !== 'playing' ? 'disabled' : ''}>${char}</button>`;
+            }).join('');
 
             toolDisplay.innerHTML = `
-                <div class="flex flex-col items-center justify-center text-center h-full">
-                    <h2 class="text-3xl font-bold text-orange-400 mb-4">Hangman</h2>
-                    ${drawingHtml}
-                    ${statusMessage}
-                    <div class="flex justify-center flex-wrap items-center gap-2 my-4 tracking-widest">${wordDisplayHtml}</div>
-                    <div class="flex flex-wrap justify-center gap-2 mt-6">${keyboardHtml}</div>
-                    <button id="play-again-btn" class="mt-8 bg-gradient-to-r from-purple-600 to-orange-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:opacity-90 transition-transform transform hover:scale-105">Play Again</button>
+                <div class="h-full flex flex-col lg:flex-row gap-8 p-6 items-center justify-center">
+                    
+                    <div class="flex-grow flex flex-col items-center max-w-4xl w-full">
+                        
+                        <div class="flex flex-col md:flex-row items-center gap-12 mb-8">
+                             <div class="relative w-64 h-64 bg-yellow-50 rounded-3xl border-4 border-yellow-200 shadow-inner">
+                                <svg viewBox="0 0 300 300" class="w-full h-full">
+                                    <path d="M20,280 L280,280 M60,280 L60,40 L180,40 M180,40 L180,80" stroke="#94a3b8" stroke-width="6" stroke-linecap="round" fill="none" />
+                                    ${parts.map((d, i) => drawPath(d, wrongs > i)).join('')}
+                                </svg>
+                            </div>
+                            
+                            <div class="flex flex-col items-center">
+                                <div class="flex flex-wrap gap-3 justify-center mb-6">
+                                    ${state.word.split('').map(char => `
+                                        <div class="w-14 h-20 flex items-center justify-center border-b-8 ${state.guesses.includes(char) ? 'border-slate-800 text-slate-800' : 'border-slate-300 text-transparent'} text-6xl font-black bg-white/50 rounded-t-xl">
+                                            ${state.guesses.includes(char) || state.status === 'lost' ? char : '_'}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                ${state.status !== 'playing' ? `
+                                    <div class="animate-pop-in text-center bg-white p-6 rounded-3xl border-4 ${state.status === 'won' ? 'border-green-400' : 'border-red-400'} shadow-xl">
+                                        <h3 class="text-4xl font-black ${state.status === 'won' ? 'text-green-500' : 'text-red-500'} mb-2">
+                                            ${state.status === 'won' ? '🎉 YOU DID IT! 🎉' : '🙈 OOPS! TRY AGAIN!'}
+                                        </h3>
+                                        <button id="restart-hangman" class="px-8 py-3 bg-slate-800 hover:bg-black text-white font-bold rounded-xl transition-all text-xl mt-2">New Game</button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-3 justify-center">
+                            ${keyboard}
+                        </div>
+
+                    </div>
                 </div>
             `;
-            
-            document.querySelectorAll('.guess-btn').forEach(button => {
-                button.onclick = () => {
-                    const letter = button.dataset.letter;
-                    renderHangman({ secretWord, guessedLetters: [...guessedLetters, letter], gameStatus });
+
+            toolDisplay.querySelectorAll('button[data-char]').forEach(btn => {
+                btn.onclick = () => {
+                    const char = btn.dataset.char;
+                    state.guesses.push(char);
+                    renderHangman(state);
                 };
             });
 
-            document.getElementById('play-again-btn').onclick = () => renderHangman();
+            const rBtn = document.getElementById('restart-hangman');
+            if (rBtn) rBtn.onclick = () => renderHangman(null);
         }
-        
-        // --- Initial Load ---
-        renderApp();
-        setupFullscreenButton();
+
+        // --- Helpers ---
+        function triggerConfetti() {
+            // Simple DOM confetti
+            for(let i=0; i<30; i++) {
+                const c = document.createElement('div');
+                c.className = 'fixed w-4 h-4 rounded-sm z-50 pointer-events-none';
+                c.style.backgroundColor = ['#facc15', '#ef4444', '#3b82f6', '#22c55e', '#a855f7'][Math.floor(Math.random()*5)];
+                c.style.left = Math.random() * 100 + 'vw';
+                c.style.top = '-10px';
+                c.style.transform = `rotate(${Math.random()*360}deg)`;
+                document.body.appendChild(c);
+                
+                const anim = c.animate([
+                    { transform: `translateY(0vh) rotate(0deg)`, opacity: 1 },
+                    { transform: `translateY(100vh) rotate(${720}deg)`, opacity: 0 }
+                ], { duration: 2000 + Math.random()*2000, easing: 'linear' });
+                
+                anim.onfinish = () => c.remove();
+            }
+        }
+
+        function setupFullscreen() {
+            const btn = document.getElementById('fullscreen-btn');
+            const container = document.getElementById('app-container');
+            
+            btn.onclick = async () => {
+                if (!document.fullscreenElement) {
+                    try {
+                        if (container.requestFullscreen) {
+                            await container.requestFullscreen();
+                        } else {
+                            throw new Error("No FS API");
+                        }
+                    } catch (e) {
+                        console.log("Fullscreen blocked/unavailable, using CSS fallback");
+                        container.classList.add('viewport-fullscreen');
+                    }
+                } else {
+                    try {
+                        if (document.exitFullscreen) {
+                            await document.exitFullscreen();
+                        }
+                    } catch (e) {
+                        // ignore
+                    }
+                    container.classList.remove('viewport-fullscreen');
+                }
+            };
+        }
+
+        init();
 
     </script>
 </body>
 </html>
-
