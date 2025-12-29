@@ -10,7 +10,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Google Fonts: Nunito for a friendly, rounded look -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
-    
+
     <script>
         tailwind.config = {
             theme: {
@@ -58,7 +58,7 @@
             background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 100%); /* Sky to Sun gradient */
             color: #1e293b;
         }
-        
+
         /* Ensure background persists in native fullscreen */
         #app-container:fullscreen {
             background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 100%);
@@ -108,7 +108,7 @@
 
         /* Dragging visuals */
         .dragging { opacity: 0.5; transform: scale(1.05) rotate(3deg); z-index: 50; }
-        .dropzone-active { 
+        .dropzone-active {
             background-color: #f0f9ff !important;
             border-color: #3b82f6 !important;
             border-width: 4px !important;
@@ -123,7 +123,7 @@
             display: flex; flex-direction: column;
         }
         .viewport-fullscreen #tool-display { border-radius: 0; border: none; box-shadow: none; background: rgba(255,255,255,0.8); }
-        
+
         .student-card-emoji { font-size: 3rem; line-height: 1; }
         .student-list-emoji { font-size: 2rem; }
     </style>
@@ -199,7 +199,7 @@
 
         const toolDisplay = document.getElementById('tool-display');
         const toolNav = document.getElementById('tool-nav');
-        
+
         // Kid-friendly Emojis
         const AVATARS = [
             '🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🦄','🐞','🦖','🐳','🐙','🦋',
@@ -269,7 +269,7 @@
             if (appState.emojiMap[student.id]) {
                 return appState.emojiMap[student.id];
             }
-            
+
             // Initial deterministic fallback until reset or init
             let hash = 0;
             const name = student.name;
@@ -295,7 +295,7 @@
         function init() {
             renderNav();
             setupFullscreen();
-            
+
             // Auth Flow
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
@@ -343,7 +343,7 @@
                     // Clear existing (if any weird state)
                     const existing = await getDocs(studentsRef);
                     existing.forEach(d => deleteDoc(d.ref));
-                    
+
                     const defaults = ['Skylar', 'Terrell', 'DJ', 'Joshua', 'Cody', 'Leon', 'Alisha', 'Miracle'];
                     await Promise.all(defaults.map(name => addDoc(studentsRef, { name, isPresent: true })));
                     await setDoc(settingsRef, { initialized: true });
@@ -378,8 +378,8 @@
                 // BIG BUTTONS for Smartboard
                 btn.className = `
                     btn-cartoon flex flex-col md:flex-row items-center justify-center gap-2 px-6 py-3 rounded-2xl text-lg font-bold transition-all
-                    ${isActive 
-                        ? `${tool.color} text-white shadow-cartoon` 
+                    ${isActive
+                        ? `${tool.color} text-white shadow-cartoon`
                         : 'bg-white text-slate-500 hover:bg-slate-50'}
                 `;
                 btn.innerHTML = `<i data-lucide="${tool.icon}" class="w-6 h-6 md:w-8 md:h-8"></i> <span>${tool.name}</span>`;
@@ -401,7 +401,7 @@
         }
 
         // --- Tool: Class Roster ---
-        
+
         function renderClassRoster() {
             const listHtml = appState.students.map(s => `
                 <div class="relative bg-white border-2 border-slate-200 p-4 rounded-3xl shadow-sm hover:shadow-cartoon hover:border-crayon-blue transition-all group flex flex-col items-center justify-center h-48">
@@ -409,7 +409,7 @@
                         ${getStudentEmoji(s)}
                     </div>
                     <span class="font-extrabold text-2xl text-slate-700 text-center leading-tight">${s.name}</span>
-                    
+
                     <button data-id="${s.id}" class="remove-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 p-3 bg-red-100 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition-all shadow-sm" title="Remove">
                         <i data-lucide="trash-2" class="w-6 h-6"></i>
                     </button>
@@ -430,7 +430,7 @@
                             </button>
                         </form>
                     </div>
-                    
+
                     <div class="flex-grow overflow-y-auto pr-4 pb-4">
                         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                             ${listHtml}
@@ -445,7 +445,7 @@
                 const input = document.getElementById('new-name');
                 const name = input.value.trim();
                 if (!name) return;
-                
+
                 if (appState.userId) {
                     await addDoc(collection(db, `artifacts/${appId}/users/${appState.userId}/students`), { name, isPresent: true });
                 } else {
@@ -468,6 +468,7 @@
                     }
                 };
             });
+            lucide.createIcons();
         }
 
         // --- Tool: Student Selector ---
@@ -501,11 +502,11 @@
 
                     <!-- Main: Action Area -->
                     <div class="flex-grow flex flex-col items-center justify-center relative">
-                        
+
                         <div id="selector-display" class="w-full max-w-2xl bg-white rounded-[3rem] border-8 border-slate-100 shadow-xl flex flex-col items-center justify-center p-12 mb-10 aspect-video relative overflow-hidden">
                             <!-- Background Pattern -->
                             <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(#6366f1 2px, transparent 2px); background-size: 20px 20px;"></div>
-                            
+
                             <div id="result-content" class="text-center relative z-10 w-full">
                                 <i data-lucide="sparkles" class="w-24 h-24 text-crayon-yellow mx-auto mb-6"></i>
                                 <h2 class="text-4xl font-black text-slate-800 mb-2">Ready to Pick!</h2>
@@ -517,9 +518,9 @@
                             <button id="pick-one-btn" class="btn-cartoon bg-crayon-purple text-white px-10 py-5 rounded-3xl font-black text-2xl shadow-cartoon flex items-center gap-3 transform active:scale-95">
                                 <i data-lucide="wand-2" class="w-8 h-8"></i> PICK RANDOM
                             </button>
-                            
+
                             <div class="w-px bg-slate-300 mx-4 hidden xl:block"></div>
-                            
+
                             <button data-size="2" class="group-btn btn-cartoon bg-white border-2 border-slate-200 text-slate-600 px-6 py-4 rounded-2xl font-bold text-xl hover:text-crayon-blue hover:border-crayon-blue">Pairs</button>
                             <button data-size="3" class="group-btn btn-cartoon bg-white border-2 border-slate-200 text-slate-600 px-6 py-4 rounded-2xl font-bold text-xl hover:text-crayon-blue hover:border-crayon-blue">Threes</button>
                             <button data-size="4" class="group-btn btn-cartoon bg-white border-2 border-slate-200 text-slate-600 px-6 py-4 rounded-2xl font-bold text-xl hover:text-crayon-blue hover:border-crayon-blue">Fours</button>
@@ -527,7 +528,7 @@
                     </div>
                 </div>
             `;
-            
+
             // Logic
             toolDisplay.querySelectorAll('.toggle-btn').forEach(btn => {
                 btn.onclick = async () => {
@@ -540,7 +541,7 @@
             document.getElementById('pick-one-btn').onclick = () => {
                 const candidates = appState.students.filter(s => s.isPresent);
                 if (candidates.length === 0) return alert("No students present!");
-                
+
                 // Fix: Restore display if it was overwritten by Group Generator
                 let display = document.getElementById('result-content');
                 if (!display) {
@@ -553,18 +554,18 @@
                         display = document.getElementById('result-content');
                     }
                 }
-                
-                if (!display) return; 
+
+                if (!display) return;
 
                 const btn = document.getElementById('pick-one-btn');
                 btn.disabled = true;
-                
+
                 // Animation loop
                 let i = 0;
                 const duration = 2000; // Longer suspense
                 const interval = 100;
                 const startTime = Date.now();
-                
+
                 const timer = setInterval(() => {
                     // Fix: Stop if user navigated away
                     if (!document.getElementById('result-content')) {
@@ -579,7 +580,7 @@
                             <h2 class="text-5xl font-black text-slate-300">${r.name}</h2>
                         </div>
                     `;
-                    
+
                     if (Date.now() - startTime > duration) {
                         clearInterval(timer);
                         const winner = candidates[Math.floor(Math.random() * candidates.length)];
@@ -603,7 +604,7 @@
                     const candidates = appState.students.filter(s => s.isPresent).sort(() => Math.random() - 0.5);
                     const groups = [];
                     while(candidates.length) groups.push(candidates.splice(0, size));
-                    
+
                     const groupsHtml = groups.map((g, i) => `
                         <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
                             <div class="text-center font-black text-slate-400 mb-3 uppercase tracking-wider text-sm">Group ${i+1}</div>
@@ -617,7 +618,7 @@
                             </div>
                         </div>
                     `).join('');
-                    
+
                     document.getElementById('selector-display').innerHTML = `
                         <div class="w-full h-full overflow-y-auto p-2">
                             <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 w-full">${groupsHtml}</div>
@@ -625,6 +626,7 @@
                     `;
                 };
             });
+            lucide.createIcons();
         }
 
         // --- Tool: Lunch Choice ---
@@ -641,7 +643,7 @@
 
             const makeDraggable = (student, colId) => {
                 return `
-                <div id="st-${student.id}" draggable="true" 
+                <div id="st-${student.id}" draggable="true"
                      data-id="${student.id}" data-col="${colId}"
                      class="draggable-item bg-white border-2 border-slate-200 p-2 md:p-3 rounded-xl cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md hover:border-crayon-blue flex flex-col items-center w-28 md:w-36 transition-all animate-pop-in">
                     <div class="text-4xl mb-1 pointer-events-none select-none">${getStudentEmoji(student)}</div>
@@ -667,7 +669,7 @@
                 return `
                 <div id="drop-${id}" class="dropzone flex flex-col h-full bg-white rounded-3xl border-4 ${colorClass} overflow-hidden shadow-sm transition-all duration-200">
                     <div class="p-4 ${colorClass.replace('border-', 'bg-')} bg-opacity-10 text-center">
-                        ${isInput 
+                        ${isInput
                             ? `
                             <div class="relative w-full">
                                 <input id="input-${id}" value="${menu[id+'Menu'] || ''}" placeholder="${placeholder}" class="w-full bg-white/60 border-2 border-white/50 focus:border-white rounded-2xl py-3 pl-4 pr-16 text-center font-black text-2xl text-slate-700 focus:outline-none placeholder-slate-400/70 shadow-sm">
@@ -688,7 +690,7 @@
                 <div class="h-full flex flex-col p-4 md:p-8 overflow-hidden gap-6">
                     <div class="flex justify-between items-center flex-shrink-0">
                         <h2 class="text-4xl font-black text-slate-800 flex items-center gap-3">
-                            <span class="bg-orange-100 p-2 rounded-xl text-orange-500"><i data-lucide="utensils"></i></span> 
+                            <span class="bg-orange-100 p-2 rounded-xl text-orange-500"><i data-lucide="utensils"></i></span>
                             Lunch Count
                         </h2>
                         <button id="reset-lunch" class="text-lg font-bold text-red-500 hover:text-white hover:bg-red-500 border-2 border-red-500 px-6 py-2 rounded-xl transition-all">Reset Board</button>
@@ -730,7 +732,7 @@
                 const zone = e.target.closest('.dropzone');
                 if (zone) zone.classList.add('dropzone-active');
             };
-            
+
             const handleDragLeave = (e) => {
                 const zone = e.target.closest('.dropzone');
                 if (zone) zone.classList.remove('dropzone-active');
@@ -740,27 +742,17 @@
                 e.preventDefault();
                 const zone = e.target.closest('.dropzone');
                 if (!zone || !draggedItem) return;
-                
+
                 const targetId = zone.id.replace('drop-', '');
                 if (targetId === sourceCol) return;
 
                 const studentId = draggedItem.dataset.id;
                 const student = appState.lunchColumns[sourceCol].find(s => s.id === studentId);
-                
+
                 appState.lunchColumns[sourceCol] = appState.lunchColumns[sourceCol].filter(s => s.id !== studentId);
                 appState.lunchColumns[targetId].push(student);
-                
-                renderLunchChoice();
-            };
 
-            // Touch Support
-            let touchItem = null;
-            const handleTouchStart = (e) => {
-                touchItem = e.target.closest('.draggable-item');
-                if(touchItem) {
-                    sourceCol = touchItem.dataset.col;
-                    touchItem.classList.add('dragging');
-                }
+                renderLunchChoice();
             };
 
             toolDisplay.querySelectorAll('.draggable-item').forEach(el => {
@@ -773,16 +765,16 @@
                 el.addEventListener('dragleave', handleDragLeave);
                 el.addEventListener('drop', handleDrop);
             });
-            
+
             ['choice1', 'choice2'].forEach(key => {
                 const input = document.getElementById(`input-${key}`);
                 const emojiDisplay = document.getElementById(`emoji-display-${key}`);
-                
+
                 if (input) {
                     input.oninput = (e) => {
                         const val = e.target.value;
                         appState.lunchMenu[`${key}Menu`] = val;
-                        
+
                         // Find emoji logic
                         const words = val.toLowerCase().split(/\s+/);
                         let foundEmoji = '';
@@ -818,6 +810,7 @@
                 randomizeEmojis(); // Reshuffle emojis for a new day
                 renderLunchChoice();
             };
+            lucide.createIcons();
         }
 
         // --- Tool: Tournament Bracket (Double Elimination) ---
@@ -834,12 +827,12 @@
                     if (!p) return '<div class="h-10 bg-slate-100/50 rounded-lg mb-1"></div>';
                     const isWin = wId === p.id;
                     const isLose = wId && wId !== p.id;
-                    
+
                     // Interaction: Only allow click if no winner set yet and not a bye
-                    const onClick = (!wId && p.name !== 'BYE') 
-                        ? `onclick="window.advanceBracket('${match.id}', '${p.id}')"` 
+                    const onClick = (!wId && p.name !== 'BYE')
+                        ? `onclick="window.advanceBracket('${match.id}', '${p.id}')"`
                         : '';
-                        
+
                     return `
                         <div ${onClick} class="
                             h-12 flex items-center justify-between px-3 rounded-lg text-lg font-bold transition-all cursor-pointer mb-1 border-2 select-none
@@ -869,7 +862,7 @@
             };
 
             let content = '';
-            
+
             if (!bracket) {
                 content = `
                     <div class="flex flex-col items-center justify-center h-full animate-pop-in">
@@ -937,11 +930,11 @@
                     lbRounds.push(matches);
                     r++;
                 }
-                
+
                 // Final
                 const finalMatch = bracket.matches.find(m => m.id === 'grand-final');
                 const resetMatch = bracket.matches.find(m => m.id === 'grand-final-reset');
-                
+
                 const finalsToRender = [finalMatch];
                 if (resetMatch) finalsToRender.push(resetMatch);
 
@@ -951,10 +944,10 @@
                             <h3 class="font-black text-2xl text-slate-700 flex items-center gap-3"><i data-lucide="git-branch" class="text-crayon-blue"></i> Tournament Bracket</h3>
                             <button id="reset-bracket-mini" class="text-red-400 font-bold hover:text-red-600">Reset</button>
                         </div>
-                        
+
                         <div class="flex-grow overflow-x-auto overflow-y-auto p-8 custom-scrollbar bg-slate-50/30">
                             <div class="flex flex-col gap-12 min-w-max">
-                                
+
                                 <!-- Winners Section -->
                                 <div class="flex gap-12">
                                     <div class="flex flex-col justify-center mr-4"><div class="p-4 bg-crayon-blue/10 text-crayon-blue font-black rounded-xl rotate-180" style="writing-mode: vertical-rl;">WINNERS BRACKET</div></div>
@@ -1000,12 +993,12 @@
             while(players.length < size) players.push({ name: 'BYE', id: 'bye' });
 
             const matches = [];
-            
+
             // --- Winners Bracket Generation ---
             // Round 1
             const totalRounds = Math.log2(size);
             let currentRoundMatches = [];
-            
+
             for(let i=0; i<size/2; i++) {
                 const id = `w-1-${i}`;
                 const m = { id, type: 'winner', round: 1, players: [players[i], players[size-1-i]], winner: null, nextWin: null, nextLose: null };
@@ -1022,7 +1015,7 @@
                     const m = { id, type: 'winner', round: r, players: [null, null], winner: null, nextWin: null, nextLose: null };
                     matches.push(m);
                     currentRoundMatches.push(m);
-                    
+
                     // Link previous winners
                     prevRoundMatches[i*2].nextWin = { id, slot: 0 };
                     prevRoundMatches[i*2+1].nextWin = { id, slot: 1 };
@@ -1035,7 +1028,7 @@
             // LB Round 1: Fed by WB Round 1 Losers
             // LB has (2 * totalRounds - 2) rounds roughly.
             // Simplified standard mapping for up to 32 players
-            
+
             let lbMatchesByRound = {};
             const createLBMatch = (r, idx) => {
                 const id = `l-${r}-${idx}`;
@@ -1049,7 +1042,7 @@
             // Calculate LB structure
             // LB R1 (N/4 matches): Fed by WB R1 losers
             for(let i=0; i<size/4; i++) createLBMatch(1, i);
-            
+
             // LB R2 (N/4 matches): Fed by LB R1 winners + WB R2 losers
             for(let i=0; i<size/4; i++) createLBMatch(2, i);
 
@@ -1061,7 +1054,7 @@
 
             // ... continue pattern until 1 match left
             // Pattern: odd LB rounds (1, 3, 5...) are pure LB. Even LB rounds (2, 4, 6...) take drop-ins from WB.
-            
+
             let lbRound = 5;
             let count = size/16;
             while(count >= 1) {
@@ -1073,17 +1066,17 @@
                 count /= 2;
                 lbRound++;
             }
-            
+
             const maxLbRound = lbRound - 1; // Last round generated
-            
+
             // --- Wiring Losers Logic ---
-            
+
             // Link WB Losers to LB
             // WB R1 -> LB R1
             const wbR1 = matches.filter(m => m.type === 'winner' && m.round === 1);
             const lbR1 = matches.filter(m => m.type === 'loser' && m.round === 1);
             // Standard cross mapping: Top half of WB losers go to Top half of LB?
-            // Simple mapping: 
+            // Simple mapping:
             for(let i=0; i<wbR1.length; i++) {
                 const targetMatch = lbR1[Math.floor(i/2)];
                 wbR1[i].nextLose = { id: targetMatch.id, slot: i%2 };
@@ -1094,7 +1087,7 @@
             const wbR2 = matches.filter(m => m.type === 'winner' && m.round === 2);
             const lbR2 = matches.filter(m => m.type === 'loser' && m.round === 2);
             const lbR1Matches = matches.filter(m => m.type === 'loser' && m.round === 1);
-            
+
             // Wire LB R1 Winners -> LB R2
             for(let i=0; i<lbR1Matches.length; i++) lbR1Matches[i].nextWin = { id: lbR2[i].id, slot: 0 };
             // Wire WB R2 Losers -> LB R2
@@ -1103,7 +1096,7 @@
             // Generalize remaining LB wiring
             let currentLbR = 2;
             let currentWbR = 3;
-            
+
             while(currentLbR < maxLbRound) {
                 // Step 1: LB R(n) -> LB R(n+1) [Internal fight]
                 const sourceMatches = matches.filter(m => m.type === 'loser' && m.round === currentLbR);
@@ -1116,7 +1109,7 @@
 
                 // Step 2: LB R(n+1) + WB R(k) -> LB R(n+2) [Drop in]
                 if (currentLbR >= maxLbRound) break;
-                
+
                 const internalSource = matches.filter(m => m.type === 'loser' && m.round === currentLbR);
                 const dropSource = matches.filter(m => m.type === 'winner' && m.round === currentWbR);
                 const destMatches = matches.filter(m => m.type === 'loser' && m.round === currentLbR+1);
@@ -1127,7 +1120,7 @@
                     // Wire Drop-ins
                     for(let i=0; i<dropSource.length; i++) dropSource[i].nextLose = { id: destMatches[i].id, slot: 1 };
                 }
-                
+
                 currentLbR++;
                 currentWbR++;
             }
@@ -1136,13 +1129,13 @@
             const finalId = 'grand-final';
             const grandFinal = { id: finalId, type: 'final', round: 1, players: [null, null], winner: null };
             matches.push(grandFinal);
-            
+
             // Wire WB Final Winner
             wbFinalMatch.nextWin = { id: finalId, slot: 0 };
             // Wire LB Final Winner
             const lbFinalMatch = matches.filter(m => m.type === 'loser' && m.round === maxLbRound)[0];
             if(lbFinalMatch) lbFinalMatch.nextWin = { id: finalId, slot: 1 };
-            
+
             if(lbFinalMatch) {
                // Usually LB Final is: Winner of prev LB vs Loser of WB Final.
                // My loop logic wires drop-ins to EVEN LB rounds.
@@ -1155,18 +1148,18 @@
             }
 
             appState.bracket = { matches };
-            
+
             // Auto-advance BYEs
             matches.forEach(m => {
                 const byeIdx = m.players.findIndex(p => p && p.id === 'bye');
                 if (byeIdx !== -1) {
                     const realPlayerIdx = byeIdx === 0 ? 1 : 0;
                     if(m.players[realPlayerIdx] && m.players[realPlayerIdx].id !== 'bye') {
-                       window.advanceBracket(m.id, m.players[realPlayerIdx].id); 
+                       window.advanceBracket(m.id, m.players[realPlayerIdx].id);
                     }
                 }
             });
-            
+
             renderTournamentBracket();
         }
 
@@ -1192,7 +1185,7 @@
                     if (nextM) nextM.players[match.nextLose.slot] = loser;
                 }
             }
-            
+
             // Logic for Grand Final 1
             if (match.id === 'grand-final') {
                 // Slot 0 is WB Winner (Undefeated). Slot 1 is LB Winner (1 loss).
@@ -1213,7 +1206,7 @@
                     }
                 }
             }
-            
+
             // Logic for Grand Final Reset
             if (match.id === 'grand-final-reset') {
                 appState.podium = { first: winner, second: loser };
@@ -1227,18 +1220,18 @@
 
         function renderHangman(state) {
             const WORDS = ["DINOSAUR", "ASTRONAUT", "BUTTERFLY", "RAINBOW", "VACATION", "CUPCAKE", "ADVENTURE", "LIBRARY", "SOCCER"];
-            
+
             if (!state) {
                 state = {
                     word: WORDS[Math.floor(Math.random() * WORDS.length)],
                     guesses: [],
-                    status: 'playing' 
+                    status: 'playing'
                 };
             }
-            
+
             const wrongs = state.guesses.filter(l => !state.word.includes(l)).length;
             const maxWrongs = 6;
-            
+
             if (state.status === 'playing') {
                 if (wrongs >= maxWrongs) state.status = 'lost';
                 else if (state.word.split('').every(l => state.guesses.includes(l))) state.status = 'won';
@@ -1246,11 +1239,11 @@
 
             const drawPath = (d, show) => `<path d="${d}" stroke="#334155" stroke-width="6" stroke-linecap="round" fill="none" class="transition-all duration-500 ${show ? 'opacity-100' : 'opacity-0 dashed-line'}" />`;
             const parts = [
-                "M140,100 A20,20 0 1,1 100,100 A20,20 0 1,1 140,100", 
-                "M120,120 L120,200", 
-                "M120,140 L90,180", 
-                "M120,140 L150,180", 
-                "M120,200 L90,250", 
+                "M140,100 A20,20 0 1,1 100,100 A20,20 0 1,1 140,100",
+                "M120,120 L120,200",
+                "M120,140 L90,180",
+                "M120,140 L150,180",
+                "M120,200 L90,250",
                 "M120,200 L150,250"
             ];
 
@@ -1266,9 +1259,9 @@
 
             toolDisplay.innerHTML = `
                 <div class="h-full flex flex-col lg:flex-row gap-8 p-6 items-center justify-center">
-                    
+
                     <div class="flex-grow flex flex-col items-center max-w-4xl w-full">
-                        
+
                         <div class="flex flex-col md:flex-row items-center gap-12 mb-8">
                              <div class="relative w-64 h-64 bg-yellow-50 rounded-3xl border-4 border-yellow-200 shadow-inner">
                                 <svg viewBox="0 0 300 300" class="w-full h-full">
@@ -1276,7 +1269,7 @@
                                     ${parts.map((d, i) => drawPath(d, wrongs > i)).join('')}
                                 </svg>
                             </div>
-                            
+
                             <div class="flex flex-col items-center">
                                 <div class="flex flex-wrap gap-3 justify-center mb-6">
                                     ${state.word.split('').map(char => `
@@ -1327,12 +1320,12 @@
                 c.style.top = '-10px';
                 c.style.transform = `rotate(${Math.random()*360}deg)`;
                 document.body.appendChild(c);
-                
+
                 const anim = c.animate([
                     { transform: `translateY(0vh) rotate(0deg)`, opacity: 1 },
                     { transform: `translateY(100vh) rotate(${720}deg)`, opacity: 0 }
                 ], { duration: 2000 + Math.random()*2000, easing: 'linear' });
-                
+
                 anim.onfinish = () => c.remove();
             }
         }
@@ -1340,7 +1333,7 @@
         function setupFullscreen() {
             const btn = document.getElementById('fullscreen-btn');
             const container = document.getElementById('app-container');
-            
+
             btn.onclick = async () => {
                 if (!document.fullscreenElement) {
                     try {
