@@ -281,6 +281,16 @@
             return emoji;
         }
 
+        function escapeHtml(text) {
+            if (!text) return text;
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         // Tool Definitions
         const tools = {
             classRoster: { name: 'Class Roster', icon: 'users', color: 'bg-crayon-blue', render: renderClassRoster },
@@ -329,8 +339,37 @@
             if (appState.isAuthReady) return;
             console.warn("Using local mode");
             appState.isAuthReady = true;
-            appState.students = ['Skylar', 'Terrell', 'DJ', 'Joshua', 'Cody', 'Leon', 'Alisha', 'Miracle'].map((n, i) => ({ id: `loc-${i}`, name: n, isPresent: true }));
+
+            // Load from LocalStorage if available
+            const saved = localStorage.getItem('classroomToolsData');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    appState.students = parsed.students || [];
+                    appState.lunchMenu = parsed.lunchMenu || { choice1Menu: '', choice2Menu: '' };
+                    appState.lunchColumns = parsed.lunchColumns || null; // Restore lunch columns if saved
+                } catch (e) {
+                    console.error("Failed to load local data", e);
+                }
+            }
+
+            if (appState.students.length === 0) {
+                appState.students = ['Skylar', 'Terrell', 'DJ', 'Joshua', 'Cody', 'Leon', 'Alisha', 'Miracle'].map((n, i) => ({ id: `loc-${i}`, name: n, isPresent: true }));
+            }
+
             renderActiveTool();
+        }
+
+        // Local Storage Helper
+        function saveLocalData() {
+            if (!appState.userId) { // Only save if not using Firebase
+                const data = {
+                    students: appState.students,
+                    lunchMenu: appState.lunchMenu,
+                    lunchColumns: appState.lunchColumns
+                };
+                localStorage.setItem('classroomToolsData', JSON.stringify(data));
+            }
         }
 
         async function initializeRosterIfNeeded() {
@@ -408,7 +447,7 @@
                     <div class="student-card-emoji mb-2 transform transition-transform group-hover:scale-125 group-hover:rotate-12">
                         ${getStudentEmoji(s)}
                     </div>
-                    <span class="font-extrabold text-2xl text-slate-700 text-center leading-tight">${s.name}</span>
+                    <span class="font-extrabold text-2xl text-slate-700 text-center leading-tight">${escapeHtml(s.name)}</span>
 
                     <button data-id="${s.id}" class="remove-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 p-3 bg-red-100 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition-all shadow-sm" title="Remove">
                         <i data-lucide="trash-2" class="w-6 h-6"></i>
@@ -450,6 +489,7 @@
                     await addDoc(collection(db, `artifacts/${appId}/users/${appState.userId}/students`), { name, isPresent: true });
                 } else {
                     appState.students.push({ id: `loc-${Date.now()}`, name, isPresent: true });
+                    saveLocalData();
                     renderClassRoster();
                 }
                 input.value = '';
@@ -463,6 +503,7 @@
                             await deleteDoc(doc(db, `artifacts/${appId}/users/${appState.userId}/students`, btn.dataset.id));
                         } else {
                             appState.students = appState.students.filter(s => s.id !== btn.dataset.id);
+                            saveLocalData();
                             renderClassRoster();
                         }
                     }
@@ -478,7 +519,7 @@
                 <div class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0">
                     <div class="flex items-center gap-3">
                         <span class="text-2xl">${getStudentEmoji(s)}</span>
-                        <span class="text-lg font-bold ${s.isPresent ? 'text-slate-700' : 'text-slate-400 line-through opacity-60'}">${s.name}</span>
+                        <span class="text-lg font-bold ${s.isPresent ? 'text-slate-700' : 'text-slate-400 line-through opacity-60'}">${escapeHtml(s.name)}</span>
                     </div>
                     <button data-id="${s.id}" class="toggle-btn w-16 h-8 rounded-full relative transition-colors border-2 ${s.isPresent ? 'bg-crayon-green border-green-600' : 'bg-slate-200 border-slate-300'}">
                         <div class="w-6 h-6 bg-white rounded-full absolute top-0.5 shadow-sm transition-all ${s.isPresent ? 'left-8' : 'left-1'}"></div>
@@ -534,7 +575,11 @@
                 btn.onclick = async () => {
                     const s = appState.students.find(st => st.id === btn.dataset.id);
                     if (appState.userId) await updateDoc(doc(db, `artifacts/${appId}/users/${appState.userId}/students`, s.id), { isPresent: !s.isPresent });
-                    else { s.isPresent = !s.isPresent; renderStudentSelector(); }
+                    else {
+                        s.isPresent = !s.isPresent;
+                        saveLocalData();
+                        renderStudentSelector();
+                    }
                 };
             });
 
@@ -577,7 +622,7 @@
                     display.innerHTML = `
                         <div class="transform scale-90 opacity-70 transition-all">
                             <div class="text-6xl mb-4">${getStudentEmoji(r)}</div>
-                            <h2 class="text-5xl font-black text-slate-300">${r.name}</h2>
+                            <h2 class="text-5xl font-black text-slate-300">${escapeHtml(r.name)}</h2>
                         </div>
                     `;
 
@@ -588,7 +633,7 @@
                             <div class="animate-pop-in transform scale-110">
                                 <div class="text-sm font-black text-crayon-purple uppercase tracking-widest mb-4 bg-purple-100 inline-block px-4 py-1 rounded-full">The Winner Is</div>
                                 <div class="text-8xl mb-6 animate-bounce-slow">${getStudentEmoji(winner)}</div>
-                                <h2 class="text-7xl font-black text-crayon-blue pb-2">${winner.name}</h2>
+                                <h2 class="text-7xl font-black text-crayon-blue pb-2">${escapeHtml(winner.name)}</h2>
                             </div>
                         `;
                         btn.disabled = false;
@@ -612,7 +657,7 @@
                                 ${g.map(s => `
                                     <div class="flex items-center gap-3 bg-white p-2 rounded-lg border border-slate-100 shadow-sm">
                                         <span class="text-2xl">${getStudentEmoji(s)}</span>
-                                        <span class="font-bold text-slate-700 text-lg">${s.name}</span>
+                                        <span class="font-bold text-slate-700 text-lg">${escapeHtml(s.name)}</span>
                                     </div>
                                 `).join('')}
                             </div>
@@ -647,7 +692,7 @@
                      data-id="${student.id}" data-col="${colId}"
                      class="draggable-item bg-white border-2 border-slate-200 p-2 md:p-3 rounded-xl cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md hover:border-crayon-blue flex flex-col items-center w-28 md:w-36 transition-all animate-pop-in">
                     <div class="text-4xl mb-1 pointer-events-none select-none">${getStudentEmoji(student)}</div>
-                    <div class="font-black text-slate-700 text-base md:text-xl text-center leading-tight pointer-events-none select-none truncate w-full">${student.name}</div>
+                    <div class="font-black text-slate-700 text-base md:text-xl text-center leading-tight pointer-events-none select-none truncate w-full">${escapeHtml(student.name)}</div>
                 </div>`;
             };
 
@@ -672,7 +717,7 @@
                         ${isInput
                             ? `
                             <div class="relative w-full">
-                                <input id="input-${id}" value="${menu[id+'Menu'] || ''}" placeholder="${placeholder}" class="w-full bg-white/60 border-2 border-white/50 focus:border-white rounded-2xl py-3 pl-4 pr-16 text-center font-black text-2xl text-slate-700 focus:outline-none placeholder-slate-400/70 shadow-sm">
+                                <input id="input-${id}" value="${escapeHtml(menu[id+'Menu'] || '')}" placeholder="${placeholder}" class="w-full bg-white/60 border-2 border-white/50 focus:border-white rounded-2xl py-3 pl-4 pr-16 text-center font-black text-2xl text-slate-700 focus:outline-none placeholder-slate-400/70 shadow-sm">
                                 <div id="emoji-display-${id}" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-4xl transition-all duration-300 ${currentEmoji ? 'scale-100 opacity-100' : 'scale-50 opacity-0'} pointer-events-none filter drop-shadow-sm">${currentEmoji}</div>
                             </div>
                             `
@@ -752,12 +797,79 @@
                 appState.lunchColumns[sourceCol] = appState.lunchColumns[sourceCol].filter(s => s.id !== studentId);
                 appState.lunchColumns[targetId].push(student);
 
+                saveLocalData();
                 renderLunchChoice();
+            };
+
+            // Touch Support
+            let touchItem = null;
+            let touchSourceCol = null;
+
+            const handleTouchStart = (e) => {
+                touchItem = e.target.closest('.draggable-item');
+                if (touchItem) {
+                    touchSourceCol = touchItem.dataset.col;
+                    touchItem.classList.add('dragging');
+                    e.preventDefault(); // Prevent scrolling while dragging
+                }
+            };
+
+            const handleTouchMove = (e) => {
+                if (!touchItem) return;
+                e.preventDefault();
+                const touch = e.touches[0];
+
+                // Visual feedback: move the item
+                touchItem.style.position = 'fixed';
+                touchItem.style.left = (touch.clientX - touchItem.offsetWidth / 2) + 'px';
+                touchItem.style.top = (touch.clientY - touchItem.offsetHeight / 2) + 'px';
+                touchItem.style.zIndex = '1000';
+
+                // Highlight dropzones
+                document.querySelectorAll('.dropzone').forEach(d => d.classList.remove('dropzone-active'));
+                const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+                const zone = elementUnder ? elementUnder.closest('.dropzone') : null;
+                if (zone) zone.classList.add('dropzone-active');
+            };
+
+            const handleTouchEnd = (e) => {
+                if (!touchItem) return;
+                const touch = e.changedTouches[0];
+                const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+                const zone = elementUnder ? elementUnder.closest('.dropzone') : null;
+
+                // Reset styles
+                touchItem.style.position = '';
+                touchItem.style.left = '';
+                touchItem.style.top = '';
+                touchItem.style.zIndex = '';
+                touchItem.classList.remove('dragging');
+                document.querySelectorAll('.dropzone').forEach(d => d.classList.remove('dropzone-active'));
+
+                if (zone) {
+                    const targetId = zone.id.replace('drop-', '');
+                    if (targetId !== touchSourceCol) {
+                        const studentId = touchItem.dataset.id;
+                        const student = appState.lunchColumns[touchSourceCol].find(s => s.id === studentId);
+
+                        appState.lunchColumns[touchSourceCol] = appState.lunchColumns[touchSourceCol].filter(s => s.id !== studentId);
+                        appState.lunchColumns[targetId].push(student);
+
+                        saveLocalData();
+                        renderLunchChoice();
+                        return; // Render rebuilt the DOM, no need to further clean up
+                    }
+                }
+
+                touchItem = null;
             };
 
             toolDisplay.querySelectorAll('.draggable-item').forEach(el => {
                 el.addEventListener('dragstart', handleDragStart);
                 el.addEventListener('dragend', handleDragEnd);
+                el.addEventListener('touchstart', handleTouchStart, {passive: false});
+                el.addEventListener('touchmove', handleTouchMove, {passive: false});
+                el.addEventListener('touchend', handleTouchEnd);
             });
 
             toolDisplay.querySelectorAll('.dropzone').forEach(el => {
@@ -774,6 +886,7 @@
                     input.oninput = (e) => {
                         const val = e.target.value;
                         appState.lunchMenu[`${key}Menu`] = val;
+                        saveLocalData();
 
                         // Find emoji logic
                         const words = val.toLowerCase().split(/\s+/);
@@ -807,6 +920,7 @@
             document.getElementById('reset-lunch').onclick = () => {
                 appState.lunchColumns = null;
                 appState.lunchMenu = {};
+                saveLocalData();
                 randomizeEmojis(); // Reshuffle emojis for a new day
                 renderLunchChoice();
             };
@@ -843,7 +957,7 @@
                         ">
                             <div class="flex items-center gap-2 overflow-hidden w-full">
                                 <span class="text-xl">${p.name !== 'BYE' ? getStudentEmoji(p) : ''}</span>
-                                <span class="truncate">${p.name}</span>
+                                <span class="truncate">${escapeHtml(p.name)}</span>
                             </div>
                         </div>
                     `;
@@ -885,14 +999,14 @@
                              <!-- 2nd -->
                             <div class="flex flex-col items-center animate-pop-in" style="animation-delay: 0.2s">
                                 <div class="text-6xl mb-4 transform -rotate-6">${getStudentEmoji(second)}</div>
-                                <div class="text-slate-600 font-bold mb-2 text-2xl">${second.name}</div>
+                                <div class="text-slate-600 font-bold mb-2 text-2xl">${escapeHtml(second.name)}</div>
                                 <div class="w-32 h-48 bg-slate-300 rounded-t-2xl border-4 border-slate-400 flex items-center justify-center text-6xl font-black text-white shadow-lg">2</div>
                             </div>
                             <!-- 1st -->
                             <div class="flex flex-col items-center animate-pop-in z-10">
                                 <i data-lucide="crown" class="w-16 h-16 text-yellow-500 mb-2 animate-bounce-slow"></i>
                                 <div class="text-8xl mb-4 transform rotate-6">${getStudentEmoji(first)}</div>
-                                <div class="text-slate-800 font-black mb-2 text-4xl">${first.name}</div>
+                                <div class="text-slate-800 font-black mb-2 text-4xl">${escapeHtml(first.name)}</div>
                                 <div class="w-48 h-64 bg-yellow-400 rounded-t-2xl border-4 border-yellow-500 flex items-center justify-center text-8xl font-black text-white shadow-xl">1</div>
                             </div>
                         </div>
