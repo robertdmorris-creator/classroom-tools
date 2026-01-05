@@ -541,7 +541,6 @@
                 const candidates = appState.students.filter(s => s.isPresent);
                 if (candidates.length === 0) return alert("No students present!");
                 
-                // Fix: Restore display if it was overwritten by Group Generator
                 let display = document.getElementById('result-content');
                 if (!display) {
                     const selectorDisplay = document.getElementById('selector-display');
