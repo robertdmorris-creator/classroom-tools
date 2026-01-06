@@ -58,6 +58,7 @@
             background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 100%); /* Sky to Sun gradient */
             color: #1e293b;
             overscroll-behavior: none; /* Prevent bounce on Mac/iOS */
+            -webkit-tap-highlight-color: transparent; /* Removes flash on touch */
         }
         
         /* Ensure background persists in native fullscreen */
@@ -108,20 +109,25 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Dragging visuals */
-        .dragging { opacity: 0.5; transform: scale(1.05) rotate(3deg); z-index: 50; }
+        .dragging { opacity: 0.3; }
+        
+        /* Touch Dragging - The 'Ghost' Element */
         .touch-dragging {
             position: fixed; 
             z-index: 9999; 
-            pointer-events: none; 
+            pointer-events: none; /* CRITICAL: Allows elementFromPoint to see through this */
             opacity: 0.9; 
             transform: scale(1.1) rotate(-3deg);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            width: auto;
+            height: auto;
         }
+        
         .dropzone-active { 
             background-color: #f0f9ff !important;
             border-color: #3b82f6 !important;
             border-width: 4px !important;
-            transform: scale(1.01);
+            /* transform: scale(1.01); REMOVED to prevent hiccup */
         }
 
         /* Smartboard Fullscreen overrides */
@@ -798,14 +804,12 @@
                 activeTouchEl.style.left = (touch.clientX - touchOffsetX) + 'px';
                 activeTouchEl.style.top = (touch.clientY - touchOffsetY) + 'px';
                 
-                // Check drop zone underneath
-                // Must hide floaty element briefly to peek underneath
-                activeTouchEl.style.display = 'none';
-                let elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-                activeTouchEl.style.display = 'flex';
-                
+                // With pointer-events: none on the activeTouchEl, we can see through it
                 document.querySelectorAll('.dropzone').forEach(d => d.classList.remove('dropzone-active'));
+                
+                let elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
                 let zone = elemBelow ? elemBelow.closest('.dropzone') : null;
+                
                 if (zone) zone.classList.add('dropzone-active');
             };
 
@@ -815,8 +819,7 @@
                 
                 const touch = e.changedTouches[0];
                 
-                // Find drop target
-                activeTouchEl.style.display = 'none';
+                // With pointer-events: none, elementFromPoint works directly
                 let elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
                 
                 // Cleanup visual
