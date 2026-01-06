@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Classroom Tools: 5th Grade Edition</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -57,6 +57,7 @@
         body {
             background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 100%); /* Sky to Sun gradient */
             color: #1e293b;
+            overscroll-behavior: none; /* Prevent bounce on Mac/iOS */
         }
         
         /* Ensure background persists in native fullscreen */
@@ -70,9 +71,9 @@
         /* Fun Panel Style */
         .fun-panel {
             background: white;
-            border-radius: 24px;
+            border-radius: 16px;
             border: 2px solid #e2e8f0;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            box-shadow: 0 4px 15px -5px rgba(0, 0, 0, 0.05);
         }
 
         /* Big Cartoon Buttons */
@@ -108,6 +109,14 @@
 
         /* Dragging visuals */
         .dragging { opacity: 0.5; transform: scale(1.05) rotate(3deg); z-index: 50; }
+        .touch-dragging {
+            position: fixed; 
+            z-index: 9999; 
+            pointer-events: none; 
+            opacity: 0.9; 
+            transform: scale(1.1) rotate(-3deg);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
         .dropzone-active { 
             background-color: #f0f9ff !important;
             border-color: #3b82f6 !important;
@@ -128,39 +137,38 @@
         .student-list-emoji { font-size: 2rem; }
     </style>
 </head>
-<body class="h-screen min-h-screen font-sans antialiased overflow-hidden text-slate-800">
+<body class="h-screen min-h-screen font-sans antialiased overflow-hidden text-slate-800 selection:bg-crayon-yellow selection:text-slate-900">
 
     <div id="app-container" class="relative flex flex-col h-full z-10">
 
-        <!-- Header / Nav -->
-        <header class="flex-shrink-0 px-6 pt-6 pb-2">
-            <div class="fun-panel px-4 py-3 flex items-center justify-between">
-                <div class="flex items-center gap-4 px-2">
-                    <div class="p-3 bg-crayon-blue rounded-2xl shadow-cartoon text-white transform -rotate-3">
-                        <i data-lucide="backpack" class="w-8 h-8"></i>
+        <!-- Header / Nav (Compact Version) -->
+        <header class="flex-shrink-0 px-4 pt-2 pb-2">
+            <div class="fun-panel px-3 py-2 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3 px-1 flex-shrink-0">
+                    <div class="p-2 bg-crayon-blue rounded-xl shadow-cartoon text-white transform -rotate-3">
+                        <i data-lucide="backpack" class="w-6 h-6"></i>
                     </div>
-                    <div>
-                        <h1 class="font-black text-2xl md:text-3xl tracking-tight text-slate-700 leading-none">Classroom<span class="text-crayon-blue">Tools</span></h1>
-                        <span class="text-sm font-bold text-slate-400">5th Grade Edition</span>
+                    <div class="hidden sm:block">
+                        <h1 class="font-black text-xl md:text-2xl tracking-tight text-slate-700 leading-none">Classroom<span class="text-crayon-blue">Tools</span></h1>
                     </div>
                 </div>
 
-                <!-- Navigation Tabs - BIG BUTTONS -->
-                <nav id="tool-nav" class="flex gap-3 overflow-x-auto no-scrollbar mx-4">
+                <!-- Navigation Tabs - COMPACT BUTTONS -->
+                <nav id="tool-nav" class="flex gap-2 overflow-x-auto no-scrollbar mx-2 flex-grow justify-center">
                     <!-- Buttons injected via JS -->
                 </nav>
 
-                <div class="flex items-center gap-2">
-                    <button id="fullscreen-btn" class="p-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors" title="Toggle Fullscreen">
-                        <i data-lucide="maximize" class="w-8 h-8"></i>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <button id="fullscreen-btn" class="p-2 md:p-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors" title="Toggle Fullscreen">
+                        <i data-lucide="maximize" class="w-6 h-6"></i>
                     </button>
                 </div>
             </div>
         </header>
 
         <!-- Main Tool Area -->
-        <main class="flex-grow p-6 min-h-0">
-            <div id="tool-display" class="fun-panel h-full w-full relative overflow-hidden flex flex-col bg-white/60 backdrop-blur-sm">
+        <main class="flex-grow px-4 pb-4 pt-1 min-h-0">
+            <div id="tool-display" class="fun-panel h-full w-full relative overflow-hidden flex flex-col bg-white/80 backdrop-blur-sm">
                 <!-- Tool content renders here -->
                  <div class="flex flex-col items-center justify-center h-full text-center">
                      <span class="loader mb-6"></span>
@@ -283,7 +291,7 @@
 
         // Tool Definitions
         const tools = {
-            classRoster: { name: 'Class Roster', icon: 'users', color: 'bg-crayon-blue', render: renderClassRoster },
+            classRoster: { name: 'Roster', icon: 'users', color: 'bg-crayon-blue', render: renderClassRoster },
             studentSelector: { name: 'Picker', icon: 'dices', color: 'bg-crayon-purple', render: renderStudentSelector },
             lunchChoice: { name: 'Lunch', icon: 'utensils', color: 'bg-crayon-green', render: renderLunchChoice },
             tournamentBracket: { name: 'Bracket', icon: 'trophy', color: 'bg-crayon-yellow', render: renderTournamentBracket },
@@ -375,14 +383,14 @@
             Object.entries(tools).forEach(([id, tool]) => {
                 const btn = document.createElement('button');
                 const isActive = appState.activeTool === id;
-                // BIG BUTTONS for Smartboard
+                // COMPACT BUTTONS for smaller banner
                 btn.className = `
-                    btn-cartoon flex flex-col md:flex-row items-center justify-center gap-2 px-6 py-3 rounded-2xl text-lg font-bold transition-all
+                    btn-cartoon flex items-center justify-center gap-2 px-3 py-2 md:px-5 rounded-xl text-base font-bold transition-all whitespace-nowrap
                     ${isActive 
                         ? `${tool.color} text-white shadow-cartoon` 
-                        : 'bg-white text-slate-500 hover:bg-slate-50'}
+                        : 'bg-white text-slate-500 hover:bg-slate-50 border-slate-100'}
                 `;
-                btn.innerHTML = `<i data-lucide="${tool.icon}" class="w-6 h-6 md:w-8 md:h-8"></i> <span>${tool.name}</span>`;
+                btn.innerHTML = `<i data-lucide="${tool.icon}" class="w-5 h-5"></i> <span class="hidden md:inline">${tool.name}</span>`;
                 btn.onclick = () => {
                     appState.activeTool = id;
                     renderNav();
@@ -408,7 +416,7 @@
                     <div class="student-card-emoji mb-2 transform transition-transform group-hover:scale-125 group-hover:rotate-12">
                         ${getStudentEmoji(s)}
                     </div>
-                    <span class="font-extrabold text-2xl text-slate-700 text-center leading-tight">${s.name}</span>
+                    <span class="font-extrabold text-2xl text-slate-700 text-center leading-tight select-none">${s.name}</span>
                     
                     <button data-id="${s.id}" class="remove-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 p-3 bg-red-100 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition-all shadow-sm" title="Remove">
                         <i data-lucide="trash-2" class="w-6 h-6"></i>
@@ -417,22 +425,22 @@
             `).join('');
 
             toolDisplay.innerHTML = `
-                <div class="h-full flex flex-col p-4 md:p-8 animate-pop-in w-full">
-                    <div class="flex flex-col lg:flex-row justify-between items-center mb-8 gap-6">
+                <div class="h-full flex flex-col p-4 md:p-6 animate-pop-in w-full">
+                    <div class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-6 flex-shrink-0">
                         <div class="text-center lg:text-left">
-                            <h2 class="text-4xl font-black text-slate-800">Class Roster</h2>
-                            <p class="text-slate-500 text-xl font-semibold mt-1">Total Students: <span class="text-crayon-blue">${appState.students.length}</span></p>
+                            <h2 class="text-3xl font-black text-slate-800">Class Roster</h2>
+                            <p class="text-slate-500 text-lg font-semibold mt-1">Total Students: <span class="text-crayon-blue">${appState.students.length}</span></p>
                         </div>
-                        <form id="add-student-form" class="flex gap-4 w-full lg:w-auto">
-                            <input type="text" id="new-name" placeholder="Student Name" class="flex-grow lg:w-80 border-4 border-slate-200 rounded-2xl px-6 py-4 text-2xl font-bold text-slate-700 focus:outline-none focus:border-crayon-blue transition-colors placeholder-slate-300">
-                            <button type="submit" class="btn-cartoon bg-crayon-green text-white px-8 py-4 rounded-2xl text-2xl font-black flex items-center gap-3 whitespace-nowrap">
-                                <i data-lucide="plus-circle" class="w-8 h-8"></i> Add
+                        <form id="add-student-form" class="flex gap-3 w-full lg:w-auto">
+                            <input type="text" id="new-name" placeholder="Student Name" class="flex-grow lg:w-80 border-4 border-slate-200 rounded-2xl px-4 py-3 text-xl font-bold text-slate-700 focus:outline-none focus:border-crayon-blue transition-colors placeholder-slate-300">
+                            <button type="submit" class="btn-cartoon bg-crayon-green text-white px-6 py-3 rounded-2xl text-xl font-black flex items-center gap-3 whitespace-nowrap">
+                                <i data-lucide="plus-circle" class="w-6 h-6"></i> Add
                             </button>
                         </form>
                     </div>
                     
-                    <div class="flex-grow overflow-y-auto pr-4 pb-4">
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                    <div class="flex-grow overflow-y-auto pr-2 pb-4">
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                             ${listHtml}
                         </div>
                         ${appState.students.length === 0 ? '<div class="flex flex-col items-center justify-center h-64 text-slate-400"><i data-lucide="ghost" class="w-16 h-16 mb-4"></i><p class="text-2xl font-bold">No students yet!</p></div>' : ''}
@@ -476,17 +484,17 @@
             const listHtml = appState.students.map(s => `
                 <div class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0">
                     <div class="flex items-center gap-3">
-                        <span class="text-2xl">${getStudentEmoji(s)}</span>
-                        <span class="text-lg font-bold ${s.isPresent ? 'text-slate-700' : 'text-slate-400 line-through opacity-60'}">${s.name}</span>
+                        <span class="text-2xl select-none">${getStudentEmoji(s)}</span>
+                        <span class="text-lg font-bold select-none ${s.isPresent ? 'text-slate-700' : 'text-slate-400 line-through opacity-60'}">${s.name}</span>
                     </div>
-                    <button data-id="${s.id}" class="toggle-btn w-16 h-8 rounded-full relative transition-colors border-2 ${s.isPresent ? 'bg-crayon-green border-green-600' : 'bg-slate-200 border-slate-300'}">
-                        <div class="w-6 h-6 bg-white rounded-full absolute top-0.5 shadow-sm transition-all ${s.isPresent ? 'left-8' : 'left-1'}"></div>
+                    <button data-id="${s.id}" class="toggle-btn w-16 h-10 rounded-full relative transition-colors border-2 ${s.isPresent ? 'bg-crayon-green border-green-600' : 'bg-slate-200 border-slate-300'}">
+                        <div class="w-8 h-8 bg-white rounded-full absolute top-0.5 shadow-sm transition-all ${s.isPresent ? 'left-7' : 'left-0.5'}"></div>
                     </button>
                 </div>
             `).join('');
 
             toolDisplay.innerHTML = `
-                <div class="h-full flex flex-col md:flex-row p-6 animate-pop-in gap-8">
+                <div class="h-full flex flex-col md:flex-row p-4 md:p-6 animate-pop-in gap-6">
                     <!-- Sidebar: Attendance -->
                     <div class="w-full md:w-80 flex-shrink-0 flex flex-col bg-white rounded-3xl border-2 border-slate-200 shadow-sm overflow-hidden h-full">
                         <div class="p-4 bg-slate-50 border-b border-slate-200">
@@ -502,27 +510,27 @@
                     <!-- Main: Action Area -->
                     <div class="flex-grow flex flex-col items-center justify-center relative">
                         
-                        <div id="selector-display" class="w-full max-w-2xl bg-white rounded-[3rem] border-8 border-slate-100 shadow-xl flex flex-col items-center justify-center p-12 mb-10 aspect-video relative overflow-hidden">
+                        <div id="selector-display" class="w-full max-w-2xl bg-white rounded-[3rem] border-8 border-slate-100 shadow-xl flex flex-col items-center justify-center p-8 md:p-12 mb-8 aspect-video relative overflow-hidden">
                             <!-- Background Pattern -->
                             <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(#6366f1 2px, transparent 2px); background-size: 20px 20px;"></div>
                             
-                            <div id="result-content" class="text-center relative z-10 w-full">
-                                <i data-lucide="sparkles" class="w-24 h-24 text-crayon-yellow mx-auto mb-6"></i>
-                                <h2 class="text-4xl font-black text-slate-800 mb-2">Ready to Pick!</h2>
-                                <p class="text-slate-500 text-xl">Tap a button below to start</p>
+                            <div id="result-content" class="text-center relative z-10 w-full select-none">
+                                <i data-lucide="sparkles" class="w-20 h-20 text-crayon-yellow mx-auto mb-4"></i>
+                                <h2 class="text-3xl md:text-4xl font-black text-slate-800 mb-2">Ready to Pick!</h2>
+                                <p class="text-slate-500 text-lg md:text-xl">Tap a button below to start</p>
                             </div>
                         </div>
 
                         <div class="flex flex-wrap gap-4 justify-center w-full">
-                            <button id="pick-one-btn" class="btn-cartoon bg-crayon-purple text-white px-10 py-5 rounded-3xl font-black text-2xl shadow-cartoon flex items-center gap-3 transform active:scale-95">
-                                <i data-lucide="wand-2" class="w-8 h-8"></i> PICK RANDOM
+                            <button id="pick-one-btn" class="btn-cartoon bg-crayon-purple text-white px-8 py-4 rounded-3xl font-black text-xl md:text-2xl shadow-cartoon flex items-center gap-3 transform active:scale-95">
+                                <i data-lucide="wand-2" class="w-6 h-6 md:w-8 md:h-8"></i> PICK RANDOM
                             </button>
                             
-                            <div class="w-px bg-slate-300 mx-4 hidden xl:block"></div>
+                            <div class="w-px bg-slate-300 mx-2 hidden xl:block"></div>
                             
-                            <button data-size="2" class="group-btn btn-cartoon bg-white border-2 border-slate-200 text-slate-600 px-6 py-4 rounded-2xl font-bold text-xl hover:text-crayon-blue hover:border-crayon-blue">Pairs</button>
-                            <button data-size="3" class="group-btn btn-cartoon bg-white border-2 border-slate-200 text-slate-600 px-6 py-4 rounded-2xl font-bold text-xl hover:text-crayon-blue hover:border-crayon-blue">Threes</button>
-                            <button data-size="4" class="group-btn btn-cartoon bg-white border-2 border-slate-200 text-slate-600 px-6 py-4 rounded-2xl font-bold text-xl hover:text-crayon-blue hover:border-crayon-blue">Fours</button>
+                            <button data-size="2" class="group-btn btn-cartoon bg-white border-2 border-slate-200 text-slate-600 px-5 py-3 rounded-2xl font-bold text-lg hover:text-crayon-blue hover:border-crayon-blue">Pairs</button>
+                            <button data-size="3" class="group-btn btn-cartoon bg-white border-2 border-slate-200 text-slate-600 px-5 py-3 rounded-2xl font-bold text-lg hover:text-crayon-blue hover:border-crayon-blue">Threes</button>
+                            <button data-size="4" class="group-btn btn-cartoon bg-white border-2 border-slate-200 text-slate-600 px-5 py-3 rounded-2xl font-bold text-lg hover:text-crayon-blue hover:border-crayon-blue">Fours</button>
                         </div>
                     </div>
                 </div>
@@ -639,22 +647,22 @@
             const menu = appState.lunchMenu;
 
             const makeDraggable = (student, colId) => {
+                // Ensure touch-action is none to allow custom drag handling
                 return `
                 <div id="st-${student.id}" draggable="true" 
                      data-id="${student.id}" data-col="${colId}"
-                     class="draggable-item bg-white border-2 border-slate-200 p-2 md:p-3 rounded-xl cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md hover:border-crayon-blue flex flex-col items-center w-28 md:w-36 transition-all animate-pop-in">
-                    <div class="text-4xl mb-1 pointer-events-none select-none">${getStudentEmoji(student)}</div>
-                    <div class="font-black text-slate-700 text-base md:text-xl text-center leading-tight pointer-events-none select-none truncate w-full">${student.name}</div>
+                     style="touch-action: none;"
+                     class="draggable-item bg-white border-2 border-slate-200 p-2 md:p-3 rounded-xl cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md hover:border-crayon-blue flex flex-col items-center w-28 md:w-32 transition-all animate-pop-in select-none">
+                    <div class="text-4xl mb-1 pointer-events-none">${getStudentEmoji(student)}</div>
+                    <div class="font-black text-slate-700 text-base md:text-lg text-center leading-tight pointer-events-none truncate w-full">${student.name}</div>
                 </div>`;
             };
 
             const colTemplate = (id, colorClass, title, items, isInput = false, placeholder = "") => {
-                // Determine if there is already a food emoji for the current menu text
                 let currentEmoji = '';
                 if (isInput) {
                     const text = menu[id+'Menu'] || '';
                     const words = text.toLowerCase().split(/\s+/);
-                    // Find the last known food word
                     for (let i = words.length - 1; i >= 0; i--) {
                         if (FOOD_EMOJIS[words[i]]) {
                             currentEmoji = FOOD_EMOJIS[words[i]];
@@ -665,50 +673,50 @@
 
                 return `
                 <div id="drop-${id}" class="dropzone flex flex-col h-full bg-white rounded-3xl border-4 ${colorClass} overflow-hidden shadow-sm transition-all duration-200">
-                    <div class="p-4 ${colorClass.replace('border-', 'bg-')} bg-opacity-10 text-center">
+                    <div class="p-3 ${colorClass.replace('border-', 'bg-')} bg-opacity-10 text-center flex-shrink-0">
                         ${isInput 
                             ? `
                             <div class="relative w-full">
-                                <input id="input-${id}" value="${menu[id+'Menu'] || ''}" placeholder="${placeholder}" class="w-full bg-white/60 border-2 border-white/50 focus:border-white rounded-2xl py-3 pl-4 pr-16 text-center font-black text-2xl text-slate-700 focus:outline-none placeholder-slate-400/70 shadow-sm">
-                                <div id="emoji-display-${id}" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-4xl transition-all duration-300 ${currentEmoji ? 'scale-100 opacity-100' : 'scale-50 opacity-0'} pointer-events-none filter drop-shadow-sm">${currentEmoji}</div>
+                                <input id="input-${id}" value="${menu[id+'Menu'] || ''}" placeholder="${placeholder}" class="w-full bg-white/60 border-2 border-white/50 focus:border-white rounded-2xl py-2 pl-3 pr-12 text-center font-black text-xl text-slate-700 focus:outline-none placeholder-slate-400/70 shadow-sm">
+                                <div id="emoji-display-${id}" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-3xl transition-all duration-300 ${currentEmoji ? 'scale-100 opacity-100' : 'scale-50 opacity-0'} pointer-events-none filter drop-shadow-sm">${currentEmoji}</div>
                             </div>
                             `
-                            : `<h3 class="font-black text-2xl text-slate-700 uppercase tracking-wide">${title}</h3>`
+                            : `<h3 class="font-black text-2xl text-slate-700 uppercase tracking-wide py-1">${title}</h3>`
                         }
-                        <div class="inline-block bg-white px-3 py-1 rounded-full text-sm font-bold text-slate-500 mt-3 shadow-sm">${items.length}</div>
+                        <div class="inline-block bg-white px-3 py-0.5 rounded-full text-sm font-bold text-slate-500 mt-2 shadow-sm">${items.length}</div>
                     </div>
-                    <div class="flex-grow p-4 bg-slate-50/50 flex flex-wrap content-start gap-3 overflow-y-auto">
+                    <div class="flex-grow p-3 bg-slate-50/50 flex flex-wrap content-start gap-3 overflow-y-auto min-h-0">
                         ${items.map(s => makeDraggable(s, id)).join('')}
                     </div>
                 </div>
             `};
 
             toolDisplay.innerHTML = `
-                <div class="h-full flex flex-col p-4 md:p-8 overflow-hidden gap-6">
+                <div class="h-full flex flex-col p-4 md:p-6 overflow-hidden gap-4">
                     <div class="flex justify-between items-center flex-shrink-0">
-                        <h2 class="text-4xl font-black text-slate-800 flex items-center gap-3">
+                        <h2 class="text-3xl font-black text-slate-800 flex items-center gap-3">
                             <span class="bg-orange-100 p-2 rounded-xl text-orange-500"><i data-lucide="utensils"></i></span> 
                             Lunch Count
                         </h2>
-                        <button id="reset-lunch" class="text-lg font-bold text-red-500 hover:text-white hover:bg-red-500 border-2 border-red-500 px-6 py-2 rounded-xl transition-all">Reset Board</button>
+                        <button id="reset-lunch" class="text-base font-bold text-red-500 hover:text-white hover:bg-red-500 border-2 border-red-500 px-5 py-2 rounded-xl transition-all">Reset Board</button>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 flex-grow min-h-0">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-grow min-h-0">
                         ${colTemplate('choice1', 'border-crayon-blue', 'Option A', cols.choice1, true, 'Pizza 🍕')}
                         ${colTemplate('choice2', 'border-crayon-green', 'Option B', cols.choice2, true, 'Salad 🥗')}
                         ${colTemplate('choice3', 'border-crayon-orange', 'Home Lunch 🥪', cols.choice3, false)}
                     </div>
 
-                    <div class="flex-shrink-0 min-h-[140px] bg-slate-100 rounded-3xl p-4 border-4 border-slate-300 border-dashed relative">
-                        <div class="absolute -top-5 left-6 bg-slate-300 text-white px-4 py-1 rounded-full font-bold uppercase text-sm tracking-wider">Waiting to Choose</div>
-                        <div id="drop-unselected" class="dropzone flex flex-wrap gap-3 mt-2 h-full items-center pl-2">
+                    <div class="flex-shrink-0 min-h-[130px] bg-slate-100 rounded-3xl p-4 border-4 border-slate-300 border-dashed relative">
+                        <div class="absolute -top-4 left-6 bg-slate-300 text-white px-4 py-0.5 rounded-full font-bold uppercase text-xs tracking-wider">Waiting to Choose</div>
+                        <div id="drop-unselected" class="dropzone flex flex-wrap gap-3 mt-1 h-full items-center pl-2 overflow-x-auto">
                             ${cols.unselected.length > 0 ? cols.unselected.map(s => makeDraggable(s, 'unselected')).join('') : '<div class="w-full text-center text-slate-400 font-bold italic">All done!</div>'}
                         </div>
                     </div>
                 </div>
             `;
 
-            // Drag Logic
+            // --- Mouse Drag Logic ---
             let draggedItem = null;
             let sourceCol = null;
 
@@ -744,27 +752,110 @@
                 if (targetId === sourceCol) return;
 
                 const studentId = draggedItem.dataset.id;
-                const student = appState.lunchColumns[sourceCol].find(s => s.id === studentId);
-                
-                appState.lunchColumns[sourceCol] = appState.lunchColumns[sourceCol].filter(s => s.id !== studentId);
-                appState.lunchColumns[targetId].push(student);
-                
-                renderLunchChoice();
+                moveStudent(sourceCol, targetId, studentId);
             };
 
-            // Touch Support
-            let touchItem = null;
+            // --- Smartboard / Touch Logic (Custom Implementation) ---
+            let activeTouchEl = null;
+            let touchOffsetX = 0;
+            let touchOffsetY = 0;
+            let originalSourceEl = null;
+
             const handleTouchStart = (e) => {
-                touchItem = e.target.closest('.draggable-item');
-                if(touchItem) {
-                    sourceCol = touchItem.dataset.col;
-                    touchItem.classList.add('dragging');
-                }
+                const item = e.target.closest('.draggable-item');
+                if (!item) return;
+                
+                // Prevent scrolling while dragging a student
+                e.preventDefault(); 
+                
+                originalSourceEl = item;
+                sourceCol = item.dataset.col;
+                
+                // Create a clone for visual feedback
+                activeTouchEl = item.cloneNode(true);
+                activeTouchEl.classList.remove('draggable-item'); // Remove listener class to avoid loops
+                activeTouchEl.classList.add('touch-dragging');
+                activeTouchEl.style.width = item.offsetWidth + 'px';
+                activeTouchEl.style.height = item.offsetHeight + 'px';
+                
+                const touch = e.touches[0];
+                const rect = item.getBoundingClientRect();
+                touchOffsetX = touch.clientX - rect.left;
+                touchOffsetY = touch.clientY - rect.top;
+                
+                activeTouchEl.style.left = (touch.clientX - touchOffsetX) + 'px';
+                activeTouchEl.style.top = (touch.clientY - touchOffsetY) + 'px';
+                
+                document.body.appendChild(activeTouchEl);
+                item.style.opacity = '0.3'; // Dim original
             };
 
+            const handleTouchMove = (e) => {
+                if (!activeTouchEl) return;
+                e.preventDefault(); // Critical for stopping scroll
+                const touch = e.touches[0];
+                
+                activeTouchEl.style.left = (touch.clientX - touchOffsetX) + 'px';
+                activeTouchEl.style.top = (touch.clientY - touchOffsetY) + 'px';
+                
+                // Check drop zone underneath
+                // Must hide floaty element briefly to peek underneath
+                activeTouchEl.style.display = 'none';
+                let elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+                activeTouchEl.style.display = 'flex';
+                
+                document.querySelectorAll('.dropzone').forEach(d => d.classList.remove('dropzone-active'));
+                let zone = elemBelow ? elemBelow.closest('.dropzone') : null;
+                if (zone) zone.classList.add('dropzone-active');
+            };
+
+            const handleTouchEnd = (e) => {
+                if (!activeTouchEl) return;
+                e.preventDefault();
+                
+                const touch = e.changedTouches[0];
+                
+                // Find drop target
+                activeTouchEl.style.display = 'none';
+                let elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+                
+                // Cleanup visual
+                activeTouchEl.remove();
+                activeTouchEl = null;
+                if(originalSourceEl) originalSourceEl.style.opacity = '1';
+                
+                document.querySelectorAll('.dropzone').forEach(d => d.classList.remove('dropzone-active'));
+                
+                // Logic
+                let zone = elemBelow ? elemBelow.closest('.dropzone') : null;
+                if (zone && originalSourceEl) {
+                    const targetId = zone.id.replace('drop-', '');
+                    if (targetId !== sourceCol) {
+                         const studentId = originalSourceEl.dataset.id;
+                         moveStudent(sourceCol, targetId, studentId);
+                    }
+                }
+                originalSourceEl = null;
+            };
+
+            const moveStudent = (fromCol, toCol, sId) => {
+                const student = appState.lunchColumns[fromCol].find(s => s.id === sId);
+                if(student) {
+                    appState.lunchColumns[fromCol] = appState.lunchColumns[fromCol].filter(s => s.id !== sId);
+                    appState.lunchColumns[toCol].push(student);
+                    renderLunchChoice();
+                }
+            }
+
+            // Bind Events
             toolDisplay.querySelectorAll('.draggable-item').forEach(el => {
+                // Mouse
                 el.addEventListener('dragstart', handleDragStart);
                 el.addEventListener('dragend', handleDragEnd);
+                // Touch
+                el.addEventListener('touchstart', handleTouchStart, {passive: false});
+                el.addEventListener('touchmove', handleTouchMove, {passive: false});
+                el.addEventListener('touchend', handleTouchEnd);
             });
 
             toolDisplay.querySelectorAll('.dropzone').forEach(el => {
@@ -782,7 +873,6 @@
                         const val = e.target.value;
                         appState.lunchMenu[`${key}Menu`] = val;
                         
-                        // Find emoji logic
                         const words = val.toLowerCase().split(/\s+/);
                         let foundEmoji = '';
                         for (let i = words.length - 1; i >= 0; i--) {
@@ -792,19 +882,14 @@
                             }
                         }
 
-                        // Update Visual Aid
                         if (emojiDisplay) {
                             emojiDisplay.textContent = foundEmoji;
                             if (foundEmoji) {
-                                emojiDisplay.classList.remove('scale-50');
-                                emojiDisplay.classList.remove('opacity-0');
-                                emojiDisplay.classList.add('scale-100');
-                                emojiDisplay.classList.add('opacity-100');
+                                emojiDisplay.classList.remove('scale-50', 'opacity-0');
+                                emojiDisplay.classList.add('scale-100', 'opacity-100');
                             } else {
-                                emojiDisplay.classList.remove('scale-100');
-                                emojiDisplay.classList.remove('opacity-100');
-                                emojiDisplay.classList.add('scale-50');
-                                emojiDisplay.classList.add('opacity-0');
+                                emojiDisplay.classList.remove('scale-100', 'opacity-100');
+                                emojiDisplay.classList.add('scale-50', 'opacity-0');
                             }
                         }
                     };
@@ -814,7 +899,7 @@
             document.getElementById('reset-lunch').onclick = () => {
                 appState.lunchColumns = null;
                 appState.lunchMenu = {};
-                randomizeEmojis(); // Reshuffle emojis for a new day
+                randomizeEmojis(); 
                 renderLunchChoice();
             };
         }
@@ -875,8 +960,8 @@
                         <div class="p-10 bg-yellow-100 rounded-full mb-8 animate-wiggle">
                             <i data-lucide="trophy" class="w-24 h-24 text-yellow-500"></i>
                         </div>
-                        <h2 class="text-5xl font-black text-slate-800 mb-4">Double Elimination</h2>
-                        <p class="text-slate-500 text-2xl mb-12 max-w-md text-center">Ready to find out who the classroom champion is?</p>
+                        <h2 class="text-4xl md:text-5xl font-black text-slate-800 mb-4">Double Elimination</h2>
+                        <p class="text-slate-500 text-xl md:text-2xl mb-12 max-w-md text-center">Ready to find out who the classroom champion is?</p>
                         <button id="gen-bracket" class="btn-cartoon bg-crayon-blue text-white px-12 py-6 rounded-3xl font-black text-2xl flex items-center gap-4">
                             <i data-lucide="zap" class="w-8 h-8"></i> GENERATE BRACKET
                         </button>
@@ -886,23 +971,23 @@
                  const { first, second } = appState.podium;
                 content = `
                     <div class="flex flex-col items-center justify-center h-full animate-pop-in text-center relative z-10">
-                        <h2 class="text-6xl font-black text-slate-800 mb-16 tracking-tight">🏆 CHAMPIONS 🏆</h2>
-                        <div class="flex items-end justify-center gap-8">
+                        <h2 class="text-5xl md:text-6xl font-black text-slate-800 mb-12 tracking-tight">🏆 CHAMPIONS 🏆</h2>
+                        <div class="flex items-end justify-center gap-6 md:gap-8">
                              <!-- 2nd -->
                             <div class="flex flex-col items-center animate-pop-in" style="animation-delay: 0.2s">
-                                <div class="text-6xl mb-4 transform -rotate-6">${getStudentEmoji(second)}</div>
-                                <div class="text-slate-600 font-bold mb-2 text-2xl">${second.name}</div>
-                                <div class="w-32 h-48 bg-slate-300 rounded-t-2xl border-4 border-slate-400 flex items-center justify-center text-6xl font-black text-white shadow-lg">2</div>
+                                <div class="text-5xl md:text-6xl mb-4 transform -rotate-6">${getStudentEmoji(second)}</div>
+                                <div class="text-slate-600 font-bold mb-2 text-xl md:text-2xl">${second.name}</div>
+                                <div class="w-24 md:w-32 h-36 md:h-48 bg-slate-300 rounded-t-2xl border-4 border-slate-400 flex items-center justify-center text-4xl md:text-6xl font-black text-white shadow-lg">2</div>
                             </div>
                             <!-- 1st -->
                             <div class="flex flex-col items-center animate-pop-in z-10">
-                                <i data-lucide="crown" class="w-16 h-16 text-yellow-500 mb-2 animate-bounce-slow"></i>
-                                <div class="text-8xl mb-4 transform rotate-6">${getStudentEmoji(first)}</div>
-                                <div class="text-slate-800 font-black mb-2 text-4xl">${first.name}</div>
-                                <div class="w-48 h-64 bg-yellow-400 rounded-t-2xl border-4 border-yellow-500 flex items-center justify-center text-8xl font-black text-white shadow-xl">1</div>
+                                <i data-lucide="crown" class="w-12 h-12 md:w-16 md:h-16 text-yellow-500 mb-2 animate-bounce-slow"></i>
+                                <div class="text-6xl md:text-8xl mb-4 transform rotate-6">${getStudentEmoji(first)}</div>
+                                <div class="text-slate-800 font-black mb-2 text-3xl md:text-4xl">${first.name}</div>
+                                <div class="w-36 md:w-48 h-48 md:h-64 bg-yellow-400 rounded-t-2xl border-4 border-yellow-500 flex items-center justify-center text-6xl md:text-8xl font-black text-white shadow-xl">1</div>
                             </div>
                         </div>
-                        <button id="reset-bracket" class="mt-16 bg-white text-slate-500 hover:text-red-500 border-2 border-slate-200 hover:border-red-400 px-8 py-4 rounded-2xl font-bold text-xl transition-all">Start New Tournament</button>
+                        <button id="reset-bracket" class="mt-12 bg-white text-slate-500 hover:text-red-500 border-2 border-slate-200 hover:border-red-400 px-8 py-4 rounded-2xl font-bold text-xl transition-all">Start New Tournament</button>
                     </div>
                 `;
             } else {
@@ -916,8 +1001,7 @@
                     </div>
                 `;
 
-                // Group matches by round for rendering
-                // WB Rounds
+                // Group matches by round
                 const wbRounds = [];
                 let r = 1;
                 while(true) {
@@ -926,8 +1010,6 @@
                     wbRounds.push(matches);
                     r++;
                 }
-
-                // LB Rounds
                 const lbRounds = [];
                 r = 1;
                 while(true) {
@@ -937,21 +1019,19 @@
                     r++;
                 }
                 
-                // Final
                 const finalMatch = bracket.matches.find(m => m.id === 'grand-final');
                 const resetMatch = bracket.matches.find(m => m.id === 'grand-final-reset');
-                
                 const finalsToRender = [finalMatch];
                 if (resetMatch) finalsToRender.push(resetMatch);
 
                 content = `
                     <div class="h-full flex flex-col overflow-hidden">
                         <div class="flex justify-between items-center p-4 bg-slate-50 border-b-2 border-slate-200 shrink-0">
-                            <h3 class="font-black text-2xl text-slate-700 flex items-center gap-3"><i data-lucide="git-branch" class="text-crayon-blue"></i> Tournament Bracket</h3>
+                            <h3 class="font-black text-xl md:text-2xl text-slate-700 flex items-center gap-3"><i data-lucide="git-branch" class="text-crayon-blue"></i> Tournament Bracket</h3>
                             <button id="reset-bracket-mini" class="text-red-400 font-bold hover:text-red-600">Reset</button>
                         </div>
                         
-                        <div class="flex-grow overflow-x-auto overflow-y-auto p-8 custom-scrollbar bg-slate-50/30">
+                        <div class="flex-grow overflow-x-auto overflow-y-auto p-6 custom-scrollbar bg-slate-50/30">
                             <div class="flex flex-col gap-12 min-w-max">
                                 
                                 <!-- Winners Section -->
@@ -1001,7 +1081,6 @@
             const matches = [];
             
             // --- Winners Bracket Generation ---
-            // Round 1
             const totalRounds = Math.log2(size);
             let currentRoundMatches = [];
             
@@ -1012,7 +1091,6 @@
                 currentRoundMatches.push(m);
             }
 
-            // Subsequent Winners Rounds
             let prevRoundMatches = currentRoundMatches;
             for(let r=2; r<=totalRounds; r++) {
                 currentRoundMatches = [];
@@ -1022,7 +1100,6 @@
                     matches.push(m);
                     currentRoundMatches.push(m);
                     
-                    // Link previous winners
                     prevRoundMatches[i*2].nextWin = { id, slot: 0 };
                     prevRoundMatches[i*2+1].nextWin = { id, slot: 1 };
                 }
@@ -1031,9 +1108,6 @@
             const wbFinalMatch = prevRoundMatches[0];
 
             // --- Losers Bracket Generation ---
-            // LB Round 1: Fed by WB Round 1 Losers
-            // LB has (2 * totalRounds - 2) rounds roughly.
-            // Simplified standard mapping for up to 32 players
             
             let lbMatchesByRound = {};
             const createLBMatch = (r, idx) => {
@@ -1045,75 +1119,50 @@
                 return m;
             };
 
-            // Calculate LB structure
-            // LB R1 (N/4 matches): Fed by WB R1 losers
             for(let i=0; i<size/4; i++) createLBMatch(1, i);
-            
-            // LB R2 (N/4 matches): Fed by LB R1 winners + WB R2 losers
             for(let i=0; i<size/4; i++) createLBMatch(2, i);
-
-            // LB R3 (N/8 matches): Fed by LB R2 winners
             for(let i=0; i<size/8; i++) createLBMatch(3, i);
-
-            // LB R4 (N/8 matches): Fed by LB R3 winners + WB R3 losers
             for(let i=0; i<size/8; i++) createLBMatch(4, i);
 
-            // ... continue pattern until 1 match left
-            // Pattern: odd LB rounds (1, 3, 5...) are pure LB. Even LB rounds (2, 4, 6...) take drop-ins from WB.
-            
             let lbRound = 5;
             let count = size/16;
             while(count >= 1) {
-                // Odd round (Internal LB)
                 for(let i=0; i<count; i++) createLBMatch(lbRound, i);
                 lbRound++;
-                // Even round (Drop in)
                 for(let i=0; i<count; i++) createLBMatch(lbRound, i);
                 count /= 2;
                 lbRound++;
             }
             
-            const maxLbRound = lbRound - 1; // Last round generated
+            const maxLbRound = lbRound - 1; 
             
             // --- Wiring Losers Logic ---
-            
-            // Link WB Losers to LB
-            // WB R1 -> LB R1
             const wbR1 = matches.filter(m => m.type === 'winner' && m.round === 1);
             const lbR1 = matches.filter(m => m.type === 'loser' && m.round === 1);
-            // Standard cross mapping: Top half of WB losers go to Top half of LB?
-            // Simple mapping: 
             for(let i=0; i<wbR1.length; i++) {
                 const targetMatch = lbR1[Math.floor(i/2)];
                 wbR1[i].nextLose = { id: targetMatch.id, slot: i%2 };
             }
 
-            // WB R2 -> LB R2
-            // LB R2 takes: Slot 0 from LB R1 Winner, Slot 1 from WB R2 Loser
             const wbR2 = matches.filter(m => m.type === 'winner' && m.round === 2);
             const lbR2 = matches.filter(m => m.type === 'loser' && m.round === 2);
             const lbR1Matches = matches.filter(m => m.type === 'loser' && m.round === 1);
             
-            // Wire LB R1 Winners -> LB R2
             for(let i=0; i<lbR1Matches.length; i++) lbR1Matches[i].nextWin = { id: lbR2[i].id, slot: 0 };
-            // Wire WB R2 Losers -> LB R2
             for(let i=0; i<wbR2.length; i++) wbR2[i].nextLose = { id: lbR2[i].id, slot: 1 };
 
-            // Generalize remaining LB wiring
             let currentLbR = 2;
             let currentWbR = 3;
             
             while(currentLbR < maxLbRound) {
-                // Step 1: LB R(n) -> LB R(n+1) [Internal fight]
                 const sourceMatches = matches.filter(m => m.type === 'loser' && m.round === currentLbR);
                 const targetMatches = matches.filter(m => m.type === 'loser' && m.round === currentLbR+1);
                 for(let i=0; i<sourceMatches.length; i++) {
-                    targetMatches[Math.floor(i/2)].players[i%2] = null; // Placeholder logic handled by nextWin
+                    targetMatches[Math.floor(i/2)].players[i%2] = null;
                     sourceMatches[i].nextWin = { id: targetMatches[Math.floor(i/2)].id, slot: i%2 };
                 }
                 currentLbR++;
 
-                // Step 2: LB R(n+1) + WB R(k) -> LB R(n+2) [Drop in]
                 if (currentLbR >= maxLbRound) break;
                 
                 const internalSource = matches.filter(m => m.type === 'loser' && m.round === currentLbR);
@@ -1121,9 +1170,7 @@
                 const destMatches = matches.filter(m => m.type === 'loser' && m.round === currentLbR+1);
 
                 if(destMatches.length > 0) {
-                    // Wire Internal Winners
                     for(let i=0; i<internalSource.length; i++) internalSource[i].nextWin = { id: destMatches[i].id, slot: 0 };
-                    // Wire Drop-ins
                     for(let i=0; i<dropSource.length; i++) dropSource[i].nextLose = { id: destMatches[i].id, slot: 1 };
                 }
                 
@@ -1131,31 +1178,22 @@
                 currentWbR++;
             }
 
-            // --- Grand Final ---
             const finalId = 'grand-final';
             const grandFinal = { id: finalId, type: 'final', round: 1, players: [null, null], winner: null };
             matches.push(grandFinal);
             
-            // Wire WB Final Winner
             wbFinalMatch.nextWin = { id: finalId, slot: 0 };
-            // Wire LB Final Winner
             const lbFinalMatch = matches.filter(m => m.type === 'loser' && m.round === maxLbRound)[0];
             if(lbFinalMatch) lbFinalMatch.nextWin = { id: finalId, slot: 1 };
             
             if(lbFinalMatch) {
-               // Usually LB Final is: Winner of prev LB vs Loser of WB Final.
-               // My loop logic wires drop-ins to EVEN LB rounds.
-               // If maxLbRound is even, it got a drop in. If odd, it didn't.
-               // Let's force wire the last WB loser to the last LB match to be safe.
                wbFinalMatch.nextLose = { id: lbFinalMatch.id, slot: 1 };
-               // And ensure the previous LB winner goes to slot 0
                const prevLb = matches.filter(m => m.type === 'loser' && m.round === maxLbRound-1);
                if(prevLb.length === 1) prevLb[0].nextWin = { id: lbFinalMatch.id, slot: 0 };
             }
 
             appState.bracket = { matches };
             
-            // Auto-advance BYEs
             matches.forEach(m => {
                 const byeIdx = m.players.findIndex(p => p && p.id === 'bye');
                 if (byeIdx !== -1) {
@@ -1178,42 +1216,33 @@
             const loser = match.players.find(p => p.id !== winnerId);
             match.winner = winner;
 
-            // Logic for regular matches (Winner Bracket & Loser Bracket)
             if (match.type !== 'final' && match.type !== 'final-reset') {
-                 // Move Winner
                 if (match.nextWin) {
                     const nextM = matches.find(m => m.id === match.nextWin.id);
                     if (nextM) nextM.players[match.nextWin.slot] = winner;
                 }
-                // Move Loser
                 if (match.nextLose) {
                     const nextM = matches.find(m => m.id === match.nextLose.id);
                     if (nextM) nextM.players[match.nextLose.slot] = loser;
                 }
             }
             
-            // Logic for Grand Final 1
             if (match.id === 'grand-final') {
-                // Slot 0 is WB Winner (Undefeated). Slot 1 is LB Winner (1 loss).
                 if (match.players[0].id === winner.id) {
-                    // WB Winner wins. Tournament Over.
                     appState.podium = { first: winner, second: loser };
                 } else {
-                    // LB Winner wins. Both have 1 loss. Reset!
-                    // Create new match
                     if (!matches.find(m => m.id === 'grand-final-reset')) {
                         matches.push({
                             id: 'grand-final-reset',
                             type: 'final-reset',
                             round: 2,
-                            players: [winner, loser], // Previous winner vs Previous loser
+                            players: [winner, loser],
                             winner: null
                         });
                     }
                 }
             }
             
-            // Logic for Grand Final Reset
             if (match.id === 'grand-final-reset') {
                 appState.podium = { first: winner, second: loser };
                 triggerConfetti();
