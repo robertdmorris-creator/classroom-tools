@@ -965,13 +965,18 @@
                     </div>
                     <div class="flex-grow flex flex-col items-center justify-center relative">
                         <div id="selector-display" class="w-full h-full max-h-[600px] bg-white rounded-[3rem] border-8 border-slate-100 shadow-xl flex flex-col items-center justify-center p-8 mb-8 relative overflow-hidden">
-                            <div id="result-content" class="text-center relative z-10 w-full select-none">
+                            <div id="result-content" class="text-center relative z-10 w-full select-none h-full overflow-hidden flex flex-col justify-center">
                                 <i data-lucide="sparkles" class="w-24 h-24 text-crayon-yellow mx-auto mb-6"></i>
                                 <h2 class="text-5xl md:text-6xl font-display text-slate-800 mb-4">Who's Next?</h2>
+                                <p class="text-slate-400 text-xl font-bold">Select an option below</p>
                             </div>
                         </div>
                         <div class="flex flex-wrap gap-4 justify-center w-full">
-                            <button id="pick-one-btn" class="btn-cartoon bg-crayon-purple text-white px-10 py-5 rounded-3xl font-black text-2xl shadow-cartoon flex items-center gap-4"><i data-lucide="wand-2" class="w-8 h-8"></i> PICK RANDOM</button>
+                            <button id="pick-one-btn" class="btn-cartoon bg-crayon-purple text-white px-8 py-4 rounded-3xl font-black text-xl shadow-cartoon flex items-center gap-3"><i data-lucide="wand-2" class="w-6 h-6"></i> PICK ONE</button>
+                            <div class="w-px bg-slate-300 mx-2 hidden md:block"></div>
+                            <button data-size="2" class="group-btn btn-cartoon bg-white border-4 border-slate-200 text-slate-600 px-6 py-4 rounded-3xl font-bold text-xl hover:text-crayon-blue hover:border-crayon-blue">Pairs</button>
+                            <button data-size="3" class="group-btn btn-cartoon bg-white border-4 border-slate-200 text-slate-600 px-6 py-4 rounded-3xl font-bold text-xl hover:text-crayon-blue hover:border-crayon-blue">Threes</button>
+                            <button data-size="4" class="group-btn btn-cartoon bg-white border-4 border-slate-200 text-slate-600 px-6 py-4 rounded-3xl font-bold text-xl hover:text-crayon-blue hover:border-crayon-blue">Fours</button>
                         </div>
                     </div>
                 </div>
@@ -983,10 +988,15 @@
                     else { s.isPresent = !s.isPresent; renderStudentSelector(); }
                 };
             });
+            
+            // Random Single Picker
             document.getElementById('pick-one-btn').onclick = () => {
                 const candidates = appState.students.filter(s => s.isPresent);
                 if (candidates.length === 0) return;
                 const display = document.getElementById('result-content');
+                // Reset view if it was showing groups
+                display.className = "text-center relative z-10 w-full select-none h-full overflow-hidden flex flex-col justify-center";
+                
                 let i = 0;
                 const timer = setInterval(() => {
                     if (!document.getElementById('result-content')) { clearInterval(timer); return; }
@@ -1000,28 +1010,434 @@
                     }
                 }, 100);
             };
+
+            // Grouping Logic
+            toolDisplay.querySelectorAll('.group-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const size = parseInt(btn.dataset.size);
+                    const candidates = appState.students.filter(s => s.isPresent).sort(() => Math.random() - 0.5);
+                    const groups = [];
+                    while(candidates.length) groups.push(candidates.splice(0, size));
+                    
+                    const groupsHtml = groups.map((g, i) => `
+                        <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200 flex flex-col h-full">
+                            <div class="text-center font-black text-slate-400 mb-3 uppercase tracking-wider text-sm">Group ${i+1}</div>
+                            <div class="flex-grow flex flex-col justify-center gap-2">
+                                ${g.map(s => `
+                                    <div class="flex items-center gap-3 bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
+                                        <span class="text-2xl">${getStudentEmoji(s)}</span>
+                                        <span class="font-bold text-slate-700 text-lg">${s.name}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    const display = document.getElementById('result-content');
+                    display.className = "w-full h-full overflow-y-auto p-2 no-scrollbar";
+                    display.innerHTML = `
+                        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 w-full pb-4">${groupsHtml}</div>
+                    `;
+                    triggerConfetti();
+                };
+            });
         }
 
+        // --- DOUBLE ELIMINATION LOGIC ---
+
         function renderTournamentBracket() {
-            if (!appState.bracket) {
+            const bracket = appState.bracket;
+
+            const renderMatch = (match, type) => {
+                const p1 = match.players[0];
+                const p2 = match.players[1];
+                const wId = match.winner?.id;
+
+                const renderPlayer = (p, isTop) => {
+                    if (!p) return '<div class="h-12 bg-slate-100/50 rounded-xl mb-1 flex items-center px-3"><span class="text-slate-300 font-bold italic">TBD</span></div>';
+                    const isWin = wId === p.id;
+                    const isLose = wId && wId !== p.id;
+                    
+                    const onClick = (!wId && p.name !== 'BYE') ? `onclick="window.advanceBracket('${match.id}', '${p.id}')"` : '';
+                        
+                    return `
+                        <div ${onClick} class="
+                            h-14 flex items-center justify-between px-4 rounded-xl text-lg font-bold transition-all cursor-pointer mb-1 border-2 select-none relative
+                            ${isWin ? 'bg-green-100 text-green-800 border-green-500 z-10 shadow-md' : ''}
+                            ${isLose ? 'bg-slate-50 text-slate-400 border-slate-200' : ''}
+                            ${!wId && p.name !== 'BYE' ? 'bg-white hover:bg-yellow-50 border-slate-300 hover:border-yellow-400 shadow-sm' : ''}
+                            ${p.name === 'BYE' ? 'bg-transparent border-transparent text-slate-400/50' : ''}
+                        ">
+                            <div class="flex items-center gap-3 overflow-hidden w-full">
+                                <span class="text-2xl">${p.name !== 'BYE' ? getStudentEmoji(p) : ''}</span>
+                                <span class="truncate">${p.name}</span>
+                            </div>
+                            ${isWin ? '<i data-lucide="check" class="w-5 h-5"></i>' : ''}
+                        </div>
+                    `;
+                };
+
+                return `
+                    <div class="relative flex flex-col justify-center mb-6 w-[340px] flex-shrink-0 group">
+                        <div class="bg-slate-200/60 p-2 rounded-2xl border-l-8 ${type === 'winner' ? 'border-crayon-blue' : (type === 'loser' ? 'border-crayon-orange' : 'border-yellow-400')}">
+                            ${renderPlayer(p1, true)}
+                            <div class="h-px bg-slate-300/50 my-1 mx-2"></div>
+                            ${renderPlayer(p2, false)}
+                        </div>
+                        <div class="flex justify-between items-center px-2 mt-1">
+                             <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Match ${match.id}</div>
+                             ${type === 'final-reset' ? '<div class="text-[10px] text-red-500 font-bold uppercase tracking-widest animate-pulse">Bracket Reset</div>' : ''}
+                        </div>
+                    </div>
+                `;
+            };
+
+            if (!bracket) {
                 toolDisplay.innerHTML = `
                     <div class="flex flex-col items-center justify-center h-full animate-pop-in p-6 text-center">
                         <div class="p-10 bg-yellow-100 rounded-full mb-8 animate-wiggle"><i data-lucide="trophy" class="w-24 h-24 text-yellow-500"></i></div>
-                        <h2 class="text-6xl font-display text-slate-800 mb-4">Tournament Time</h2>
-                        <button id="gen-bracket" class="btn-cartoon bg-crayon-blue text-white px-10 py-5 rounded-3xl font-black text-2xl flex items-center gap-4 mt-8">GENERATE BRACKET</button>
+                        <h2 class="text-6xl font-display text-slate-800 mb-4">Double Elimination</h2>
+                        <p class="text-slate-500 text-xl font-bold mb-8">Second chance bracket enabled!</p>
+                        <button id="gen-bracket" class="btn-cartoon bg-crayon-blue text-white px-10 py-5 rounded-3xl font-black text-2xl flex items-center gap-4">
+                            GENERATE BRACKET
+                        </button>
                     </div>
                 `;
-                document.getElementById('gen-bracket').onclick = () => {
-                    const players = appState.students.filter(s => s.isPresent).sort(() => Math.random() - 0.5);
-                    if(players.length < 2) return;
-                    appState.bracket = { players }; 
-                    renderTournamentBracket();
-                };
+                document.getElementById('gen-bracket').onclick = generateDoubleElimination;
+            } else if (appState.podium) {
+                const { first, second } = appState.podium;
+                toolDisplay.innerHTML = `
+                     <div class="flex flex-col items-center justify-center h-full animate-pop-in text-center relative z-10">
+                        <h2 class="text-5xl md:text-7xl font-display text-slate-800 mb-12 tracking-tight">🏆 CHAMPIONS 🏆</h2>
+                        <div class="flex items-end justify-center gap-6 md:gap-12">
+                             <!-- 2nd -->
+                            <div class="flex flex-col items-center animate-pop-in" style="animation-delay: 0.2s">
+                                <div class="text-7xl md:text-8xl mb-4 transform -rotate-6">${getStudentEmoji(second)}</div>
+                                <div class="text-slate-600 font-bold mb-2 text-2xl md:text-3xl">${second.name}</div>
+                                <div class="w-32 md:w-40 h-48 md:h-64 bg-slate-300 rounded-t-2xl border-8 border-slate-400 flex items-center justify-center text-6xl md:text-7xl font-display text-white shadow-lg">2</div>
+                            </div>
+                            <!-- 1st -->
+                            <div class="flex flex-col items-center animate-pop-in z-10">
+                                <i data-lucide="crown" class="w-20 h-20 text-yellow-500 mb-4 animate-bounce-slow"></i>
+                                <div class="text-8xl md:text-9xl mb-6 transform rotate-6">${getStudentEmoji(first)}</div>
+                                <div class="text-slate-800 font-black mb-2 text-4xl md:text-5xl">${first.name}</div>
+                                <div class="w-48 md:w-60 h-64 md:h-80 bg-yellow-400 rounded-t-2xl border-8 border-yellow-500 flex items-center justify-center text-8xl md:text-9xl font-display text-white shadow-xl">1</div>
+                            </div>
+                        </div>
+                        <button onclick="appState.bracket=null;appState.podium=null;renderActiveTool()" class="mt-12 bg-white text-slate-500 hover:text-red-500 border-4 border-slate-200 hover:border-red-400 px-10 py-5 rounded-3xl font-bold text-2xl transition-all">Start New Tournament</button>
+                    </div>
+                `;
             } else {
-                toolDisplay.innerHTML = `<div class="h-full flex items-center justify-center flex-col"><h2 class="text-4xl font-bold mb-6">Bracket Generated!</h2><button class="text-red-500 font-bold text-2xl border-4 border-red-200 px-6 py-3 rounded-2xl" onclick="appState.bracket=null;renderActiveTool()">Reset</button></div>`;
+                // Group matches by round for UI
+                const wbRounds = [];
+                let r = 1;
+                while(true) {
+                    const matches = bracket.matches.filter(m => m.type === 'winner' && m.round === r);
+                    if(matches.length === 0) break;
+                    wbRounds.push(matches);
+                    r++;
+                }
+                const lbRounds = [];
+                r = 1;
+                while(true) {
+                    const matches = bracket.matches.filter(m => m.type === 'loser' && m.round === r);
+                    if(matches.length === 0) break;
+                    lbRounds.push(matches);
+                    r++;
+                }
+
+                // Identify finals
+                const gf = bracket.matches.find(m => m.id === 'grand-final');
+                const gfr = bracket.matches.find(m => m.id === 'grand-final-reset');
+                const finalsList = [gf];
+                if(gfr) finalsList.push(gfr);
+
+                const renderRoundCol = (matches, title, color) => `
+                    <div class="flex flex-col gap-6 mx-4">
+                         <div class="text-center font-black ${color} uppercase tracking-widest bg-white/80 rounded-full py-2 px-4 shadow-sm border-2 border-slate-100 sticky top-0 z-20 whitespace-nowrap">${title}</div>
+                         <div class="flex flex-col gap-8 justify-center flex-grow py-4">
+                             ${matches.map(m => renderMatch(m, m.type)).join('')}
+                         </div>
+                    </div>
+                `;
+
+                toolDisplay.innerHTML = `
+                    <div class="h-full flex flex-col overflow-hidden bg-slate-50">
+                        <div class="flex justify-between items-center p-4 bg-white border-b-4 border-slate-200 shrink-0 z-30 shadow-sm">
+                            <h3 class="font-display text-3xl text-slate-700 flex items-center gap-3"><i data-lucide="git-branch" class="text-crayon-blue"></i> Tournament Bracket</h3>
+                            <button onclick="appState.bracket=null;renderActiveTool()" class="text-red-400 font-bold hover:text-red-600 text-xl px-4">Reset</button>
+                        </div>
+                        
+                        <div class="flex-grow overflow-x-auto overflow-y-auto p-4 custom-scrollbar">
+                            <div class="flex flex-col gap-8 min-w-max pb-12">
+                                
+                                <!-- Winners -->
+                                <div class="flex gap-2">
+                                    <div class="flex flex-col justify-center mr-4"><div class="p-6 bg-crayon-blue/10 text-crayon-blue font-black rounded-3xl text-xl rotate-180 border-4 border-crayon-blue/20" style="writing-mode: vertical-rl;">WINNERS BRACKET</div></div>
+                                    ${wbRounds.map((roundMatches, i) => renderRoundCol(roundMatches, `Round ${i+1}`, 'text-crayon-blue')).join('')}
+                                    
+                                    <!-- Finals Column -->
+                                    <div class="flex flex-col gap-6 mx-8 border-l-4 border-slate-200 pl-8 border-dashed">
+                                         <div class="text-center font-black text-yellow-500 uppercase tracking-widest bg-white/80 rounded-full py-2 px-4 shadow-sm border-2 border-slate-100 sticky top-0 z-20">CHAMPIONSHIP</div>
+                                         <div class="flex flex-col gap-12 justify-center flex-grow">
+                                            ${finalsList.map(m => renderMatch(m, m.type)).join('')}
+                                         </div>
+                                    </div>
+                                </div>
+
+                                <!-- Losers -->
+                                <div class="h-2 w-full bg-slate-200 rounded-full my-4"></div>
+
+                                <div class="flex gap-2">
+                                    <div class="flex flex-col justify-center mr-4"><div class="p-6 bg-crayon-orange/10 text-crayon-orange font-black rounded-3xl text-xl rotate-180 border-4 border-crayon-orange/20" style="writing-mode: vertical-rl;">LOSERS BRACKET</div></div>
+                                    ${lbRounds.map((roundMatches, i) => renderRoundCol(roundMatches, `L-Round ${i+1}`, 'text-crayon-orange')).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
             }
+            lucide.createIcons();
+            
+            // Expose logic globally so HTML strings can call it
+            window.advanceBracket = advanceBracket;
         }
-        
+
+        function generateDoubleElimination() {
+            const players = appState.students.filter(s => s.isPresent).sort(() => Math.random() - 0.5);
+            if (players.length < 3) { alert("Need at least 3 players!"); return; }
+
+            // Pad to power of 2
+            let size = 2;
+            while(size < players.length) size *= 2;
+            while(players.length < size) players.push({ name: 'BYE', id: 'bye' });
+
+            const matches = [];
+            
+            // --- Winners Bracket Generation ---
+            const totalRounds = Math.log2(size);
+            let currentRoundMatches = [];
+            
+            // Round 1
+            for(let i=0; i<size/2; i++) {
+                const id = `W1-${i+1}`;
+                const m = { id, type: 'winner', round: 1, players: [players[i], players[size-1-i]], winner: null, nextWin: null, nextLose: null };
+                matches.push(m);
+                currentRoundMatches.push(m);
+            }
+
+            let prevRoundMatches = currentRoundMatches;
+            for(let r=2; r<=totalRounds; r++) {
+                currentRoundMatches = [];
+                for(let i=0; i<prevRoundMatches.length/2; i++) {
+                    const id = `W${r}-${i+1}`;
+                    const m = { id, type: 'winner', round: r, players: [null, null], winner: null, nextWin: null, nextLose: null };
+                    matches.push(m);
+                    currentRoundMatches.push(m);
+                    
+                    prevRoundMatches[i*2].nextWin = { id, slot: 0 };
+                    prevRoundMatches[i*2+1].nextWin = { id, slot: 1 };
+                }
+                prevRoundMatches = currentRoundMatches;
+            }
+            const wbFinalMatch = prevRoundMatches[0]; // This winner goes to Grand Final
+
+            // --- Losers Bracket Generation ---
+            // Structure for 8 players (Total Size):
+            // L1 (4 matches) -> L2 (2 matches) -> L3 (2 matches) -> L4 (1 match) -> GF
+            
+            let lbMatchesByRound = {};
+            const createLBMatch = (r, idx) => {
+                const id = `L${r}-${idx+1}`;
+                const m = { id, type: 'loser', round: r, players: [null, null], winner: null, nextWin: null };
+                matches.push(m);
+                if(!lbMatchesByRound[r]) lbMatchesByRound[r] = [];
+                lbMatchesByRound[r].push(m);
+                return m;
+            };
+
+            // Calculate LB structure
+            // L-Round 1 takes W-Round 1 losers. Count = Size/4
+            for(let i=0; i<size/4; i++) createLBMatch(1, i);
+            
+            // Subsequent LB rounds
+            let lbRound = 2;
+            let matchCount = size/4; 
+            
+            // Logic: The number of matches in LB stays same for 2 rounds, then halves
+            // For 8 players: L1(2), L2(2), L3(1)
+            // For 16 players: L1(4), L2(4), L3(2), L4(2), L5(1)
+            
+            while(matchCount >= 1) {
+                // First round of a pair (fed by LB winners + WB losers)
+                for(let i=0; i<matchCount; i++) createLBMatch(lbRound, i);
+                if (matchCount === 1) break; // Final LB match (before GF)
+                
+                lbRound++;
+                // Second round of a pair (fed by LB winners only)
+                for(let i=0; i<matchCount/2; i++) createLBMatch(lbRound, i);
+                
+                matchCount /= 2;
+                lbRound++;
+            }
+            const maxLbRound = lbRound;
+            
+            // --- Wiring Losers Logic ---
+            
+            // Wire WB R1 losers to LB R1
+            const wbR1 = matches.filter(m => m.type === 'winner' && m.round === 1);
+            const lbR1 = matches.filter(m => m.type === 'loser' && m.round === 1);
+            
+            // Simple cross mapping to avoid immediate rematches
+            // Top half of bracket vs bottom half logic usually
+            for(let i=0; i<wbR1.length; i++) {
+                // Map WB matches 0,1 -> LB 0. WB 2,3 -> LB 1.
+                const targetLbIdx = Math.floor(i/2);
+                const targetSlot = i%2; 
+                wbR1[i].nextLose = { id: lbR1[targetLbIdx].id, slot: targetSlot };
+            }
+
+            // Wire LB internal + Drops from WB
+            // Pattern: 
+            // Odd LB rounds (1, 3, 5...) receive WB losers.
+            // Even LB rounds (2, 4, 6...) are just LB winners advancing.
+            
+            // Actually, standard DE:
+            // L1: WB R1 losers.
+            // L2: L1 Winners + WB R2 Losers.
+            // L3: L2 Winners.
+            // L4: L3 Winners + WB R3 Losers.
+            
+            // Let's wire purely based on existence
+            let currentLbR = 1;
+            let currentWbR = 2; // WB round that feeds into LB
+            
+            while(currentLbR < maxLbRound) {
+                const currentLbMatches = matches.filter(m => m.type === 'loser' && m.round === currentLbR);
+                const nextLbMatches = matches.filter(m => m.type === 'loser' && m.round === currentLbR + 1);
+                
+                // If next round has SAME amount of matches, it's a "Drop Round" (fed by WB)
+                if (nextLbMatches.length === currentLbMatches.length) {
+                    // Current LB winners go to slot 0 of next
+                    for(let i=0; i<currentLbMatches.length; i++) {
+                        currentLbMatches[i].nextWin = { id: nextLbMatches[i].id, slot: 0 };
+                    }
+                    // WB Losers go to slot 1
+                    const wbDropMatches = matches.filter(m => m.type === 'winner' && m.round === currentWbR);
+                    // We need to reverse map or cross map to avoid repeat matchups
+                    for(let i=0; i<wbDropMatches.length; i++) {
+                         // Simple map for robustness
+                         if(i < nextLbMatches.length) {
+                            wbDropMatches[i].nextLose = { id: nextLbMatches[i].id, slot: 1 };
+                         }
+                    }
+                    currentWbR++;
+                } else {
+                    // It's a "consolidation round" (halving matches)
+                    for(let i=0; i<currentLbMatches.length; i++) {
+                        const target = nextLbMatches[Math.floor(i/2)];
+                        currentLbMatches[i].nextWin = { id: target.id, slot: i%2 };
+                    }
+                }
+                currentLbR++;
+            }
+
+            // --- Grand Finals Wiring ---
+            const finalId = 'grand-final';
+            const grandFinal = { id: finalId, type: 'final', round: 1, players: [null, null], winner: null };
+            matches.push(grandFinal);
+            
+            // WB Winner -> GF Slot 0
+            wbFinalMatch.nextWin = { id: finalId, slot: 0 };
+            
+            // LB Winner -> GF Slot 1
+            const lbFinalMatch = matches.filter(m => m.type === 'loser' && m.round === maxLbRound)[0];
+            if(lbFinalMatch) lbFinalMatch.nextWin = { id: finalId, slot: 1 };
+
+            // Note: WB Final Loser needs to go to LB Final
+            // The WB Final is the one before wbFinalMatch? No, wbFinalMatch IS the match that produces the WB winner.
+            // The loser of wbFinalMatch goes to the LB Final (maxLbRound).
+            // Actually, logic check:
+            // WB Final produces 1 undefeated (to GF) and 1 loser.
+            // That loser goes to the very last match of LB.
+            // Let's fix the WB drop for the final WB round.
+            wbFinalMatch.nextLose = { id: lbFinalMatch.id, slot: 1 }; // Last LB match gets WB finalist loser in slot 1 (usually)
+            
+            // The last LB match needs a player in slot 0 too.
+            // That comes from the previous LB round.
+            // (Handled by the loop above hopefully, but let's verify)
+            
+            appState.bracket = { matches };
+            
+            // Auto-Advance BYEs
+            matches.forEach(m => {
+                const byeIdx = m.players.findIndex(p => p && p.id === 'bye');
+                if (byeIdx !== -1) {
+                    const realPlayerIdx = byeIdx === 0 ? 1 : 0;
+                    if(m.players[realPlayerIdx] && m.players[realPlayerIdx].id !== 'bye') {
+                       advanceBracket(m.id, m.players[realPlayerIdx].id); 
+                    }
+                }
+            });
+            
+            renderTournamentBracket();
+        }
+
+        function advanceBracket(matchId, winnerId) {
+            const matches = appState.bracket.matches;
+            const match = matches.find(m => m.id === matchId);
+            if (!match || match.winner) return; // Already decided
+
+            const winner = match.players.find(p => p.id === winnerId);
+            const loser = match.players.find(p => p.id !== winnerId);
+            match.winner = winner;
+
+            // Handle standard advancements
+            if (match.nextWin) {
+                const nextM = matches.find(m => m.id === match.nextWin.id);
+                if (nextM) nextM.players[match.nextWin.slot] = winner;
+            }
+            if (match.nextLose) {
+                const nextM = matches.find(m => m.id === match.nextLose.id);
+                if (nextM) nextM.players[match.nextLose.slot] = loser;
+            }
+            
+            // --- Grand Final Logic ---
+            if (match.id === 'grand-final') {
+                // If the player from Slot 0 (WB Winner) wins, it's over.
+                // If the player from Slot 1 (LB Winner) wins, we need a reset.
+                
+                // Note: We need to know who came from where.
+                // By our generation, Slot 0 is always WB.
+                if (match.players[0].id === winner.id) {
+                    // WB Winner won. Over.
+                    appState.podium = { first: winner, second: loser };
+                    triggerConfetti();
+                } else {
+                    // LB Winner won. Reset needed.
+                    // Check if reset match already exists
+                    if (!matches.find(m => m.id === 'grand-final-reset')) {
+                        matches.push({
+                            id: 'grand-final-reset',
+                            type: 'final-reset',
+                            round: 2,
+                            players: [winner, loser], // Rematch
+                            winner: null
+                        });
+                        alert("Bracket Reset! The challenger forced a second match!");
+                    }
+                }
+            }
+            
+            // --- Grand Final Reset Logic ---
+            if (match.id === 'grand-final-reset') {
+                appState.podium = { first: winner, second: loser };
+                triggerConfetti();
+            }
+
+            renderTournamentBracket();
+        }
+
         function renderHangman() {
              toolDisplay.innerHTML = `<div class="h-full flex items-center justify-center"><p class="text-slate-400 font-bold text-3xl">Game loaded...</p></div>`;
         }
