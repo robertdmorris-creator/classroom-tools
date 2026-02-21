@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts: Nunito and Fredoka One for that "Game" feel -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Fredoka+One&display=swap" rel="stylesheet">
     
     <script>
@@ -21,36 +21,37 @@
                     },
                     colors: {
                         paper: '#ffffff',
+                        board: '#fffbeb', /* Warm Amber-50 */
                         crayon: {
-                            blue: '#3b82f6',
-                            yellow: '#fbbf24',
+                            blue: '#3b82f6',   
+                            yellow: '#eab308',
                             green: '#22c55e',
                             red: '#ef4444',
                             purple: '#a855f7',
                             orange: '#f97316',
                             pink: '#ec4899',
-                            teal: '#14b8a6'
+                            dark: '#1e293b' // Slate 800 for outlines
                         },
                         monster: {
-                            a: '#60a5fa', // Blue monster
-                            b: '#4ade80', // Green monster
-                            c: '#fb923c'  // Orange monster
+                            a: '#3b82f6', // Bright Blue
+                            b: '#22c55e', // Bright Green
+                            c: '#a855f7'  // Bright Purple (was orange/gray)
                         }
                     },
                     boxShadow: {
-                        'cartoon': '4px 4px 0px 0px rgba(0,0,0,0.15)',
-                        'cartoon-hover': '6px 6px 0px 0px rgba(0,0,0,0.2)',
-                        'cartoon-active': '2px 2px 0px 0px rgba(0,0,0,0.2)',
-                        'inner-lg': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+                        /* Bold, solid shadows for the cartoon effect */
+                        'cartoon': '8px 8px 0px 0px #1e293b',
+                        'tactile': '4px 4px 0px 0px #1e293b',
+                        'tactile-hover': '6px 6px 0px 0px #1e293b',
+                        'tactile-active': '0px 0px 0px 0px #1e293b',
+                        'inner-deep': 'inset 0 6px 0px 0px rgba(0, 0, 0, 0.15)',
                     },
                     animation: {
                         'bounce-slow': 'bounce 3s infinite',
                         'wiggle': 'wiggle 1s ease-in-out infinite',
-                        'pop-in': 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                        'pop-in': 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'blink': 'blink 4s infinite',
                         'chew': 'chew 0.4s ease-in-out',
-                        'float': 'float 3s ease-in-out infinite',
-                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
-                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     },
                     keyframes: {
                         wiggle: {
@@ -58,23 +59,16 @@
                             '50%': { transform: 'rotate(3deg)' },
                         },
                         popIn: {
-                            '0%': { transform: 'scale(0.5)', opacity: '0' },
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
                             '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        blink: {
+                            '0%, 96%, 98%, 100%': { transform: 'scaleY(1)' },
+                            '97%, 99%': { transform: 'scaleY(0.1)' }
                         },
                         chew: {
                             '0%, 100%': { transform: 'scale(1)' },
-                            '50%': { transform: 'scale(0.95) rotate(2deg)' },
-                            '75%': { transform: 'scale(1.05) rotate(-2deg)' }
-                        },
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        },
-                        shake: {
-                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
-                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
-                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
-                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                            '50%': { transform: 'scale(0.95) translateY(5px)' }
                         }
                     }
                 }
@@ -83,158 +77,120 @@
     </script>
     <style>
         body {
-            background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 100%);
+            /* Vibrant Yellow Polka Dot Background */
+            background-color: #fde047; /* Yellow 300 */
+            background-image: radial-gradient(#facc15 15%, transparent 15%); /* Yellow 400 dots */
+            background-size: 30px 30px;
             color: #1e293b;
             overscroll-behavior: none;
             -webkit-tap-highlight-color: transparent;
-            /* Disable selection globally for better touch feel */
             user-select: none;
             -webkit-user-select: none;
         }
         
         #app-container:fullscreen {
-            background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 100%);
-            width: 100vw;
-            height: 100vh;
-            overflow-y: hidden; /* Lock scroll in FS */
+            width: 100vw; height: 100vh; overflow: hidden;
         }
 
+        /* Thick borders and solid shadows make it look like a comic book */
         .fun-panel {
             background: white;
-            border-radius: 20px;
-            border: 3px solid #e2e8f0;
-            box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.1);
+            border-radius: 24px;
+            border: 4px solid #1e293b;
+            box-shadow: 8px 8px 0px 0px #1e293b;
         }
 
-        .btn-cartoon {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 2px solid transparent;
-            cursor: pointer;
+        .btn-tactile {
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 4px 4px 0px 0px #1e293b;
+            transform: translateY(0);
         }
-        .btn-cartoon:hover {
+        .btn-tactile:hover {
             transform: translateY(-2px);
-            box-shadow: 6px 6px 0px 0px rgba(0,0,0,0.1);
+            box-shadow: 6px 6px 0px 0px #1e293b;
         }
-        .btn-cartoon:active {
-            transform: translateY(2px);
-            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.1);
+        .btn-tactile:active {
+            transform: translateY(4px);
+            box-shadow: 0px 0px 0px 0px transparent;
         }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 12px; height: 12px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 20px; border: 3px solid white; background-clip: content-box; }
-        ::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
-
-        /* Loader */
-        .loader {
-            width: 60px; height: 60px;
-            border: 8px solid #f3f3f3; border-top: 8px solid #3b82f6;
-            border-radius: 50%; animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        ::-webkit-scrollbar { width: 14px; height: 14px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 20px; border: 3px solid white; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #334155; }
 
         /* Dragging visuals */
-        .dragging { opacity: 0.3; }
+        .dragging { opacity: 0.5; transform: scale(0.95) rotate(-2deg); }
         
-        /* Optimized Touch Dragging */
         .touch-dragging {
-            position: fixed; 
-            z-index: 2147483647;
-            pointer-events: none;
-            opacity: 0.9; 
-            transform: scale(1.15) rotate(-3deg); /* Bigger pop */
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            width: auto; height: auto;
+            position: fixed; z-index: 2147483647; pointer-events: none;
+            opacity: 1; transform: scale(1.15) rotate(-5deg); 
+            box-shadow: 10px 10px 0px 0px rgba(30,41,59,0.4);
+            border: 4px solid #1e293b; border-radius: 24px; background: white;
         }
         
-        /* Monster Dropzones */
+        /* Monster Styles */
+        .monster-mouth { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .dropzone-active .monster-mouth { 
-            height: 70px !important; /* Bigger mouth */
-            border-radius: 40px !important;
-            background-color: #374151 !important;
+            height: 100px !important; 
+            border-radius: 50px !important;
+            background-color: #0f172a !important;
         }
-        .dropzone-active .monster-face { transform: scale(1.05); }
-        .dropzone.chewing { animation: chew 0.5s ease-in-out; }
-
-        .student-card-emoji { font-size: 3rem; line-height: 1; }
-        .viewport-fullscreen {
-            position: fixed !important; top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 9999;
-            background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 100%);
-            display: flex; flex-direction: column;
-        }
-        .viewport-fullscreen #tool-display { border-radius: 0; border: none; box-shadow: none; background: rgba(255,255,255,0.9); }
-        
-        /* Meter Bar */
-        .meter-fill { transition: width 0.1s linear, background-color 0.2s ease; }
-        
-        /* Smartboard Tweaks */
-        input:focus { outline: none; }
+        .dropzone-active .monster-face { transform: scale(1.02); }
+        .dropzone.chewing .monster-face { animation: chew 0.4s ease-in-out; }
     </style>
 </head>
-<body class="h-screen min-h-screen font-sans antialiased overflow-hidden text-slate-800 selection:bg-crayon-yellow selection:text-slate-900">
+<body class="h-screen min-h-screen font-sans antialiased overflow-hidden text-slate-800">
 
-    <div id="app-container" class="relative flex flex-col h-full z-10">
-
-        <!-- Header / Nav -->
-        <header class="flex-shrink-0 px-4 pt-2 pb-2">
-            <div class="fun-panel px-3 py-2 flex items-center justify-between gap-2 md:gap-4">
-                <div class="flex items-center gap-3 px-1 flex-shrink-0">
-                    <div class="p-2 bg-crayon-blue rounded-xl shadow-cartoon text-white transform -rotate-3 hidden md:block">
-                        <i data-lucide="backpack" class="w-8 h-8"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-display text-2xl md:text-3xl tracking-tight text-slate-700 leading-none">Class<span class="text-crayon-blue">Tools</span></h1>
-                    </div>
+    <div id="app-container" class="relative flex flex-col h-full z-10 p-2 md:p-4 gap-3 md:gap-5">
+        <!-- Header -->
+        <header class="fun-panel flex-shrink-0 px-4 py-3 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3 flex-shrink-0">
+                <div class="p-2 bg-crayon-blue rounded-xl text-white transform -rotate-3 btn-tactile border-4 border-slate-800">
+                    <i data-lucide="backpack" class="w-8 h-8"></i>
                 </div>
-
-                <!-- Navigation Tabs -->
-                <nav id="tool-nav" class="flex gap-2 overflow-x-auto no-scrollbar mx-2 flex-grow justify-start md:justify-center px-1">
-                    <!-- Buttons injected via JS -->
-                </nav>
-
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    <button id="fullscreen-btn" class="p-3 md:p-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors" title="Toggle Fullscreen">
-                        <i data-lucide="maximize" class="w-6 h-6 md:w-8 md:h-8"></i>
-                    </button>
-                </div>
+                <h1 class="font-display text-4xl tracking-tight text-slate-800 hidden md:block" style="-webkit-text-stroke: 1px white;">Class<span class="text-crayon-blue">Tools</span></h1>
             </div>
+
+            <!-- Navigation Tabs -->
+            <nav id="tool-nav" class="flex gap-4 overflow-x-auto flex-grow justify-start md:justify-center px-2 py-1 no-scrollbar"></nav>
+
+            <button id="fullscreen-btn" class="p-3 rounded-xl bg-white border-4 border-slate-800 text-slate-800 btn-tactile flex-shrink-0">
+                <i data-lucide="maximize" class="w-7 h-7"></i>
+            </button>
         </header>
 
-        <!-- Main Tool Area - FLEX GROW to fill screen -->
-        <main class="flex-grow px-4 pb-4 pt-1 min-h-0 flex flex-col">
-            <div id="tool-display" class="fun-panel flex-grow w-full relative overflow-hidden flex flex-col bg-white/80 backdrop-blur-sm transition-all h-full">
+        <!-- Main Workspace -->
+        <main class="fun-panel flex-grow relative overflow-hidden flex flex-col bg-board">
+            <div id="tool-display" class="absolute inset-0 w-full h-full flex flex-col rounded-[20px] overflow-hidden">
                  <div class="flex flex-col items-center justify-center h-full text-center">
-                     <span class="loader mb-6"></span>
-                     <p class="text-3xl font-bold text-slate-400 animate-pulse">Loading Smartboard...</p>
+                     <i data-lucide="loader-2" class="w-16 h-16 animate-spin text-crayon-blue mb-4"></i>
+                     <p class="text-3xl font-display text-slate-800">Loading...</p>
                  </div>
             </div>
         </main>
     </div>
 
-    <!-- Firebase and Logic -->
+    <!-- Modal Container -->
+    <div id="modal-container" class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4"></div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Configuration & State ---
         const appState = {
-            userId: null,
-            isAuthReady: false,
-            activeTool: 'lunchChoice',
-            students: [],
-            lunchColumns: null,
-            lunchMenu: { choice1Menu: '', choice2Menu: '' },
-            bracket: null,
-            podium: null,
-            emojiMap: {},
-            timerInterval: null
+            userId: null, isAuthReady: false, activeTool: 'lunchChoice',
+            students: [], lunchColumns: null,
+            lunchMenu: { choice1: null, choice2: null, _date: null },
+            currentMenuDate: '2026-02-02',
+            bracket: null, podium: null, emojiMap: {},
+            timerInterval: null, audioContext: null, audioStream: null 
         };
 
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "DEMO", authDomain: "DEMO", projectId: "DEMO" };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'classroom-tools-smartboard';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "DEMO", projectId: "DEMO" };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'classroom-tools-sb';
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -243,137 +199,185 @@
         const toolDisplay = document.getElementById('tool-display');
         const toolNav = document.getElementById('tool-nav');
         
-        // Kid-friendly Emojis
+        // MASSIVE library of over 400 fun, kid-safe emojis for daily rotation!
         const AVATARS = [
-            '🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🦄','🐞','🦖','🐳','🐙','🦋',
-            '🐝','🐢','🦎','🦒','🦓','🐘','🦛','🦏','🐪','🦙','🦘','🦡','🦢','🦜','🦩','🦚','🦉','🐊','🦈','🐬'
+            // Animals
+            '🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🐤','🦆','🦅','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞','🐜','🦟','🐢','🐍','🦎','🦖','🦕','🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅','🦓','🦍','🦧','🐘','🦛','🦏','🐪','🐫','🦒','🦘','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🦙','🐐','🦌','🐕','🐩','🐈','🐓','🦃','🦚','🦜','🦢','🦩','🕊️','🐇','🦝','🦨','🦡','🦦','🦥','🐁','🐀','🐿️','🦔',
+            // Fun Faces, Robots & Aliens
+            '😀','😁','😂','🤣','😃','😄','😅','😆','😉','😊','😋','😎','😍','🥰','😗','😙','😚','🙂','🤗','🤩','🤔','🤨','😐','😑','😶','🙄','😏','😣','😥','😮','🤐','😯','😪','😫','🥱','😴','😌','😛','😜','😝','🤤','😒','😓','😔','😕','🙃','🤑','😲','☹️','🙁','😖','😞','😟','😤','😢','😭','😦','😧','😨','😩','🤯','😬','😰','😱','🥵','🥶','😳','🤪','😵','😡','😠','🤬','😷','🤒','🤕','🤢','🤮','🤧','😇','🥳','🥺','🤠','🤡','🤥','🤫','🤭','🧐','🤓','😈','👿','👹','👺','💀','☠️','👻','👽','👾','🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿','😾',
+            // Space, Weather & Nature
+            '☀️','🌤️','⛅','🌥️','☁️','🌦️','🌧️','⛈️','🌩️','🌨️','❄️','⛄','🌬️','💨','🌪️','🌫️','🌈','☔','⚡','⭐','🌟','💫','✨','☄️','🪐','🌍','🌎','🌏','🌌','🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘','🌙','🌚','🌛','🌜','🌝','🌞','🌲','🌳','🌴','🌵','🌾','🌿','☘️','🍀','🍁','🍂','🍃','🍄','🌰',
+            // Sports, Hobbies, Vehicles & Objects
+            '⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🥏','🎱','🪀','🏓','🏸','🏒','🏑','🥍','🏏','🪃','🥅','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🎽','🛹','🛼','🛷','⛸️','🥌','🎿','⛷️','🏂','🪂','🏋️','🤼','🤸','⛹️','🤺','🤾','🏌️','🏇','🧘','🏄','🏊','🤽','🚣','🧗','🚵','🚴','🏆','🥇','🥈','🥉','🏅','🎖️','🏵️','🎗️','🎫','🎟️','🎪','🤹','🎭','🩰','🎨','🎬','🎤','🎧','🎼','🎹','🥁','🪘','🎷','🎺','🪗','🎸','🪕','🎻','🎲','♟️','🎯','🎳','🎮','🎰','🧩','🚗','🚕','🚙','🚌','🚎','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🛴','🚲','🛵','🏍️','🚨','🚔','🚍','🚘','🚖','🚡','🚠','🚟','🚃','🚋','🚞','🚝','🚄','🚅','🚈','🚂','🚆','🚇','🚊','🚉','✈️','🛫','🛬','🛩️','🚀','🛸','🚁','🛶','⛵','🚤','🛥️','🛳️','⛴️','🚢','⚓','🪝','⛽','🚧','🚦','🚥','🚏','🗺️','🗿','🗽','🗼','🏰','🏯','🏟️','🎡','🎢','🎠','⛲','⛱️','🏖️','🏝️','🏜️','🌋','⛰️','🏔️','🗻','🏕️','⛺','🛖','🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨','🏪','🏫','🏩','💒','🏛️','⛪','🕌','🕍','🛕','🕋','⛩️'
         ];
-
-        // Food Emoji Dictionary
-        const FOOD_EMOJIS = {
-            'pizza': '🍕', 'burger': '🍔', 'hotdog': '🌭', 'fries': '🍟', 'taco': '🌮', 'burrito': '🌯',
-            'sandwich': '🥪', 'salad': '🥗', 'spaghetti': '🍝', 'sushi': '🍣', 'chicken': '🍗', 'steak': '🥩',
-            'egg': '🍳', 'pancake': '🥞', 'waffle': '🧇', 'bacon': '🥓', 'pretzel': '🥨', 'bagel': '🥯',
-            'cheese': '🧀', 'soup': '🥣', 'popcorn': '🍿', 'cookie': '🍪', 'cake': '🍰', 'cupcake': '🧁',
-            'donut': '🍩', 'ice cream': '🍦', 'chocolate': '🍫', 'candy': '🍬', 'apple': '🍎', 'banana': '🍌',
-            'grapes': '🍇', 'watermelon': '🍉', 'orange': '🍊', 'strawberry': '🍓', 'cherry': '🍒', 'corn': '🌽',
-            'carrot': '🥕', 'broccoli': '🥦', 'bread': '🍞', 'milk': '🥛', 'juice': '🧃', 'water': '💧'
+        
+        const SCHOOL_MENU = {
+            '2026-01-05': { c1: 'Popcorn Chicken', c2: 'Hamburger', sides: ['Seasoned Corn', 'Broccoli Dippers', 'Fruit'] },
+            '2026-01-06': { c1: 'Soft Beefy Taco', c2: 'Mexican Pizza', sides: ['Refried Beans', 'Lettuce/Tomato', 'Fruit'] },
+            '2026-01-07': { c1: 'Grilled Cheese', c2: 'PBJ Uncrustable', sides: ['Chili Bowl', 'Baked Potato', 'Baby Carrots'] },
+            '2026-01-08': { c1: 'Stuffed Breadsticks', c2: 'Steak Sandwich', sides: ['Broccoli & Cheese', 'Tossed Salad', 'Fruit'] },
+            '2026-01-09': { c1: 'Chicken Filet Sandwich', c2: 'BBQ Sandwich', sides: ['Tater Tots', 'Baby Carrots', 'Fruit'] },
+            '2026-01-12': { c1: 'Chicken & Waffles', c2: 'Yogurt & Muffin', sides: ['Broccoli Dippers', 'Tossed Salad', 'Fruit'] },
+            '2026-01-13': { c1: 'French Bread Pizza', c2: 'Spicy Chicken', sides: ['Seasoned Carrots', 'Lettuce/Tomato', 'Fruit'] },
+            '2026-01-14': { c1: 'Pasta w/meatsauce', c2: 'Grilled Cheese', sides: ['Steamed Broccoli', 'Seasoned Corn', 'Fruit'] },
+            '2026-01-15': { c1: 'Chicken Biscuit', c2: 'Sausage Biscuit', sides: ['Sweet Potato', 'Smiles', 'Fruit'] },
+            '2026-01-16': { c1: 'Hotdog', c2: 'Hamburger', sides: ['Baked Beans', 'Coleslaw', 'Fruit'] },
+            '2026-01-20': { c1: 'Chicken Sandwich', c2: 'Hamburger', sides: ['Lettuce/Tomato', 'Baked Beans', 'Fruit'] },
+            '2026-01-21': { c1: 'Steak Sticks w/gravy', c2: 'PBJ Uncrustable', sides: ['Mashed Potatoes', 'Broccoli Dippers', 'Fruit'] },
+            '2026-01-22': { c1: 'Chicken Tenders', c2: 'Corndog', sides: ['Pinto Beans', 'Celery & Carrots', 'Fruit'] },
+            '2026-01-26': { c1: 'Popcorn Chicken', c2: 'Hamburger', sides: ['Seasoned Corn', 'Broccoli Dippers', 'Fruit'] },
+            '2026-01-27': { c1: 'Soft Beefy Taco', c2: 'Cheese Quesadilla', sides: ['Refried Beans', 'Lettuce/Tomato', 'Fruit'] },
+            '2026-01-28': { c1: 'Grilled Cheese', c2: 'PBJ Uncrustable', sides: ['Chili Bowl', 'Baked Potato', 'Baby Carrots'] },
+            '2026-01-29': { c1: 'Stuffed Breadsticks', c2: 'Ham & Cheese Deli', sides: ['Broccoli & Cheese', 'Tossed Salad', 'Fruit'] },
+            '2026-01-30': { c1: 'Chicken Filet Sandwich', c2: 'BBQ Sandwich', sides: ['Tater Tots', 'Baby Carrots', 'Fruit'] },
+            '2026-02-02': { c1: 'Chicken & Waffles', c2: 'Yogurt & Muffin', sides: ['Broccoli Dippers', 'Tossed Salad', 'Fruit'] },
+            '2026-02-03': { c1: 'French Bread Pizza', c2: 'Chicken Sandwich', sides: ['Seasoned Carrots', 'Lettuce/Tomato', 'Fruit'] },
+            '2026-02-04': { c1: 'Pasta w/meatsauce', c2: 'Grilled Cheese', sides: ['Steamed Broccoli', 'Seasoned Corn', 'Fruit'] },
+            '2026-02-05': { c1: 'Chicken Biscuit', c2: 'Sausage Biscuit', sides: ['Baby Carrots', 'Smiles', 'Fruit'] },
+            '2026-02-06': { c1: 'Hotdog', c2: 'Hamburger', sides: ['Baked Beans', 'Coleslaw', 'Fruit'] },
+            '2026-02-09': { c1: 'Pepperoni Pizza', c2: 'Oven Fried Chicken', sides: ['Tossed Salad', 'Seasoned Corn', 'Fruit'] },
+            '2026-02-10': { c1: 'Popcorn Chicken', c2: 'Ham & Cheese Wrap', sides: ['Greenbeans', 'Baby Carrots', 'Fruit'] },
+            '2026-02-11': { c1: 'Chicken Filet Sandwich', c2: 'Hamburger', sides: ['Baked Beans', 'Lettuce/Tomato', 'Fruit'] },
+            '2026-02-12': { c1: 'Steak Sticks w/gravy', c2: 'PBJ Uncrustable', sides: ['Mashed Potatoes', 'Broccoli w/dip', 'Fruit'] },
+            '2026-02-13': { c1: 'Chicken Tenders', c2: 'Corndog', sides: ['Pinto Beans', 'Celery & Carrots', 'Fruit'] },
+            '2026-02-17': { c1: 'Soft Beefy Taco', c2: 'Mexican Pizza', sides: ['Refried Beans', 'Lettuce/Tomato', 'Baby Carrots'] },
+            '2026-02-18': { c1: 'Grilled Cheese', c2: 'PBJ Uncrustable', sides: ['Chili Bowl', 'Baked Potato Half', 'Fruit'] },
+            '2026-02-19': { c1: 'Pizza Sticks', c2: 'Hot Ham & Cheese', sides: ['Broccoli & Cheese', 'Tossed Salad', 'Fruit'] },
+            '2026-02-20': { c1: 'Chicken Filet Sandwich', c2: 'BBQ Sandwich', sides: ['Tater Tots', 'Baby Carrots', 'Fruit'] },
+            '2026-02-23': { c1: 'Chicken & Waffles', c2: 'Yogurt & Muffin', sides: ['Broccoli Dippers', 'Tossed Salad', 'Fruit'] },
+            '2026-02-24': { c1: 'French Bread Pizza', c2: 'Chicken Sandwich', sides: ['Seasoned Carrots', 'Lettuce/Tomato', 'Fruit'] },
+            '2026-02-25': { c1: 'Pasta w/meatsauce', c2: 'Grilled Cheese', sides: ['Steamed Broccoli', 'Seasoned Corn', 'Fruit'] },
+            '2026-02-26': { c1: 'Chicken Biscuit', c2: 'Sausage Biscuit', sides: ['Sweet Potato', 'Smiles', 'Fruit'] },
+            '2026-02-27': { c1: 'Hotdog', c2: 'Hamburger', sides: ['Baked Beans', 'Coleslaw', 'Fruit'] }
         };
+        const DATES = Object.keys(SCHOOL_MENU).sort();
 
-        function randomizeEmojis() {
-            if (appState.students.length > 0) {
-                appState.students.forEach(s => {
-                    appState.emojiMap[s.id] = AVATARS[Math.floor(Math.random() * AVATARS.length)];
-                });
-            }
+        function getFoodEmoji(name) {
+            const n = name.toLowerCase();
+            if (n.includes('pizza') || n.includes('breadsticks')) return '🍕';
+            if (n.includes('waffle')) return '🧇';
+            if (n.includes('pasta') || n.includes('spaghetti')) return '🍝';
+            if (n.includes('taco') || n.includes('quesadilla')) return '🌮';
+            if (n.includes('cheese') && (n.includes('sandwich') || n.includes('grilled'))) return '🥪';
+            if (n.includes('sandwich') || n.includes('wrap') || n.includes('uncrustable')) return '🥪';
+            if (n.includes('burger')) return '🍔';
+            if (n.includes('hotdog') || n.includes('corndog')) return '🌭';
+            if (n.includes('chicken') || n.includes('tenders')) return '🍗';
+            if (n.includes('steak') || n.includes('bbq') || n.includes('meat')) return '🥩';
+            if (n.includes('yogurt') || n.includes('muffin')) return '🧁';
+            if (n.includes('biscuit')) return '🥐';
+            if (n.includes('cheese')) return '🧀';
+            return '🍱';
         }
+
+        function getSideEmoji(name) {
+            const n = name.toLowerCase();
+            if (n.includes('broccoli')) return '🥦';
+            if (n.includes('carrot')) return '🥕';
+            if (n.includes('corn')) return '🌽';
+            if (n.includes('fruit')) return '🍎';
+            if (n.includes('bean') || n.includes('chili')) return '🫘';
+            if (n.includes('potato') || n.includes('tots') || n.includes('smiles')) return '🥔';
+            if (n.includes('salad') || n.includes('lettuce') || n.includes('slaw')) return '🥗';
+            if (n.includes('greenbean')) return '🥬';
+            return '🍽️';
+        }
+
+        const MENU_OPTIONS = Array.from(new Set(Object.values(SCHOOL_MENU).flatMap(d => [d.c1, d.c2])))
+            .sort().map(name => ({ name, emoji: getFoodEmoji(name) }));
 
         function getStudentEmoji(student) {
             if (appState.emojiMap[student.id]) return appState.emojiMap[student.id];
-            let hash = 0;
-            const name = student.name;
-            for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            
+            // Combine the student's name with today's date string (e.g., "SkylarFri Feb 20 2026")
+            // This ensures the emoji changes daily, but stays consistent all day long!
+            const todayStr = new Date().toDateString();
+            const seedString = student.name + todayStr;
+            
+            let hash = 0; 
+            for (let i = 0; i < seedString.length; i++) {
+                hash = seedString.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            
             const emoji = AVATARS[Math.abs(hash) % AVATARS.length];
             appState.emojiMap[student.id] = emoji;
             return emoji;
         }
 
-        // Tool Definitions
         const tools = {
-            lunchChoice: { name: 'Lunch Feed', icon: 'utensils', color: 'bg-crayon-green', render: renderLunchChoice },
-            noiseMeter: { name: 'Quiet Critter', icon: 'mic', color: 'bg-crayon-pink', render: renderNoiseMeter },
-            timer: { name: 'Timer', icon: 'timer', color: 'bg-crayon-red', render: renderTimer },
-            classRoster: { name: 'Roster', icon: 'users', color: 'bg-crayon-blue', render: renderClassRoster },
-            studentSelector: { name: 'Picker', icon: 'dices', color: 'bg-crayon-purple', render: renderStudentSelector },
-            tournamentBracket: { name: 'Bracket', icon: 'trophy', color: 'bg-crayon-yellow', render: renderTournamentBracket },
-            hangman: { name: 'Hangman', icon: 'gamepad-2', color: 'bg-crayon-orange', render: renderHangman },
+            lunchChoice: { name: 'Lunch Board', icon: 'utensils', color: 'bg-crayon-green', text: 'text-crayon-green', render: renderLunchChoice },
+            noiseMeter: { name: 'Quiet Critter', icon: 'mic', color: 'bg-crayon-pink', text: 'text-crayon-pink', render: renderNoiseMeter },
+            timer: { name: 'Focus Timer', icon: 'timer', color: 'bg-crayon-red', text: 'text-crayon-red', render: renderTimer },
+            classRoster: { name: 'Roster', icon: 'users', color: 'bg-crayon-blue', text: 'text-crayon-blue', render: renderClassRoster },
+            studentSelector: { name: 'Picker', icon: 'dices', color: 'bg-crayon-purple', text: 'text-crayon-purple', render: renderStudentSelector },
+            tournamentBracket: { name: 'Bracket', icon: 'trophy', color: 'bg-crayon-yellow', text: 'text-yellow-600', render: renderTournamentBracket },
         };
 
-        // --- Initialization ---
-
         function init() {
-            renderNav();
-            setupFullscreen();
-            
+            renderNav(); setupFullscreen();
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    appState.userId = user.uid;
-                    appState.isAuthReady = true;
-                    await initializeRosterIfNeeded();
-                    setupStudentListener();
-                    renderActiveTool();
+                    appState.userId = user.uid; appState.isAuthReady = true;
+                    await initRoster(); setupStudentListener(); renderActiveTool();
                 }
             });
-
             (async () => {
                 try {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                } catch (error) {
-                    console.error("Auth failed:", error);
-                    fallbackToLocal();
-                }
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+                    else await signInAnonymously(auth);
+                } catch (e) { fallbackToLocal(); }
             })();
-            setTimeout(() => { if (!appState.isAuthReady) fallbackToLocal(); }, 3500);
+            setTimeout(() => { if (!appState.isAuthReady) fallbackToLocal(); }, 3000);
         }
 
         function fallbackToLocal() {
             if (appState.isAuthReady) return;
-            console.warn("Using local mode");
             appState.isAuthReady = true;
             appState.students = ['Skylar', 'Terrell', 'DJ', 'Joshua', 'Cody', 'Leon', 'Alisha', 'Miracle'].map((n, i) => ({ id: `loc-${i}`, name: n, isPresent: true }));
             renderActiveTool();
         }
 
-        async function initializeRosterIfNeeded() {
+        async function initRoster() {
             if (!appState.userId) return;
-            const settingsRef = doc(db, `artifacts/${appId}/users/${appState.userId}/settings`, 'roster');
+            const ref = doc(db, `artifacts/${appId}/users/${appState.userId}/settings`, 'roster');
             try {
-                const snap = await getDoc(settingsRef);
+                const snap = await getDoc(ref);
                 if (!snap.exists() || !snap.data().initialized) {
-                    const studentsRef = collection(db, `artifacts/${appId}/users/${appState.userId}/students`);
-                    const existing = await getDocs(studentsRef);
-                    existing.forEach(d => deleteDoc(d.ref));
+                    const sRef = collection(db, `artifacts/${appId}/users/${appState.userId}/students`);
                     const defaults = ['Skylar', 'Terrell', 'DJ', 'Joshua', 'Cody', 'Leon', 'Alisha', 'Miracle'];
-                    await Promise.all(defaults.map(name => addDoc(studentsRef, { name, isPresent: true })));
-                    await setDoc(settingsRef, { initialized: true });
+                    await Promise.all(defaults.map(name => addDoc(sRef, { name, isPresent: true })));
+                    await setDoc(ref, { initialized: true });
                 }
-            } catch (e) { console.error("Roster init error", e); }
+            } catch (e) {}
         }
 
         function setupStudentListener() {
             if (!appState.userId) return;
-            const q = collection(db, `artifacts/${appId}/users/${appState.userId}/students`);
-            onSnapshot(q, (snap) => {
+            onSnapshot(collection(db, `artifacts/${appId}/users/${appState.userId}/students`), (snap) => {
                 appState.students = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => a.name.localeCompare(b.name));
-                if (Object.keys(appState.emojiMap).length === 0) randomizeEmojis();
                 if (['classRoster', 'studentSelector', 'lunchChoice'].includes(appState.activeTool)) renderActiveTool();
-            }, (err) => console.error("Snapshot error", err));
+            }, () => {});
         }
 
-        // --- Core UI Functions ---
+        function cleanupCurrentTool() {
+            clearInterval(appState.timerInterval);
+            if(appState.audioContext) {
+                appState.audioContext.close(); appState.audioContext = null;
+            }
+            if(appState.audioStream) {
+                appState.audioStream.getTracks().forEach(t => t.stop()); appState.audioStream = null;
+            }
+        }
 
         function renderNav() {
             toolNav.innerHTML = '';
             Object.entries(tools).forEach(([id, tool]) => {
                 const btn = document.createElement('button');
                 const isActive = appState.activeTool === id;
-                btn.className = `
-                    btn-cartoon flex items-center justify-center gap-2 px-4 py-3 md:px-6 rounded-2xl text-base md:text-xl font-bold transition-all whitespace-nowrap
-                    ${isActive 
-                        ? `${tool.color} text-white shadow-cartoon` 
-                        : 'bg-white text-slate-500 hover:bg-slate-50 border-slate-100'}
-                `;
-                btn.innerHTML = `<i data-lucide="${tool.icon}" class="w-5 h-5 md:w-6 md:h-6"></i> <span class="hidden md:inline">${tool.name}</span>`;
-                btn.onclick = () => {
-                    clearInterval(appState.timerInterval);
-                    appState.activeTool = id;
-                    renderNav();
-                    renderActiveTool();
-                };
+                btn.className = `btn-tactile flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-lg md:text-xl font-bold transition-all whitespace-nowrap border-4 border-slate-800
+                    ${isActive ? `${tool.color} text-white` : `bg-white text-slate-700 hover:bg-slate-100`}`;
+                btn.innerHTML = `<i data-lucide="${tool.icon}" class="w-6 h-6 ${isActive ? 'text-white' : tool.text}"></i> <span class="hidden md:inline">${tool.name}</span>`;
+                btn.onclick = () => { cleanupCurrentTool(); appState.activeTool = id; renderNav(); renderActiveTool(); };
                 toolNav.appendChild(btn);
             });
             lucide.createIcons();
@@ -381,30 +385,44 @@
 
         function renderActiveTool() {
             if (!appState.isAuthReady) return;
+            toolDisplay.innerHTML = ''; // Clear display
             const tool = tools[appState.activeTool];
             if (tool) tool.render();
             lucide.createIcons();
         }
 
-        // --- Tool: Lunch Choice (Optimized for Smartboard) ---
+        function showModal(contentHtml) {
+            const modal = document.getElementById('modal-container');
+            modal.innerHTML = `
+                <div class="bg-white rounded-[32px] p-6 md:p-8 max-w-3xl w-full transform transition-all animate-pop-in border-4 border-slate-800 shadow-cartoon relative">
+                    <button id="close-modal" class="absolute top-4 right-4 p-2 bg-slate-100 hover:bg-red-500 hover:text-white border-2 border-slate-800 text-slate-800 rounded-full btn-tactile"><i data-lucide="x" class="w-6 h-6"></i></button>
+                    ${contentHtml}
+                </div>
+            `;
+            modal.classList.remove('hidden');
+            document.getElementById('close-modal').onclick = () => modal.classList.add('hidden');
+            lucide.createIcons();
+        }
 
+        // --- 1. LUNCH CHOICE ---
         function renderLunchChoice() {
-            if (!appState.lunchColumns) {
-                appState.lunchColumns = {
-                    unselected: [...appState.students.filter(s => s.isPresent)],
-                    choice1: [], choice2: [], choice3: []
+            const dayData = SCHOOL_MENU[appState.currentMenuDate];
+            if (!appState.lunchMenu.choice1 || appState.lunchMenu._date !== appState.currentMenuDate) {
+                appState.lunchMenu = {
+                    _date: appState.currentMenuDate,
+                    choice1: { name: dayData.c1, emoji: getFoodEmoji(dayData.c1) },
+                    choice2: { name: dayData.c2, emoji: getFoodEmoji(dayData.c2) },
+                    sides: dayData.sides
                 };
+            }
+
+            if (!appState.lunchColumns) {
+                appState.lunchColumns = { unselected: [...appState.students.filter(s => s.isPresent)], choice1: [], choice2: [], choice3: [] };
             } else {
                 const allIds = new Set(appState.students.map(s => s.id));
-                ['unselected', 'choice1', 'choice2', 'choice3'].forEach(k => {
-                    appState.lunchColumns[k] = appState.lunchColumns[k].filter(s => allIds.has(s.id));
-                });
-                const currentTrackedIds = new Set([
-                    ...appState.lunchColumns.unselected, ...appState.lunchColumns.choice1, ...appState.lunchColumns.choice2, ...appState.lunchColumns.choice3
-                ].map(s => s.id));
-                appState.students.forEach(s => {
-                    if (s.isPresent && !currentTrackedIds.has(s.id)) appState.lunchColumns.unselected.push(s);
-                });
+                ['unselected', 'choice1', 'choice2', 'choice3'].forEach(k => appState.lunchColumns[k] = appState.lunchColumns[k].filter(s => allIds.has(s.id)));
+                const current = new Set([...appState.lunchColumns.unselected, ...appState.lunchColumns.choice1, ...appState.lunchColumns.choice2, ...appState.lunchColumns.choice3].map(s => s.id));
+                appState.students.forEach(s => { if (s.isPresent && !current.has(s.id)) appState.lunchColumns.unselected.push(s); });
             }
 
             const cols = appState.lunchColumns;
@@ -413,1063 +431,585 @@
             const isComplete = cols.unselected.length === 0 && total > 0;
 
             const makeDraggable = (student, colId) => `
-                <div id="st-${student.id}" draggable="true" 
-                     data-id="${student.id}" data-col="${colId}"
-                     style="touch-action: none;"
-                     class="draggable-item bg-white border-b-4 border-slate-200 p-3 md:p-4 rounded-2xl cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md hover:-translate-y-1 transition-all animate-pop-in select-none flex flex-col items-center w-36 md:w-44 m-2">
-                    <div class="text-5xl md:text-6xl pointer-events-none transform transition-transform">${getStudentEmoji(student)}</div>
-                    <div class="font-bold text-slate-700 text-base md:text-xl text-center leading-tight pointer-events-none truncate w-full mt-2">${student.name}</div>
+                <div id="st-${student.id}" draggable="true" data-id="${student.id}" data-col="${colId}" style="touch-action: none;"
+                     class="draggable-item bg-white border-2 border-slate-800 p-3 rounded-2xl cursor-grab active:cursor-grabbing hover:-translate-y-1 hover:rotate-2 transition-all animate-pop-in select-none flex items-center gap-3 w-full max-w-[200px] shadow-tactile text-slate-800">
+                    <div class="text-3xl md:text-4xl pointer-events-none drop-shadow-sm">${getStudentEmoji(student)}</div>
+                    <div class="font-bold text-lg md:text-xl pointer-events-none truncate tracking-wide">${student.name}</div>
                 </div>`;
 
-            const monsterTemplate = (id, color, eyeColor, title, items, isInput = false, placeholder = "") => {
-                let currentEmoji = '';
-                if (isInput) {
-                    const text = menu[id+'Menu'] || '';
-                    const words = text.toLowerCase().split(/\s+/);
-                    for (let i = words.length - 1; i >= 0; i--) {
-                        if (FOOD_EMOJIS[words[i]]) {
-                            currentEmoji = FOOD_EMOJIS[words[i]];
-                            break;
-                        }
-                    }
-                }
-
+            const monsterTemplate = (id, bgClass, trayClass, title, items, isEditable = false) => {
+                const menuData = isEditable ? menu[id] : null;
+                const emoji = isEditable ? menuData.emoji : '🍱';
+                const label = isEditable ? menuData.name : title;
+                
                 return `
-                <div id="drop-${id}" class="dropzone group flex flex-col h-full rounded-t-[3rem] rounded-b-3xl relative overflow-hidden transition-all duration-200 hover:-translate-y-1 flex-1 border-4 border-transparent hover:border-white/50">
+                <div id="drop-${id}" class="dropzone group flex flex-col h-full rounded-[2rem] relative overflow-hidden flex-1 border-4 border-slate-800 bg-white shadow-tactile transition-all">
                     
-                    <!-- Monster Head/Header -->
-                    <div class="monster-face relative h-32 md:h-40 ${color} transition-transform duration-300 z-10 flex flex-col items-center justify-end pb-3">
-                        <div class="absolute top-6 w-full flex justify-center gap-6">
-                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center"><div class="w-4 h-4 ${eyeColor} rounded-full"></div></div>
-                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center"><div class="w-4 h-4 ${eyeColor} rounded-full"></div></div>
+                    <!-- Monster Header -->
+                    <div class="monster-face relative h-32 md:h-40 ${bgClass} z-10 flex flex-col items-center justify-end pb-4 transition-transform rounded-b-[2rem] border-b-4 border-slate-800">
+                        <!-- Eyes -->
+                        <div class="absolute top-6 w-full flex justify-center gap-8">
+                            <div class="w-12 h-12 bg-white border-4 border-slate-800 rounded-full flex items-center justify-center overflow-hidden"><div class="w-5 h-5 bg-slate-800 rounded-full animate-blink"></div></div>
+                            <div class="w-12 h-12 bg-white border-4 border-slate-800 rounded-full flex items-center justify-center overflow-hidden"><div class="w-5 h-5 bg-slate-800 rounded-full animate-blink"></div></div>
                         </div>
                         
-                         ${isInput 
-                            ? `<input id="input-${id}" value="${menu[id+'Menu'] || ''}" placeholder="${placeholder}" class="absolute top-20 w-4/5 bg-white text-slate-900 placeholder-slate-400 border-4 border-slate-200 text-center font-display text-2xl rounded-full py-2 focus:scale-105 focus:outline-none focus:border-crayon-blue transition-all shadow-cartoon z-20">`
-                            : `<div class="absolute top-20 bg-white text-slate-900 px-6 py-2 rounded-full font-display text-2xl tracking-wide uppercase shadow-cartoon border-4 border-slate-200 z-20 whitespace-nowrap">${title}</div>`
+                        <!-- Menu Button -->
+                        ${isEditable 
+                            ? `<button onclick="window.openMenuPicker('${id}')" class="absolute top-[70px] w-[90%] min-h-[54px] bg-white text-slate-800 px-4 py-2 rounded-2xl font-display text-xl md:text-2xl shadow-tactile border-4 border-slate-800 z-20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 leading-tight text-center">
+                                 <span>${label}</span>
+                               </button>`
+                            : `<div class="absolute top-[70px] bg-slate-800 text-white px-6 py-2 rounded-full font-display text-xl md:text-2xl shadow-tactile border-2 border-slate-900 z-20">${label}</div>`
                         }
                         
-                        <div id="emoji-display-${id}" class="absolute -top-4 -right-4 text-7xl transform rotate-12 transition-all duration-300 ${currentEmoji ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} filter drop-shadow-lg z-30 pointer-events-none">${currentEmoji}</div>
-                        <div class="monster-mouth w-20 h-5 bg-slate-800 rounded-full transition-all duration-200 mb-2 opacity-80 group-hover:opacity-100"></div>
+                        <div class="absolute -top-6 -right-2 text-[5rem] md:text-[6rem] transform rotate-12 drop-shadow-xl z-30 pointer-events-none opacity-100">${emoji}</div>
+                        
+                        <!-- Mouth -->
+                        <div class="monster-mouth w-24 h-6 bg-slate-900 rounded-full mt-4 opacity-100 shadow-inner-deep border-b-2 border-white/20"></div>
                     </div>
 
-                    <!-- Body / Tray (Fills Remaining Space) -->
-                    <div class="flex-grow bg-slate-100 border-x-4 border-b-4 border-slate-200 rounded-b-3xl relative p-3 shadow-inner overflow-hidden">
-                        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(${eyeColor === 'bg-slate-800' ? '#94a3b8' : eyeColor.replace('bg-', '#')} 2px, transparent 2px); background-size: 20px 20px;"></div>
-                        <div class="absolute top-3 right-3 bg-white px-4 py-1.5 rounded-full text-lg font-black text-slate-600 border-2 border-slate-200 shadow-sm z-10">
+                    <!-- Tray -->
+                    <div class="flex-grow ${trayClass} relative p-4 shadow-inner overflow-y-auto no-scrollbar">
+                        <div class="absolute top-3 right-3 bg-white w-10 h-10 rounded-full flex items-center justify-center text-xl font-black text-slate-800 border-4 border-slate-800 shadow-tactile z-10">
                             ${items.length}
                         </div>
-                        <div class="relative z-0 h-full overflow-y-auto flex flex-wrap content-start justify-center gap-2 pb-4">
+                        <div class="relative z-0 h-full flex flex-col items-center gap-3 pb-10 mt-2">
                              ${items.map(s => makeDraggable(s, id)).join('')}
                         </div>
                     </div>
                 </div>
             `};
 
-            const p1 = total ? Math.round((cols.choice1.length/total)*100) : 0;
-            const p2 = total ? Math.round((cols.choice2.length/total)*100) : 0;
-            const p3 = total ? Math.round((cols.choice3.length/total)*100) : 0;
+            const sidesHtml = menu.sides.map(side => 
+                `<span class="bg-white text-slate-800 px-4 py-2 rounded-xl text-base md:text-xl font-bold whitespace-nowrap border-2 border-slate-800 shadow-tactile"><span class="mr-2">${getSideEmoji(side)}</span>${side}</span>`
+            ).join('');
+
+            const dateObj = new Date(appState.currentMenuDate + 'T12:00:00');
+            const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+            const monthDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
             toolDisplay.innerHTML = `
-                <div class="h-full flex flex-col p-4 gap-4 relative overflow-hidden">
+                <div class="h-full flex flex-row overflow-hidden relative">
                     
-                    <!-- Header -->
-                    <div class="flex justify-between items-center flex-shrink-0 px-2">
-                        <div>
-                            <h2 class="text-3xl md:text-4xl font-display text-slate-800 flex items-center gap-3">
-                                <span class="text-crayon-orange">Feed</span> the Monsters!
-                            </h2>
+                    <!-- Left Sidebar: Students (Yellow Tray) -->
+                    <div class="w-1/3 max-w-[300px] bg-white border-r-4 border-slate-800 flex flex-col z-20 shadow-[8px_0px_0px_#1e293b]">
+                        <div class="p-4 bg-crayon-yellow border-b-4 border-slate-800 flex justify-between items-center shadow-sm z-10">
+                            <h2 class="font-display text-2xl text-slate-900">Waiting <span class="bg-white px-2 py-1 rounded-lg border-2 border-slate-800 shadow-tactile ml-1">${cols.unselected.length}</span></h2>
+                            <button id="reset-lunch" class="p-2 bg-white text-red-500 rounded-xl hover:bg-red-500 hover:text-white border-2 border-slate-800 shadow-tactile transition-colors" title="Reset Board"><i data-lucide="rotate-ccw" class="w-6 h-6"></i></button>
                         </div>
-                        <button id="reset-lunch" class="text-lg font-bold text-red-400 hover:text-white hover:bg-red-400 border-2 border-red-300 px-6 py-2 rounded-2xl transition-all">Reset Board</button>
+                        <div id="drop-unselected" class="dropzone flex-grow overflow-y-auto p-4 flex flex-col gap-3 no-scrollbar bg-yellow-50/50">
+                            ${cols.unselected.length > 0 ? cols.unselected.map(s => makeDraggable(s, 'unselected')).join('') : 
+                              '<div class="text-center text-slate-400 font-display text-2xl mt-10 opacity-50">All done!</div>'}
+                        </div>
                     </div>
 
-                    <!-- The Monsters (Grow to fill vertical space) -->
-                    <div class="flex flex-row gap-4 flex-grow min-h-0 items-stretch">
-                        ${monsterTemplate('choice1', 'bg-monster-a', 'bg-blue-600', 'Option A', cols.choice1, true, 'Pizza?')}
-                        ${monsterTemplate('choice2', 'bg-monster-b', 'bg-green-600', 'Option B', cols.choice2, true, 'Salad?')}
-                        ${monsterTemplate('choice3', 'bg-monster-c', 'bg-orange-600', 'Home Lunch', cols.choice3, false)}
-                    </div>
-
-                    <!-- Waiting Area / Stats (Horizontal Strip at Bottom) -->
-                    <div class="flex-shrink-0 h-[180px] md:h-[220px] bg-slate-50 rounded-3xl p-4 border-4 border-slate-200 border-dashed relative flex flex-col">
+                    <!-- Right Area: Menus & Monsters -->
+                    <div class="flex-grow flex flex-col p-4 md:p-6 bg-transparent gap-5 h-full z-10">
                         
-                        <!-- Live Stats Bar -->
-                        <div class="absolute bottom-0 left-0 right-0 h-4 bg-slate-200 rounded-b-2xl overflow-hidden flex">
-                            <div style="width:${p1}%" class="bg-monster-a transition-all duration-500"></div>
-                            <div style="width:${p2}%" class="bg-monster-b transition-all duration-500"></div>
-                            <div style="width:${p3}%" class="bg-monster-c transition-all duration-500"></div>
-                        </div>
+                        <!-- Header & Sides Bar -->
+                        <div class="flex flex-col gap-4 mb-2">
+                            <div class="flex justify-between items-center">
+                                <h2 class="text-4xl md:text-5xl font-display text-slate-800 tracking-tight" style="-webkit-text-stroke: 1px white;">Daily <span class="text-crayon-orange">Menu</span></h2>
+                                
+                                <div class="flex items-center gap-3 md:gap-4 bg-white px-3 py-2 rounded-[2rem] border-4 border-slate-800 shadow-tactile">
+                                    <button onclick="window.changeMenuDate(-1)" class="p-3 hover:bg-crayon-yellow rounded-2xl text-slate-800 transition-colors border-4 border-transparent hover:border-slate-800 btn-tactile"><i data-lucide="chevron-left" class="w-7 h-7 md:w-8 md:h-8"></i></button>
+                                    <div class="flex flex-col items-center justify-center w-40 md:w-56 select-none">
+                                        <div class="font-display text-2xl md:text-4xl text-crayon-blue tracking-wide uppercase drop-shadow-sm leading-tight">${dayName}</div>
+                                        <div class="font-bold text-slate-500 text-sm md:text-lg uppercase tracking-widest">${monthDate}</div>
+                                    </div>
+                                    <button onclick="window.changeMenuDate(1)" class="p-3 hover:bg-crayon-yellow rounded-2xl text-slate-800 transition-colors border-4 border-transparent hover:border-slate-800 btn-tactile"><i data-lucide="chevron-right" class="w-7 h-7 md:w-8 md:h-8"></i></button>
+                                </div>
+                            </div>
 
-                        <div class="flex justify-between items-center mb-2 px-1">
-                            <div class="bg-slate-200 text-slate-500 px-4 py-1 rounded-full font-bold uppercase text-sm tracking-wider">Waiting to Eat</div>
-                            <div class="text-sm font-bold text-slate-400 flex gap-4">
-                                <span class="text-blue-400 text-lg">${p1}%</span>
-                                <span class="text-green-400 text-lg">${p2}%</span>
-                                <span class="text-orange-400 text-lg">${p3}%</span>
+                            <div class="bg-crayon-blue rounded-2xl p-3 md:p-4 shadow-tactile flex items-center gap-4 overflow-x-auto no-scrollbar border-4 border-slate-800">
+                                <div class="text-white font-display tracking-widest uppercase text-base md:text-lg flex-shrink-0 mr-1 drop-shadow-md"><i data-lucide="utensils-crossed" class="w-5 h-5 inline-block mb-1"></i> Sides:</div>
+                                ${sidesHtml}
                             </div>
                         </div>
 
-                        <div id="drop-unselected" class="dropzone flex flex-wrap gap-2 items-center justify-start overflow-x-auto overflow-y-hidden border-4 border-transparent rounded-xl flex-grow pl-1 pr-4 no-scrollbar">
-                            ${cols.unselected.length > 0 ? cols.unselected.map(s => makeDraggable(s, 'unselected')).join('') : ''}
-                            
-                            ${isComplete ? `
-                                <div class="w-full flex flex-col items-center justify-center animate-pop-in">
-                                    <h3 class="font-display text-4xl text-crayon-green uppercase drop-shadow-sm">Bon Appétit!</h3>
-                                    <p class="text-slate-400 text-xl font-bold">Class is ready.</p>
-                                </div>
-                            ` : ''}
+                        <!-- The Monsters -->
+                        <div class="flex flex-row gap-5 md:gap-6 flex-grow min-h-0 items-stretch">
+                            ${monsterTemplate('choice1', 'bg-monster-a', 'bg-blue-50', 'Option A', cols.choice1, true)}
+                            ${monsterTemplate('choice2', 'bg-monster-b', 'bg-green-50', 'Option B', cols.choice2, true)}
+                            ${monsterTemplate('choice3', 'bg-monster-c', 'bg-purple-50', 'Home Lunch', cols.choice3, false)}
                         </div>
                     </div>
                 </div>
             `;
+            lucide.createIcons();
 
-            // --- Robust Drag & Drop Logic for Smartboards ---
-            let draggedItem = null;
-            let sourceCol = null;
-
-            const handleDragStart = (e) => {
-                draggedItem = e.target;
-                sourceCol = e.target.dataset.col;
-                e.target.classList.add('dragging');
-                e.dataTransfer.effectAllowed = 'move';
-            };
-
-            const handleDragEnd = (e) => {
-                if(e.target) e.target.classList.remove('dragging');
-                document.querySelectorAll('.dropzone').forEach(d => {
-                    d.classList.remove('dropzone-active');
-                    d.classList.remove('chewing');
-                });
-            };
-
-            const handleDragOver = (e) => {
-                e.preventDefault();
-                const zone = e.target.closest('.dropzone');
-                if (zone) zone.classList.add('dropzone-active');
-            };
-            
-            const handleDragLeave = (e) => {
-                const zone = e.target.closest('.dropzone');
-                if (zone) zone.classList.remove('dropzone-active');
-            };
-
-            const handleDrop = (e) => {
-                e.preventDefault();
-                const zone = e.target.closest('.dropzone');
-                if (!zone || !draggedItem) return;
-                const targetId = zone.id.replace('drop-', '');
-                if (targetId === sourceCol) return;
-                zone.classList.add('chewing');
-                setTimeout(() => zone.classList.remove('chewing'), 500);
-                const studentId = draggedItem.dataset.id;
-                moveStudent(sourceCol, targetId, studentId);
-            };
-
-            // Enhanced Touch Handling for Smartboards
-            let activeTouchEl = null;
-            let touchOffsetX = 0;
-            let touchOffsetY = 0;
-            let originalSourceEl = null;
-
-            const handleTouchStart = (e) => {
-                const item = e.target.closest('.draggable-item');
-                if (!item) return;
-                e.preventDefault();
-                originalSourceEl = item;
-                sourceCol = item.dataset.col;
+            window.changeMenuDate = (dir) => {
+                const idx = DATES.indexOf(appState.currentMenuDate);
+                let newIdx = idx + dir;
+                if(newIdx < 0) newIdx = 0;
+                if(newIdx >= DATES.length) newIdx = DATES.length - 1;
                 
-                // Create larger clone for visibility under finger/stylus
-                activeTouchEl = item.cloneNode(true);
-                activeTouchEl.classList.remove('draggable-item');
-                activeTouchEl.classList.add('touch-dragging');
-                // Force size
-                activeTouchEl.style.width = (item.offsetWidth * 1.1) + 'px';
-                activeTouchEl.style.height = (item.offsetHeight * 1.1) + 'px';
-                
-                const touch = e.touches[0];
-                const rect = item.getBoundingClientRect();
-                touchOffsetX = (touch.clientX - rect.left) * 1.1; // Adjust offset for scale
-                touchOffsetY = (touch.clientY - rect.top) * 1.1;
-                
-                activeTouchEl.style.left = (touch.clientX - touchOffsetX) + 'px';
-                activeTouchEl.style.top = (touch.clientY - touchOffsetY - 20) + 'px'; // Lift slightly
-                
-                document.body.appendChild(activeTouchEl); // Append to body to escape overflow containers
-                item.style.opacity = '0.3';
-            };
-
-            const handleTouchMove = (e) => {
-                if (!activeTouchEl) return;
-                e.preventDefault();
-                const touch = e.touches[0];
-                activeTouchEl.style.left = (touch.clientX - touchOffsetX) + 'px';
-                activeTouchEl.style.top = (touch.clientY - touchOffsetY - 20) + 'px';
-                
-                document.querySelectorAll('.dropzone').forEach(d => d.classList.remove('dropzone-active'));
-                let elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-                let zone = elemBelow ? elemBelow.closest('.dropzone') : null;
-                if (zone) zone.classList.add('dropzone-active');
-            };
-
-            const handleTouchEnd = (e) => {
-                if (!activeTouchEl) return;
-                e.preventDefault();
-                const touch = e.changedTouches[0];
-                let elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-                activeTouchEl.remove();
-                activeTouchEl = null;
-                if(originalSourceEl) originalSourceEl.style.opacity = '1';
-                
-                document.querySelectorAll('.dropzone').forEach(d => {
-                    d.classList.remove('dropzone-active');
-                    d.classList.remove('chewing');
-                });
-                
-                let zone = elemBelow ? elemBelow.closest('.dropzone') : null;
-                if (zone && originalSourceEl) {
-                    const targetId = zone.id.replace('drop-', '');
-                    if (targetId !== sourceCol) {
-                        zone.classList.add('chewing');
-                        setTimeout(() => zone.classList.remove('chewing'), 500);
-                        moveStudent(sourceCol, targetId, originalSourceEl.dataset.id);
+                if (newIdx !== idx) {
+                    if(appState.lunchColumns && (appState.lunchColumns.choice1.length > 0 || appState.lunchColumns.choice2.length > 0 || appState.lunchColumns.choice3.length > 0)) {
+                        if(!confirm("Change date and reset the board?")) return;
                     }
-                }
-                originalSourceEl = null;
-            };
-
-            const moveStudent = (fromCol, toCol, sId) => {
-                const student = appState.lunchColumns[fromCol].find(s => s.id === sId);
-                if(student) {
-                    appState.lunchColumns[fromCol] = appState.lunchColumns[fromCol].filter(s => s.id !== sId);
-                    appState.lunchColumns[toCol].push(student);
-                    
-                    const newTotal = appState.lunchColumns.choice1.length + appState.lunchColumns.choice2.length + appState.lunchColumns.choice3.length + appState.lunchColumns.unselected.length;
-                    if (appState.lunchColumns.unselected.length === 0 && newTotal > 0 && fromCol === 'unselected') {
-                        triggerConfetti();
-                    }
+                    appState.currentMenuDate = DATES[newIdx];
+                    appState.lunchColumns = null;
                     renderLunchChoice();
                 }
-            }
+            };
 
-            // Bind Events
+            window.openMenuPicker = (choiceId) => {
+                const optionsHtml = MENU_OPTIONS.map((opt, i) => `
+                    <button onclick="window.selectMenu('${choiceId}', ${i})" class="flex flex-col items-center justify-center p-4 bg-white border-4 border-slate-800 rounded-2xl hover:bg-crayon-yellow btn-tactile">
+                        <span class="text-5xl md:text-6xl mb-3 drop-shadow-md">${opt.emoji}</span>
+                        <span class="font-bold text-slate-800 text-base md:text-lg text-center leading-tight tracking-wide">${opt.name}</span>
+                    </button>
+                `).join('');
+                showModal(`
+                    <h3 class="text-4xl font-display text-slate-800 mb-8 text-center" style="-webkit-text-stroke: 1px white;">Override Menu Option</h3>
+                    <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 max-h-[60vh] overflow-y-auto p-4 no-scrollbar bg-slate-100 rounded-[24px] border-4 border-slate-800 shadow-inner">${optionsHtml}</div>
+                `);
+            };
+
+            window.selectMenu = (choiceId, optionIndex) => {
+                appState.lunchMenu[choiceId] = MENU_OPTIONS[optionIndex];
+                document.getElementById('modal-container').classList.add('hidden');
+                renderLunchChoice(); 
+            };
+
+            let draggedItem = null, sourceCol = null, activeTouchEl = null, originalSourceEl = null;
+
+            const handleDragStart = (e) => { draggedItem = e.target; sourceCol = e.target.dataset.col; e.target.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; };
+            const handleDragEnd = (e) => { if(e.target) e.target.classList.remove('dragging'); cleanupDrops(); };
+            const handleDragOver = (e) => { e.preventDefault(); const zone = e.target.closest('.dropzone'); if(zone) zone.classList.add('dropzone-active'); };
+            const handleDragLeave = (e) => { const zone = e.target.closest('.dropzone'); if(zone) zone.classList.remove('dropzone-active'); };
+            const handleDrop = (e) => {
+                e.preventDefault(); const zone = e.target.closest('.dropzone');
+                if (!zone || !draggedItem) return;
+                const targetId = zone.id.replace('drop-', '');
+                if (targetId !== sourceCol) performMove(sourceCol, targetId, draggedItem.dataset.id, zone);
+            };
+
+            const handleTouchStart = (e) => {
+                const item = e.target.closest('.draggable-item'); if (!item) return;
+                e.preventDefault(); originalSourceEl = item; sourceCol = item.dataset.col;
+                activeTouchEl = item.cloneNode(true); activeTouchEl.classList.remove('draggable-item'); activeTouchEl.classList.add('touch-dragging');
+                activeTouchEl.style.width = item.offsetWidth + 'px';
+                document.body.appendChild(activeTouchEl); item.style.opacity = '0.3';
+                moveTouchClone(e.touches[0]);
+            };
+            const moveTouchClone = (touch) => {
+                if(!activeTouchEl) return;
+                activeTouchEl.style.left = (touch.clientX - (activeTouchEl.offsetWidth/2)) + 'px';
+                activeTouchEl.style.top = (touch.clientY - (activeTouchEl.offsetHeight/2) - 40) + 'px'; 
+            }
+            const handleTouchMove = (e) => {
+                if (!activeTouchEl) return; e.preventDefault(); moveTouchClone(e.touches[0]);
+                document.querySelectorAll('.dropzone').forEach(d => d.classList.remove('dropzone-active'));
+                const elemBelow = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+                if(elemBelow) { const zone = elemBelow.closest('.dropzone'); if(zone) zone.classList.add('dropzone-active'); }
+            };
+            const handleTouchEnd = (e) => {
+                if (!activeTouchEl) return; e.preventDefault();
+                const touch = e.changedTouches[0];
+                const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+                activeTouchEl.remove(); activeTouchEl = null; if(originalSourceEl) originalSourceEl.style.opacity = '1';
+                cleanupDrops();
+                if(elemBelow && originalSourceEl) {
+                    const zone = elemBelow.closest('.dropzone');
+                    if(zone) {
+                        const targetId = zone.id.replace('drop-', '');
+                        if(targetId !== sourceCol) performMove(sourceCol, targetId, originalSourceEl.dataset.id, zone);
+                    }
+                }
+            };
+
+            const cleanupDrops = () => document.querySelectorAll('.dropzone').forEach(d => { d.classList.remove('dropzone-active'); d.classList.remove('chewing'); });
+
+            const performMove = (fromCol, toCol, sId, zone) => {
+                const student = appState.lunchColumns[fromCol].find(s => s.id === sId);
+                if(student) {
+                    zone.classList.add('chewing');
+                    appState.lunchColumns[fromCol] = appState.lunchColumns[fromCol].filter(s => s.id !== sId);
+                    appState.lunchColumns[toCol].push(student);
+                    if (appState.lunchColumns.unselected.length === 0 && fromCol === 'unselected') triggerConfetti();
+                    setTimeout(renderLunchChoice, 300); 
+                }
+            };
+
             toolDisplay.querySelectorAll('.draggable-item').forEach(el => {
-                el.addEventListener('dragstart', handleDragStart);
-                el.addEventListener('dragend', handleDragEnd);
+                el.addEventListener('dragstart', handleDragStart); el.addEventListener('dragend', handleDragEnd);
                 el.addEventListener('touchstart', handleTouchStart, {passive: false});
                 el.addEventListener('touchmove', handleTouchMove, {passive: false});
                 el.addEventListener('touchend', handleTouchEnd);
             });
             toolDisplay.querySelectorAll('.dropzone').forEach(el => {
-                el.addEventListener('dragover', handleDragOver);
-                el.addEventListener('dragleave', handleDragLeave);
-                el.addEventListener('drop', handleDrop);
+                el.addEventListener('dragover', handleDragOver); el.addEventListener('dragleave', handleDragLeave); el.addEventListener('drop', handleDrop);
             });
 
-            ['choice1', 'choice2'].forEach(key => {
-                const input = document.getElementById(`input-${key}`);
-                const emojiDisplay = document.getElementById(`emoji-display-${key}`);
-                if (input) {
-                    input.oninput = (e) => {
-                        const val = e.target.value;
-                        appState.lunchMenu[`${key}Menu`] = val;
-                        const words = val.toLowerCase().split(/\s+/);
-                        let foundEmoji = '';
-                        for (let i = words.length - 1; i >= 0; i--) {
-                            if (FOOD_EMOJIS[words[i]]) {
-                                foundEmoji = FOOD_EMOJIS[words[i]];
-                                break;
-                            }
-                        }
-                        if (emojiDisplay) {
-                            emojiDisplay.textContent = foundEmoji;
-                            if (foundEmoji) {
-                                emojiDisplay.classList.remove('scale-0', 'opacity-0');
-                                emojiDisplay.classList.add('scale-100', 'opacity-100');
-                            } else {
-                                emojiDisplay.classList.remove('scale-100', 'opacity-100');
-                                emojiDisplay.classList.add('scale-0', 'opacity-0');
-                            }
-                        }
-                    };
-                }
-            });
-
-            document.getElementById('reset-lunch').onclick = () => {
-                appState.lunchColumns = null;
-                appState.lunchMenu = {};
-                randomizeEmojis();
-                renderLunchChoice();
-            };
+            document.getElementById('reset-lunch').onclick = () => { appState.lunchColumns = null; renderLunchChoice(); };
         }
 
-        // --- Tool: Quiet Critter (Noise Meter) ---
-        
+        // --- 2. QUIET CRITTER ---
         function renderNoiseMeter() {
             let isListening = false;
-            let audioContext = null;
             
             toolDisplay.innerHTML = `
-                <div class="h-full flex flex-col items-center justify-center p-6 text-center animate-pop-in">
-                    <h2 class="text-4xl md:text-5xl font-display text-slate-800 mb-4">The Quiet Critter</h2>
-                    <p class="text-slate-500 mb-8 max-w-lg text-xl">Keep the volume down so the Critter can sleep! If it gets too loud, he'll wake up!</p>
+                <div class="h-full flex flex-col items-center justify-center p-6 text-center animate-pop-in relative bg-white">
+                    <h2 class="text-6xl md:text-7xl font-display text-slate-800 mb-4" style="-webkit-text-stroke: 1px white;">Quiet Critter</h2>
+                    <p class="text-slate-800 mb-8 max-w-lg text-2xl font-bold bg-crayon-yellow px-6 py-2 rounded-2xl border-4 border-slate-800 shadow-tactile">Shhh... Keep it down so he can sleep!</p>
                     
-                    <div class="relative w-80 h-80 md:w-[500px] md:h-[500px] mb-12">
-                        <!-- Sleeping State -->
-                        <div id="critter-sleep" class="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-500">
-                            <div class="text-9xl md:text-[20rem] animate-float">😴</div>
-                            <div class="absolute top-0 right-10 text-6xl animate-pulse text-slate-400 font-display">Zzz...</div>
+                    <div class="relative w-80 h-80 md:w-[400px] md:h-[400px] mb-12">
+                        <div id="critter-sleep" class="absolute inset-0 flex items-center justify-center transition-opacity duration-500">
+                            <div class="text-[12rem] md:text-[15rem] animate-float drop-shadow-2xl">😴</div>
+                            <div class="absolute top-10 right-0 text-6xl animate-pulse text-slate-300 font-display">Zzz</div>
                         </div>
-                        
-                        <!-- Awake State -->
-                        <div id="critter-awake" class="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-200 opacity-0 scale-90">
-                            <div class="text-9xl md:text-[20rem] animate-shake">😳</div>
+                        <div id="critter-awake" class="absolute inset-0 flex items-center justify-center transition-opacity duration-200 opacity-0 scale-95">
+                            <div class="text-[12rem] md:text-[15rem] drop-shadow-2xl">😳</div>
                         </div>
-
-                         <!-- Angry State -->
-                        <div id="critter-angry" class="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-200 opacity-0 scale-110">
-                            <div class="text-9xl md:text-[20rem] animate-bounce-slow">😫</div>
+                        <div id="critter-angry" class="absolute inset-0 flex items-center justify-center transition-opacity duration-200 opacity-0 scale-105">
+                            <div class="text-[12rem] md:text-[15rem] animate-bounce-slow drop-shadow-2xl">😫</div>
                         </div>
                     </div>
 
-                    <!-- Volume Bar -->
-                    <div class="w-full max-w-3xl h-12 bg-slate-200 rounded-full overflow-hidden border-8 border-slate-300 relative shadow-inner">
-                        <div id="volume-fill" class="h-full bg-green-400 w-0 meter-fill"></div>
-                        <div class="absolute top-0 bottom-0 w-2 bg-red-400 left-[70%] opacity-50"></div>
+                    <div class="w-full max-w-2xl h-16 bg-white rounded-full overflow-hidden border-4 border-slate-800 shadow-[inset_0_4px_8px_rgba(0,0,0,0.2)] relative">
+                        <div id="volume-fill" class="h-full bg-green-400 w-0 transition-all duration-75 ease-out border-r-4 border-slate-800"></div>
+                        <div class="absolute top-0 bottom-0 w-2 bg-slate-800 left-[75%]"></div>
+                        <div class="absolute top-0 bottom-0 left-[75%] ml-4 flex items-center text-red-500 font-black text-xl">WAKE UP ZONE!</div>
                     </div>
-                    <div class="text-lg font-bold text-slate-400 mt-2 uppercase tracking-widest">Noise Level</div>
 
-                    <button id="toggle-mic" class="mt-8 btn-cartoon bg-crayon-pink text-white px-12 py-6 rounded-3xl font-black text-3xl flex items-center gap-4">
+                    <button id="toggle-mic" class="mt-10 btn-tactile bg-crayon-pink text-white px-10 py-5 rounded-3xl font-black text-2xl flex items-center gap-3 border-4 border-slate-800">
                         <i data-lucide="mic" class="w-8 h-8"></i> Start Listening
                     </button>
-                    <p id="mic-error" class="text-red-500 font-bold mt-4 hidden text-xl">Microphone access denied or unavailable.</p>
+                    <p id="mic-error" class="text-red-500 font-bold mt-4 hidden">Microphone access denied.</p>
                 </div>
             `;
 
             const btn = document.getElementById('toggle-mic');
             const fill = document.getElementById('volume-fill');
-            const sleepEl = document.getElementById('critter-sleep');
-            const awakeEl = document.getElementById('critter-awake');
-            const angryEl = document.getElementById('critter-angry');
-            const errorEl = document.getElementById('mic-error');
+            const [sleepEl, awakeEl, angryEl] = ['sleep', 'awake', 'angry'].map(s => document.getElementById(`critter-${s}`));
+            let animationFrameId;
 
             const updateCritter = (vol) => {
                 fill.style.width = Math.min(vol, 100) + '%';
-                if (vol > 70) {
-                    fill.className = 'h-full bg-red-500 meter-fill';
+                if (vol > 75) {
+                    fill.className = 'h-full bg-red-500 transition-all duration-75 border-r-4 border-slate-800';
                     sleepEl.style.opacity = '0'; awakeEl.style.opacity = '0'; angryEl.style.opacity = '1';
-                } else if (vol > 30) {
-                    fill.className = 'h-full bg-yellow-400 meter-fill';
+                } else if (vol > 35) {
+                    fill.className = 'h-full bg-yellow-400 transition-all duration-75 border-r-4 border-slate-800';
                     sleepEl.style.opacity = '0'; awakeEl.style.opacity = '1'; angryEl.style.opacity = '0';
                 } else {
-                    fill.className = 'h-full bg-green-400 meter-fill';
+                    fill.className = 'h-full bg-green-400 transition-all duration-75 border-r-4 border-slate-800';
                     sleepEl.style.opacity = '1'; awakeEl.style.opacity = '0'; angryEl.style.opacity = '0';
                 }
             };
 
             btn.onclick = async () => {
-                if (isListening) { window.location.reload(); return; }
+                if (isListening) { cleanupCurrentTool(); renderNoiseMeter(); return; }
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const analyser = audioContext.createAnalyser();
-                    const microphone = audioContext.createMediaStreamSource(stream);
-                    const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
-                    analyser.smoothingTimeConstant = 0.8; analyser.fftSize = 1024;
-                    microphone.connect(analyser); analyser.connect(javascriptNode); javascriptNode.connect(audioContext.destination);
-                    javascriptNode.onaudioprocess = function() {
-                        const array = new Uint8Array(analyser.frequencyBinCount);
-                        analyser.getByteFrequencyData(array);
-                        let values = 0;
-                        for (let i = 0; i < array.length; i++) values += array[i];
-                        updateCritter((values / array.length) * 2.5);
+                    appState.audioStream = stream;
+                    appState.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const analyser = appState.audioContext.createAnalyser();
+                    const microphone = appState.audioContext.createMediaStreamSource(stream);
+                    analyser.smoothingTimeConstant = 0.7; analyser.fftSize = 256;
+                    microphone.connect(analyser);
+                    
+                    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+                    const checkAudio = () => {
+                        if(!appState.audioContext) return;
+                        analyser.getByteFrequencyData(dataArray);
+                        let sum = 0; for(let i=0; i<dataArray.length; i++) sum += dataArray[i];
+                        updateCritter((sum / dataArray.length) * 2);
+                        animationFrameId = requestAnimationFrame(checkAudio);
                     };
+                    checkAudio();
+
                     btn.innerHTML = `<i data-lucide="mic-off"></i> Stop Listening`;
-                    btn.classList.replace('bg-crayon-pink', 'bg-slate-700');
+                    btn.classList.replace('bg-crayon-pink', 'bg-slate-300');
+                    btn.classList.replace('text-white', 'text-slate-800');
                     isListening = true;
-                    errorEl.classList.add('hidden');
-                } catch (err) { console.error(err); errorEl.classList.remove('hidden'); }
+                } catch (err) { document.getElementById('mic-error').classList.remove('hidden'); }
             };
         }
 
-        // --- Tool: Focus Timer ---
-
+        // --- 3. FOCUS TIMER ---
         function renderTimer() {
-            let secondsLeft = 300; let totalTime = 300; let isRunning = false;
-            
-            const formatTime = (s) => {
-                const m = Math.floor(s / 60); const sec = s % 60;
-                return `${m}:${sec < 10 ? '0' : ''}${sec}`;
-            };
+            let secondsLeft = 300, totalTime = 300, isRunning = false;
+            const formatTime = (s) => `${Math.floor(s/60)}:${(s%60).toString().padStart(2, '0')}`;
 
             toolDisplay.innerHTML = `
-                <div class="h-full flex flex-col items-center justify-center p-6 animate-pop-in">
-                    <div class="relative w-[300px] h-[300px] md:w-[600px] md:h-[600px] flex items-center justify-center mb-12">
-                        <div class="absolute inset-0 rounded-full border-8 border-slate-100 bg-white shadow-inner-lg"></div>
-                        <svg class="absolute inset-0 w-full h-full transform -rotate-90 pointer-events-none">
-                            <circle id="timer-ring" cx="50%" cy="50%" r="45%" stroke="#ef4444" stroke-width="30" fill="none" stroke-linecap="round" stroke-dasharray="1000" stroke-dashoffset="0" class="transition-all duration-1000 ease-linear" />
+                <div class="h-full flex flex-col items-center justify-center p-6 bg-white animate-pop-in">
+                    <div class="relative w-[320px] h-[320px] md:w-[500px] md:h-[500px] flex items-center justify-center mb-10">
+                        <div class="absolute inset-0 rounded-full border-[16px] border-slate-800 bg-white shadow-cartoon"></div>
+                        <svg class="absolute inset-0 w-full h-full transform -rotate-90 pointer-events-none drop-shadow-md z-10">
+                            <circle id="timer-ring" cx="50%" cy="50%" r="42%" stroke="#ef4444" stroke-width="30" fill="none" stroke-linecap="round" stroke-dasharray="1000" class="transition-all duration-1000 ease-linear" />
                         </svg>
-                        <div class="relative z-10 text-center group cursor-pointer" id="timer-display-container" title="Click to Set Time">
-                            <div id="time-display" class="font-display text-8xl md:text-[12rem] text-slate-800 tracking-tighter tabular-nums select-none group-hover:text-crayon-blue transition-colors">05:00</div>
-                            <div class="text-slate-400 font-bold uppercase tracking-widest mt-4 text-2xl group-hover:text-crayon-blue transition-colors">Time Remaining</div>
+                        <div class="relative z-20 text-center cursor-pointer group bg-white rounded-full p-8 border-4 border-slate-100 hover:bg-slate-50 transition-colors shadow-inner" onclick="window.showTimerSettings()">
+                            <div id="time-display" class="font-display text-7xl md:text-[8rem] text-slate-800 tracking-tighter tabular-nums">${formatTime(secondsLeft)}</div>
                         </div>
                     </div>
-                    <div id="timer-controls" class="flex flex-wrap justify-center gap-6 min-h-[80px] items-center"></div>
-                    <button id="timer-toggle" class="mt-12 btn-cartoon bg-crayon-green text-white w-32 h-32 rounded-full flex items-center justify-center shadow-cartoon transition-colors">
-                        <i data-lucide="play" class="w-16 h-16 fill-current"></i>
-                    </button>
+                    
+                    <div class="flex gap-6 items-center">
+                        <button onclick="window.addTime(-60)" class="w-20 h-20 rounded-2xl bg-white border-4 border-slate-800 text-slate-800 font-black text-3xl btn-tactile hover:bg-slate-100">-1</button>
+                        <button id="timer-toggle" class="btn-tactile bg-crayon-green text-white w-32 h-32 rounded-full flex items-center justify-center shadow-tactile border-4 border-slate-800">
+                            <i data-lucide="play" class="w-14 h-14 fill-current ml-2"></i>
+                        </button>
+                        <button onclick="window.addTime(60)" class="w-20 h-20 rounded-2xl bg-white border-4 border-slate-800 text-slate-800 font-black text-3xl btn-tactile hover:bg-slate-100">+1</button>
+                    </div>
+                    <button onclick="window.resetTimer()" class="mt-8 text-slate-500 font-bold hover:text-slate-800 bg-slate-100 px-6 py-2 rounded-xl border-2 border-slate-300 hover:border-slate-800 transition-colors">Reset Time</button>
                 </div>
             `;
 
             const ring = document.getElementById('timer-ring');
             const display = document.getElementById('time-display');
             const toggleBtn = document.getElementById('timer-toggle');
-            const controlsContainer = document.getElementById('timer-controls');
             ring.setAttribute("pathLength", "100");
 
-            const updateVisuals = () => {
+            const updateUI = () => {
                 display.innerText = formatTime(secondsLeft);
-                const percent = totalTime > 0 ? (secondsLeft / totalTime) * 100 : 0;
-                ring.style.strokeDashoffset = 100 - percent;
-                if (percent < 20) ring.setAttribute('stroke', '#ef4444');
-                else if (percent < 50) ring.setAttribute('stroke', '#facc15');
-                else ring.setAttribute('stroke', '#22c55e');
+                const pct = totalTime > 0 ? (secondsLeft / totalTime) * 100 : 0;
+                ring.style.strokeDashoffset = 100 - pct;
+                ring.setAttribute('stroke', pct < 20 ? '#ef4444' : pct < 50 ? '#eab308' : '#22c55e');
             };
 
-            const stopTimer = (isFinished = false) => {
-                clearInterval(appState.timerInterval); isRunning = false;
-                toggleBtn.innerHTML = isFinished ? `<i data-lucide="rotate-ccw" class="w-16 h-16"></i>` : `<i data-lucide="play" class="w-16 h-16 fill-current"></i>`;
-                if(isFinished) {
-                    toggleBtn.classList.replace('bg-crayon-red', 'bg-slate-700');
-                    display.classList.add('animate-pulse', 'text-red-500');
-                    triggerConfetti();
-                } else {
-                    toggleBtn.classList.remove('bg-crayon-red', 'bg-slate-700');
-                    toggleBtn.classList.add('bg-crayon-green');
+            const tick = () => {
+                if (secondsLeft > 0) { secondsLeft--; updateUI(); } 
+                else {
+                    clearInterval(appState.timerInterval); isRunning = false;
+                    toggleBtn.innerHTML = `<i data-lucide="rotate-ccw" class="w-14 h-14"></i>`;
+                    toggleBtn.className = "btn-tactile bg-slate-800 text-white w-32 h-32 rounded-full flex items-center justify-center shadow-tactile border-4 border-slate-900 animate-pulse";
+                    display.classList.add('text-red-500'); triggerConfetti(); lucide.createIcons();
                 }
             };
 
-            const tick = () => { if (secondsLeft > 0) { secondsLeft--; updateVisuals(); } else { stopTimer(true); } };
-
             toggleBtn.onclick = () => {
-                if (isRunning) { clearInterval(appState.timerInterval); isRunning = false; toggleBtn.innerHTML = `<i data-lucide="play" class="w-16 h-16 fill-current"></i>`; toggleBtn.classList.replace('bg-crayon-red', 'bg-crayon-green'); } 
-                else {
-                    if (secondsLeft === 0) secondsLeft = totalTime || 300;
+                if (isRunning) {
+                    clearInterval(appState.timerInterval); isRunning = false;
+                    toggleBtn.innerHTML = `<i data-lucide="play" class="w-14 h-14 fill-current ml-2"></i>`;
+                    toggleBtn.className = "btn-tactile bg-crayon-green text-white w-32 h-32 rounded-full flex items-center justify-center shadow-tactile border-4 border-slate-800";
+                } else {
+                    if (secondsLeft === 0) { secondsLeft = totalTime || 300; display.classList.remove('text-red-500'); }
                     appState.timerInterval = setInterval(tick, 1000); isRunning = true;
-                    toggleBtn.innerHTML = `<i data-lucide="pause" class="w-16 h-16 fill-current"></i>`; toggleBtn.classList.replace('bg-crayon-green', 'bg-crayon-red');
-                    display.classList.remove('animate-pulse', 'text-red-500');
+                    toggleBtn.innerHTML = `<i data-lucide="pause" class="w-14 h-14 fill-current"></i>`;
+                    toggleBtn.className = "btn-tactile bg-crayon-red text-white w-32 h-32 rounded-full flex items-center justify-center shadow-tactile border-4 border-slate-800";
                 }
                 lucide.createIcons();
             };
 
-            const setTime = (m) => { secondsLeft = m * 60; totalTime = secondsLeft; stopTimer(false); display.classList.remove('animate-pulse', 'text-red-500'); updateVisuals(); };
-            const addTime = (m) => { secondsLeft += m * 60; totalTime = Math.max(totalTime, secondsLeft); updateVisuals(); };
-
-            const renderControls = (mode = 'default') => {
-                if(mode === 'default') {
-                    controlsContainer.innerHTML = `
-                        <button id="timer-5m" class="px-6 py-3 bg-slate-100 rounded-2xl font-bold hover:bg-slate-200 text-slate-600 text-xl transition-colors">+5 Min</button>
-                        <button id="timer-1m" class="px-6 py-3 bg-slate-100 rounded-2xl font-bold hover:bg-slate-200 text-slate-600 text-xl transition-colors">+1 Min</button>
-                        <button id="timer-custom" class="px-6 py-3 bg-slate-100 rounded-2xl font-bold hover:bg-slate-200 text-slate-600 text-xl transition-colors">Set Time</button>
-                        <button id="timer-reset" class="px-6 py-3 bg-slate-100 rounded-2xl font-bold hover:bg-slate-200 text-red-400 text-xl transition-colors">Reset</button>
-                    `;
-                    document.getElementById('timer-5m').onclick = () => addTime(5);
-                    document.getElementById('timer-1m').onclick = () => addTime(1);
-                    document.getElementById('timer-custom').onclick = () => renderControls('custom');
-                    document.getElementById('timer-reset').onclick = () => setTime(5);
-                } else {
-                    controlsContainer.innerHTML = `
-                        <div class="flex items-center gap-4 animate-pop-in">
-                            <input type="number" id="custom-min" placeholder="Min" class="w-32 px-4 py-3 border-4 border-slate-300 rounded-2xl font-bold text-2xl focus:border-crayon-blue outline-none text-center" min="1" max="999" autofocus>
-                            <button id="timer-set" class="px-6 py-3 bg-crayon-blue text-white rounded-2xl font-bold text-xl hover:bg-blue-600 transition-colors">Go</button>
-                            <button id="timer-cancel" class="px-6 py-3 bg-slate-100 text-slate-500 rounded-2xl font-bold text-xl hover:bg-slate-200 transition-colors">X</button>
-                        </div>
-                    `;
-                    const input = document.getElementById('custom-min');
-                    input.focus();
-                    input.onkeydown = (e) => { if(e.key === 'Enter') document.getElementById('timer-set').click(); };
-                    document.getElementById('timer-set').onclick = () => { const val = parseInt(input.value); if(val && val > 0) { setTime(val); renderControls('default'); } };
-                    document.getElementById('timer-cancel').onclick = () => renderControls('default');
-                }
+            window.addTime = (s) => { secondsLeft = Math.max(0, secondsLeft + s); totalTime = Math.max(totalTime, secondsLeft); updateUI(); };
+            window.resetTimer = () => { clearInterval(appState.timerInterval); isRunning = false; secondsLeft = 300; totalTime = 300; toggleBtn.innerHTML = `<i data-lucide="play" class="w-14 h-14 fill-current ml-2"></i>`; toggleBtn.className = "btn-tactile bg-crayon-green text-white w-32 h-32 rounded-full flex items-center justify-center shadow-tactile border-4 border-slate-800"; display.classList.remove('text-red-500'); updateUI(); lucide.createIcons(); };
+            
+            window.showTimerSettings = () => {
+                showModal(`
+                    <h3 class="text-4xl font-display text-slate-800 mb-8 text-center" style="-webkit-text-stroke: 1px white;">Set Timer</h3>
+                    <div class="flex justify-center gap-5 flex-wrap mb-6">
+                        ${[1,2,5,10,15,20].map(m => `<button onclick="window.setCustomTime(${m})" class="btn-tactile w-24 h-24 rounded-2xl bg-white border-4 border-slate-800 text-slate-800 font-display text-4xl hover:bg-crayon-blue hover:text-white">${m}</button>`).join('')}
+                    </div>
+                `);
             };
-            document.getElementById('timer-display-container').onclick = () => renderControls('custom');
-            renderControls(); updateVisuals();
+            window.setCustomTime = (m) => { secondsLeft = m * 60; totalTime = secondsLeft; updateUI(); document.getElementById('modal-container').classList.add('hidden'); };
+            updateUI();
         }
 
-        // --- Existing Tools (Roster, Picker, Bracket, Hangman) ---
-
+        // --- 4. ROSTER ---
         function renderClassRoster() {
-            const listHtml = appState.students.map(s => `
-                <div class="relative bg-white border-2 border-slate-200 p-4 rounded-3xl shadow-sm hover:shadow-cartoon hover:border-crayon-blue transition-all group flex flex-col items-center justify-center h-56 md:h-64">
-                    <div class="student-card-emoji mb-4 transform transition-transform group-hover:scale-125 group-hover:rotate-12 text-6xl md:text-7xl">${getStudentEmoji(s)}</div>
-                    <span class="font-bold text-2xl md:text-3xl text-slate-700 text-center leading-tight select-none">${s.name}</span>
-                    <button data-id="${s.id}" class="remove-btn absolute top-3 right-3 opacity-0 group-hover:opacity-100 p-3 bg-red-100 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition-all shadow-sm"><i data-lucide="trash-2" class="w-6 h-6"></i></button>
+            const list = appState.students.map(s => `
+                <div class="bg-white border-4 border-slate-800 p-4 rounded-3xl shadow-tactile hover:shadow-cartoon hover:-translate-y-1 transition-all group flex flex-col items-center justify-center h-48 relative">
+                    <div class="text-6xl mb-2 transform transition-transform group-hover:scale-110 drop-shadow-md">${getStudentEmoji(s)}</div>
+                    <span class="font-bold text-xl text-slate-800 truncate w-full text-center tracking-wide">${s.name}</span>
+                    <button onclick="window.removeStudent('${s.id}')" class="absolute -top-4 -right-4 p-2 bg-red-500 text-white border-4 border-slate-800 rounded-full opacity-0 group-hover:opacity-100 shadow-tactile transition-opacity hover:scale-110"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
             `).join('');
 
             toolDisplay.innerHTML = `
-                <div class="h-full flex flex-col p-6 animate-pop-in w-full">
-                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-6 flex-shrink-0">
-                        <div class="text-center md:text-left">
-                            <h2 class="text-4xl font-display text-slate-800">Class Roster</h2>
-                            <p class="text-slate-400 font-bold text-xl">Total Students: <span class="text-crayon-blue">${appState.students.length}</span></p>
-                        </div>
-                        <form id="add-student-form" class="flex gap-3 w-full md:w-auto">
-                            <input type="text" id="new-name" placeholder="Student Name" class="flex-grow md:w-80 border-4 border-slate-200 rounded-2xl px-6 py-3 font-bold text-xl text-slate-700 focus:outline-none focus:border-crayon-blue transition-colors">
-                            <button type="submit" class="btn-cartoon bg-crayon-green text-white px-8 py-3 rounded-2xl font-bold text-xl flex items-center gap-2 whitespace-nowrap"><i data-lucide="plus-circle" class="w-6 h-6"></i> Add</button>
-                        </form>
+                <div class="h-full flex flex-col p-6 animate-pop-in bg-board relative">
+                    <div class="flex justify-between items-center mb-6 bg-crayon-blue p-4 rounded-3xl border-4 border-slate-800 shadow-tactile">
+                        <h2 class="text-4xl font-display text-white flex items-center gap-3 drop-shadow-md"><i data-lucide="users" class="w-8 h-8"></i> Roster (${appState.students.length})</h2>
+                        <button onclick="window.showAddStudentModal()" class="btn-tactile bg-crayon-green text-white px-6 py-3 rounded-2xl border-4 border-slate-800 font-bold text-xl flex items-center gap-2">Add Student</button>
                     </div>
-                    <div class="flex-grow overflow-y-auto pr-2 pb-4">
-                        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                            ${listHtml}
-                        </div>
-                    </div>
+                    <div class="flex-grow overflow-y-auto pr-2 pb-10"><div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">${list}</div></div>
                 </div>
             `;
-            document.getElementById('add-student-form').onsubmit = async (e) => {
-                e.preventDefault();
-                const input = document.getElementById('new-name');
-                const name = input.value.trim();
-                if (!name) return;
+            
+            window.showAddStudentModal = () => {
+                showModal(`
+                    <h3 class="text-3xl font-display text-slate-800 mb-6 text-center">Add New Student</h3>
+                    <input type="text" id="new-student-name" class="w-full border-4 border-slate-800 shadow-[inset_0_4px_8px_rgba(0,0,0,0.1)] rounded-2xl px-6 py-4 font-bold text-2xl mb-6 focus:border-crayon-blue outline-none" placeholder="Student Name" autocomplete="off">
+                    <button onclick="window.addStudent()" class="w-full btn-tactile bg-crayon-green border-4 border-slate-800 text-white py-4 rounded-2xl font-black text-2xl tracking-widest uppercase">Add to Class</button>
+                `);
+                setTimeout(() => document.getElementById('new-student-name').focus(), 100);
+            };
+
+            window.addStudent = async () => {
+                const name = document.getElementById('new-student-name').value.trim();
+                if(!name) return;
+                document.getElementById('modal-container').classList.add('hidden');
                 if (appState.userId) await addDoc(collection(db, `artifacts/${appId}/users/${appState.userId}/students`), { name, isPresent: true });
                 else { appState.students.push({ id: `loc-${Date.now()}`, name, isPresent: true }); renderClassRoster(); }
-                input.value = ''; input.focus();
             };
-            toolDisplay.querySelectorAll('.remove-btn').forEach(btn => {
-                btn.onclick = async () => {
-                    if (confirm('Remove student?')) {
-                        if (appState.userId) await deleteDoc(doc(db, `artifacts/${appId}/users/${appState.userId}/students`, btn.dataset.id));
-                        else { appState.students = appState.students.filter(s => s.id !== btn.dataset.id); renderClassRoster(); }
-                    }
-                };
-            });
+            
+            window.removeStudent = async (id) => {
+                if(confirm('Remove this student?')) {
+                    if (appState.userId) await deleteDoc(doc(db, `artifacts/${appId}/users/${appState.userId}/students`, id));
+                    else { appState.students = appState.students.filter(s => s.id !== id); renderClassRoster(); }
+                }
+            };
         }
 
+        // --- 5. RANDOM PICKER ---
         function renderStudentSelector() {
-            const listHtml = appState.students.map(s => `
-                <div class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 border-b border-slate-100 last:border-0">
-                    <div class="flex items-center gap-3">
-                        <span class="text-3xl select-none">${getStudentEmoji(s)}</span>
-                        <span class="font-bold text-xl select-none ${s.isPresent ? 'text-slate-700' : 'text-slate-400 line-through opacity-60'}">${s.name}</span>
+            const list = appState.students.map(s => `
+                <div class="flex items-center justify-between p-3 mb-2 bg-white rounded-xl border-2 border-slate-800 shadow-[2px_2px_0px_#1e293b] hover:bg-slate-50 cursor-pointer" onclick="window.toggleAttendance('${s.id}')">
+                    <div class="flex items-center gap-3"><span class="text-3xl drop-shadow-sm">${getStudentEmoji(s)}</span> <span class="font-bold text-lg tracking-wide ${s.isPresent?'text-slate-800':'text-slate-400 line-through opacity-70'}">${s.name}</span></div>
+                    <div class="w-14 h-8 rounded-full border-2 border-slate-800 relative transition-colors ${s.isPresent ? 'bg-crayon-green' : 'bg-slate-300'}">
+                        <div class="w-6 h-6 bg-white border-2 border-slate-800 rounded-full absolute top-[2px] transition-all ${s.isPresent ? 'left-[26px]' : 'left-[2px]'}"></div>
                     </div>
-                    <button data-id="${s.id}" class="toggle-btn w-16 h-8 rounded-full relative transition-colors border-2 ${s.isPresent ? 'bg-crayon-green border-green-600' : 'bg-slate-200 border-slate-300'}">
-                        <div class="w-6 h-6 bg-white rounded-full absolute top-[2px] shadow-sm transition-all ${s.isPresent ? 'left-8' : 'left-1'}"></div>
-                    </button>
                 </div>
             `).join('');
 
             toolDisplay.innerHTML = `
-                <div class="h-full flex flex-col md:flex-row p-4 gap-6 animate-pop-in">
-                    <div class="w-full md:w-80 flex-shrink-0 flex flex-col bg-white rounded-3xl border-4 border-slate-200 shadow-sm overflow-hidden h-64 md:h-full">
-                        <div class="p-4 bg-slate-50 border-b border-slate-200"><h3 class="font-display text-2xl text-slate-700">Attendance</h3></div>
-                        <div class="overflow-y-auto flex-grow p-2">${listHtml}</div>
+                <div class="h-full flex p-4 gap-6 animate-pop-in bg-board">
+                    <div class="w-80 flex-shrink-0 flex flex-col bg-white rounded-[2rem] border-4 border-slate-800 shadow-cartoon overflow-hidden h-full">
+                        <div class="p-4 bg-crayon-yellow border-b-4 border-slate-800 text-center font-display text-2xl text-slate-900 shadow-sm z-10">Attendance</div>
+                        <div class="overflow-y-auto flex-grow p-4 no-scrollbar bg-slate-50">${list}</div>
                     </div>
-                    <div class="flex-grow flex flex-col items-center justify-center relative">
-                        <div id="selector-display" class="w-full h-full max-h-[600px] bg-white rounded-[3rem] border-8 border-slate-100 shadow-xl flex flex-col items-center justify-center p-8 mb-8 relative overflow-hidden">
-                            <div id="result-content" class="text-center relative z-10 w-full select-none h-full overflow-hidden flex flex-col justify-center">
-                                <i data-lucide="sparkles" class="w-24 h-24 text-crayon-yellow mx-auto mb-6"></i>
-                                <h2 class="text-5xl md:text-6xl font-display text-slate-800 mb-4">Who's Next?</h2>
-                                <p class="text-slate-400 text-xl font-bold">Select an option below</p>
+                    
+                    <div class="flex-grow flex flex-col items-center justify-center p-4">
+                        <div id="selector-display" class="w-full max-w-4xl h-[450px] bg-white rounded-[3rem] border-8 border-slate-800 shadow-cartoon flex flex-col items-center justify-center p-8 mb-8 relative">
+                            <div id="result-content" class="text-center w-full h-full flex flex-col justify-center items-center">
+                                <i data-lucide="dices" class="w-32 h-32 text-crayon-purple mb-8 opacity-40"></i>
+                                <h2 class="text-6xl font-display text-slate-800" style="-webkit-text-stroke: 1px white;">Ready to Pick!</h2>
                             </div>
                         </div>
-                        <div class="flex flex-wrap gap-4 justify-center w-full">
-                            <button id="pick-one-btn" class="btn-cartoon bg-crayon-purple text-white px-8 py-4 rounded-3xl font-black text-xl shadow-cartoon flex items-center gap-3"><i data-lucide="wand-2" class="w-6 h-6"></i> PICK ONE</button>
-                            <div class="w-px bg-slate-300 mx-2 hidden md:block"></div>
-                            <button data-size="2" class="group-btn btn-cartoon bg-white border-4 border-slate-200 text-slate-600 px-6 py-4 rounded-3xl font-bold text-xl hover:text-crayon-blue hover:border-crayon-blue">Pairs</button>
-                            <button data-size="3" class="group-btn btn-cartoon bg-white border-4 border-slate-200 text-slate-600 px-6 py-4 rounded-3xl font-bold text-xl hover:text-crayon-blue hover:border-crayon-blue">Threes</button>
-                            <button data-size="4" class="group-btn btn-cartoon bg-white border-4 border-slate-200 text-slate-600 px-6 py-4 rounded-3xl font-bold text-xl hover:text-crayon-blue hover:border-crayon-blue">Fours</button>
+                        <div class="flex gap-5">
+                            <button onclick="window.pickOne()" class="btn-tactile bg-crayon-purple border-4 border-slate-800 text-white px-10 py-5 rounded-2xl font-black text-2xl flex items-center gap-3"><i data-lucide="wand-2" class="w-8 h-8"></i> Pick One</button>
+                            <button onclick="window.pickGroups(2)" class="btn-tactile bg-white border-4 border-slate-800 text-slate-800 px-8 py-5 rounded-2xl font-bold text-2xl hover:bg-crayon-yellow">Pairs</button>
+                            <button onclick="window.pickGroups(4)" class="btn-tactile bg-white border-4 border-slate-800 text-slate-800 px-8 py-5 rounded-2xl font-bold text-2xl hover:bg-crayon-yellow">Groups of 4</button>
                         </div>
                     </div>
                 </div>
             `;
-            toolDisplay.querySelectorAll('.toggle-btn').forEach(btn => {
-                btn.onclick = async () => {
-                    const s = appState.students.find(st => st.id === btn.dataset.id);
-                    if (appState.userId) await updateDoc(doc(db, `artifacts/${appId}/users/${appState.userId}/students`, s.id), { isPresent: !s.isPresent });
-                    else { s.isPresent = !s.isPresent; renderStudentSelector(); }
-                };
-            });
-            
-            // Random Single Picker
-            document.getElementById('pick-one-btn').onclick = () => {
-                const candidates = appState.students.filter(s => s.isPresent);
-                if (candidates.length === 0) return;
+
+            window.toggleAttendance = async (id) => {
+                const s = appState.students.find(st => st.id === id);
+                if (appState.userId) await updateDoc(doc(db, `artifacts/${appId}/users/${appState.userId}/students`, s.id), { isPresent: !s.isPresent });
+                else { s.isPresent = !s.isPresent; renderStudentSelector(); }
+            };
+
+            window.pickOne = () => {
+                const pool = appState.students.filter(s => s.isPresent);
+                if(!pool.length) return;
                 const display = document.getElementById('result-content');
-                // Reset view if it was showing groups
-                display.className = "text-center relative z-10 w-full select-none h-full overflow-hidden flex flex-col justify-center";
-                
                 let i = 0;
                 const timer = setInterval(() => {
-                    if (!document.getElementById('result-content')) { clearInterval(timer); return; }
-                    const r = candidates[Math.floor(Math.random() * candidates.length)];
-                    display.innerHTML = `<div class="transform scale-90 opacity-70"><div class="text-7xl mb-4">${getStudentEmoji(r)}</div><h2 class="text-6xl font-black text-slate-300">${r.name}</h2></div>`;
+                    const r = pool[Math.floor(Math.random() * pool.length)];
+                    display.innerHTML = `<div class="opacity-50 scale-90"><div class="text-8xl mb-4 drop-shadow-md">${getStudentEmoji(r)}</div><h2 class="text-6xl font-bold text-slate-400">${r.name}</h2></div>`;
                     if (++i > 15) {
                         clearInterval(timer);
-                        const winner = candidates[Math.floor(Math.random() * candidates.length)];
-                        display.innerHTML = `<div class="animate-pop-in transform scale-110"><div class="text-9xl mb-8 animate-bounce-slow">${getStudentEmoji(winner)}</div><h2 class="text-8xl font-display text-crayon-blue">${winner.name}</h2></div>`;
+                        const win = pool[Math.floor(Math.random() * pool.length)];
+                        display.innerHTML = `<div class="animate-pop-in"><div class="text-[10rem] mb-6 animate-bounce-slow drop-shadow-2xl">${getStudentEmoji(win)}</div><h2 class="text-8xl font-display text-crayon-purple" style="-webkit-text-stroke: 2px white;">${win.name}</h2></div>`;
                         triggerConfetti();
                     }
                 }, 100);
             };
 
-            // Grouping Logic
-            toolDisplay.querySelectorAll('.group-btn').forEach(btn => {
-                btn.onclick = () => {
-                    const size = parseInt(btn.dataset.size);
-                    const candidates = appState.students.filter(s => s.isPresent).sort(() => Math.random() - 0.5);
-                    const groups = [];
-                    while(candidates.length) groups.push(candidates.splice(0, size));
-                    
-                    const groupsHtml = groups.map((g, i) => `
-                        <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200 flex flex-col h-full">
-                            <div class="text-center font-black text-slate-400 mb-3 uppercase tracking-wider text-sm">Group ${i+1}</div>
-                            <div class="flex-grow flex flex-col justify-center gap-2">
-                                ${g.map(s => `
-                                    <div class="flex items-center gap-3 bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
-                                        <span class="text-2xl">${getStudentEmoji(s)}</span>
-                                        <span class="font-bold text-slate-700 text-lg">${s.name}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `).join('');
-                    
-                    const display = document.getElementById('result-content');
-                    display.className = "w-full h-full overflow-y-auto p-2 no-scrollbar";
-                    display.innerHTML = `
-                        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 w-full pb-4">${groupsHtml}</div>
-                    `;
-                    triggerConfetti();
-                };
-            });
-        }
-
-        // --- DOUBLE ELIMINATION LOGIC ---
-
-        function renderTournamentBracket() {
-            const bracket = appState.bracket;
-
-            const renderMatch = (match, type) => {
-                const p1 = match.players[0];
-                const p2 = match.players[1];
-                const wId = match.winner?.id;
-
-                const renderPlayer = (p, isTop) => {
-                    if (!p) return '<div class="h-12 bg-slate-100/50 rounded-xl mb-1 flex items-center px-3"><span class="text-slate-300 font-bold italic">TBD</span></div>';
-                    const isWin = wId === p.id;
-                    const isLose = wId && wId !== p.id;
-                    
-                    const onClick = (!wId && p.name !== 'BYE') ? `onclick="window.advanceBracket('${match.id}', '${p.id}')"` : '';
-                        
-                    return `
-                        <div ${onClick} class="
-                            h-14 flex items-center justify-between px-4 rounded-xl text-lg font-bold transition-all cursor-pointer mb-1 border-2 select-none relative
-                            ${isWin ? 'bg-green-100 text-green-800 border-green-500 z-10 shadow-md' : ''}
-                            ${isLose ? 'bg-slate-50 text-slate-400 border-slate-200' : ''}
-                            ${!wId && p.name !== 'BYE' ? 'bg-white hover:bg-yellow-50 border-slate-300 hover:border-yellow-400 shadow-sm' : ''}
-                            ${p.name === 'BYE' ? 'bg-transparent border-transparent text-slate-400/50' : ''}
-                        ">
-                            <div class="flex items-center gap-3 overflow-hidden w-full">
-                                <span class="text-2xl">${p.name !== 'BYE' ? getStudentEmoji(p) : ''}</span>
-                                <span class="truncate">${p.name}</span>
-                            </div>
-                            ${isWin ? '<i data-lucide="check" class="w-5 h-5"></i>' : ''}
-                        </div>
-                    `;
-                };
-
-                return `
-                    <div class="relative flex flex-col justify-center mb-6 w-[340px] flex-shrink-0 group">
-                        <div class="bg-slate-200/60 p-2 rounded-2xl border-l-8 ${type === 'winner' ? 'border-crayon-blue' : (type === 'loser' ? 'border-crayon-orange' : 'border-yellow-400')}">
-                            ${renderPlayer(p1, true)}
-                            <div class="h-px bg-slate-300/50 my-1 mx-2"></div>
-                            ${renderPlayer(p2, false)}
-                        </div>
-                        <div class="flex justify-between items-center px-2 mt-1">
-                             <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Match ${match.id}</div>
-                             ${type === 'final-reset' ? '<div class="text-[10px] text-red-500 font-bold uppercase tracking-widest animate-pulse">Bracket Reset</div>' : ''}
-                        </div>
-                    </div>
-                `;
-            };
-
-            if (!bracket) {
-                toolDisplay.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full animate-pop-in p-6 text-center">
-                        <div class="p-10 bg-yellow-100 rounded-full mb-8 animate-wiggle"><i data-lucide="trophy" class="w-24 h-24 text-yellow-500"></i></div>
-                        <h2 class="text-6xl font-display text-slate-800 mb-4">Double Elimination</h2>
-                        <p class="text-slate-500 text-xl font-bold mb-8">Second chance bracket enabled!</p>
-                        <button id="gen-bracket" class="btn-cartoon bg-crayon-blue text-white px-10 py-5 rounded-3xl font-black text-2xl flex items-center gap-4">
-                            GENERATE BRACKET
-                        </button>
-                    </div>
-                `;
-                document.getElementById('gen-bracket').onclick = generateDoubleElimination;
-            } else if (appState.podium) {
-                const { first, second } = appState.podium;
-                toolDisplay.innerHTML = `
-                     <div class="flex flex-col items-center justify-center h-full animate-pop-in text-center relative z-10">
-                        <h2 class="text-5xl md:text-7xl font-display text-slate-800 mb-12 tracking-tight">🏆 CHAMPIONS 🏆</h2>
-                        <div class="flex items-end justify-center gap-6 md:gap-12">
-                             <!-- 2nd -->
-                            <div class="flex flex-col items-center animate-pop-in" style="animation-delay: 0.2s">
-                                <div class="text-7xl md:text-8xl mb-4 transform -rotate-6">${getStudentEmoji(second)}</div>
-                                <div class="text-slate-600 font-bold mb-2 text-2xl md:text-3xl">${second.name}</div>
-                                <div class="w-32 md:w-40 h-48 md:h-64 bg-slate-300 rounded-t-2xl border-8 border-slate-400 flex items-center justify-center text-6xl md:text-7xl font-display text-white shadow-lg">2</div>
-                            </div>
-                            <!-- 1st -->
-                            <div class="flex flex-col items-center animate-pop-in z-10">
-                                <i data-lucide="crown" class="w-20 h-20 text-yellow-500 mb-4 animate-bounce-slow"></i>
-                                <div class="text-8xl md:text-9xl mb-6 transform rotate-6">${getStudentEmoji(first)}</div>
-                                <div class="text-slate-800 font-black mb-2 text-4xl md:text-5xl">${first.name}</div>
-                                <div class="w-48 md:w-60 h-64 md:h-80 bg-yellow-400 rounded-t-2xl border-8 border-yellow-500 flex items-center justify-center text-8xl md:text-9xl font-display text-white shadow-xl">1</div>
-                            </div>
-                        </div>
-                        <button onclick="appState.bracket=null;appState.podium=null;renderActiveTool()" class="mt-12 bg-white text-slate-500 hover:text-red-500 border-4 border-slate-200 hover:border-red-400 px-10 py-5 rounded-3xl font-bold text-2xl transition-all">Start New Tournament</button>
-                    </div>
-                `;
-            } else {
-                // Group matches by round for UI
-                const wbRounds = [];
-                let r = 1;
-                while(true) {
-                    const matches = bracket.matches.filter(m => m.type === 'winner' && m.round === r);
-                    if(matches.length === 0) break;
-                    wbRounds.push(matches);
-                    r++;
-                }
-                const lbRounds = [];
-                r = 1;
-                while(true) {
-                    const matches = bracket.matches.filter(m => m.type === 'loser' && m.round === r);
-                    if(matches.length === 0) break;
-                    lbRounds.push(matches);
-                    r++;
-                }
-
-                // Identify finals
-                const gf = bracket.matches.find(m => m.id === 'grand-final');
-                const gfr = bracket.matches.find(m => m.id === 'grand-final-reset');
-                const finalsList = [gf];
-                if(gfr) finalsList.push(gfr);
-
-                const renderRoundCol = (matches, title, color) => `
-                    <div class="flex flex-col gap-6 mx-4">
-                         <div class="text-center font-black ${color} uppercase tracking-widest bg-white/80 rounded-full py-2 px-4 shadow-sm border-2 border-slate-100 sticky top-0 z-20 whitespace-nowrap">${title}</div>
-                         <div class="flex flex-col gap-8 justify-center flex-grow py-4">
-                             ${matches.map(m => renderMatch(m, m.type)).join('')}
-                         </div>
-                    </div>
-                `;
-
-                toolDisplay.innerHTML = `
-                    <div class="h-full flex flex-col overflow-hidden bg-slate-50">
-                        <div class="flex justify-between items-center p-4 bg-white border-b-4 border-slate-200 shrink-0 z-30 shadow-sm">
-                            <h3 class="font-display text-3xl text-slate-700 flex items-center gap-3"><i data-lucide="git-branch" class="text-crayon-blue"></i> Tournament Bracket</h3>
-                            <button onclick="appState.bracket=null;renderActiveTool()" class="text-red-400 font-bold hover:text-red-600 text-xl px-4">Reset</button>
-                        </div>
-                        
-                        <div class="flex-grow overflow-x-auto overflow-y-auto p-4 custom-scrollbar">
-                            <div class="flex flex-col gap-8 min-w-max pb-12">
-                                
-                                <!-- Winners -->
-                                <div class="flex gap-2">
-                                    <div class="flex flex-col justify-center mr-4"><div class="p-6 bg-crayon-blue/10 text-crayon-blue font-black rounded-3xl text-xl rotate-180 border-4 border-crayon-blue/20" style="writing-mode: vertical-rl;">WINNERS BRACKET</div></div>
-                                    ${wbRounds.map((roundMatches, i) => renderRoundCol(roundMatches, `Round ${i+1}`, 'text-crayon-blue')).join('')}
-                                    
-                                    <!-- Finals Column -->
-                                    <div class="flex flex-col gap-6 mx-8 border-l-4 border-slate-200 pl-8 border-dashed">
-                                         <div class="text-center font-black text-yellow-500 uppercase tracking-widest bg-white/80 rounded-full py-2 px-4 shadow-sm border-2 border-slate-100 sticky top-0 z-20">CHAMPIONSHIP</div>
-                                         <div class="flex flex-col gap-12 justify-center flex-grow">
-                                            ${finalsList.map(m => renderMatch(m, m.type)).join('')}
-                                         </div>
-                                    </div>
-                                </div>
-
-                                <!-- Losers -->
-                                <div class="h-2 w-full bg-slate-200 rounded-full my-4"></div>
-
-                                <div class="flex gap-2">
-                                    <div class="flex flex-col justify-center mr-4"><div class="p-6 bg-crayon-orange/10 text-crayon-orange font-black rounded-3xl text-xl rotate-180 border-4 border-crayon-orange/20" style="writing-mode: vertical-rl;">LOSERS BRACKET</div></div>
-                                    ${lbRounds.map((roundMatches, i) => renderRoundCol(roundMatches, `L-Round ${i+1}`, 'text-crayon-orange')).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            lucide.createIcons();
-            
-            // Expose logic globally so HTML strings can call it
-            window.advanceBracket = advanceBracket;
-        }
-
-        function generateDoubleElimination() {
-            const players = appState.students.filter(s => s.isPresent).sort(() => Math.random() - 0.5);
-            if (players.length < 3) { alert("Need at least 3 players!"); return; }
-
-            // Pad to power of 2
-            let size = 2;
-            while(size < players.length) size *= 2;
-            while(players.length < size) players.push({ name: 'BYE', id: 'bye' });
-
-            const matches = [];
-            
-            // --- Winners Bracket Generation ---
-            const totalRounds = Math.log2(size);
-            let currentRoundMatches = [];
-            
-            // Round 1
-            for(let i=0; i<size/2; i++) {
-                const id = `W1-${i+1}`;
-                const m = { id, type: 'winner', round: 1, players: [players[i], players[size-1-i]], winner: null, nextWin: null, nextLose: null };
-                matches.push(m);
-                currentRoundMatches.push(m);
-            }
-
-            let prevRoundMatches = currentRoundMatches;
-            for(let r=2; r<=totalRounds; r++) {
-                currentRoundMatches = [];
-                for(let i=0; i<prevRoundMatches.length/2; i++) {
-                    const id = `W${r}-${i+1}`;
-                    const m = { id, type: 'winner', round: r, players: [null, null], winner: null, nextWin: null, nextLose: null };
-                    matches.push(m);
-                    currentRoundMatches.push(m);
-                    
-                    prevRoundMatches[i*2].nextWin = { id, slot: 0 };
-                    prevRoundMatches[i*2+1].nextWin = { id, slot: 1 };
-                }
-                prevRoundMatches = currentRoundMatches;
-            }
-            const wbFinalMatch = prevRoundMatches[0]; // This winner goes to Grand Final
-
-            // --- Losers Bracket Generation ---
-            // Structure for 8 players (Total Size):
-            // L1 (4 matches) -> L2 (2 matches) -> L3 (2 matches) -> L4 (1 match) -> GF
-            
-            let lbMatchesByRound = {};
-            const createLBMatch = (r, idx) => {
-                const id = `L${r}-${idx+1}`;
-                const m = { id, type: 'loser', round: r, players: [null, null], winner: null, nextWin: null };
-                matches.push(m);
-                if(!lbMatchesByRound[r]) lbMatchesByRound[r] = [];
-                lbMatchesByRound[r].push(m);
-                return m;
-            };
-
-            // Calculate LB structure
-            // L-Round 1 takes W-Round 1 losers. Count = Size/4
-            for(let i=0; i<size/4; i++) createLBMatch(1, i);
-            
-            // Subsequent LB rounds
-            let lbRound = 2;
-            let matchCount = size/4; 
-            
-            // Logic: The number of matches in LB stays same for 2 rounds, then halves
-            // For 8 players: L1(2), L2(2), L3(1)
-            // For 16 players: L1(4), L2(4), L3(2), L4(2), L5(1)
-            
-            while(matchCount >= 1) {
-                // First round of a pair (fed by LB winners + WB losers)
-                for(let i=0; i<matchCount; i++) createLBMatch(lbRound, i);
-                if (matchCount === 1) break; // Final LB match (before GF)
-                
-                lbRound++;
-                // Second round of a pair (fed by LB winners only)
-                for(let i=0; i<matchCount/2; i++) createLBMatch(lbRound, i);
-                
-                matchCount /= 2;
-                lbRound++;
-            }
-            const maxLbRound = lbRound;
-            
-            // --- Wiring Losers Logic ---
-            
-            // Wire WB R1 losers to LB R1
-            const wbR1 = matches.filter(m => m.type === 'winner' && m.round === 1);
-            const lbR1 = matches.filter(m => m.type === 'loser' && m.round === 1);
-            
-            // Simple cross mapping to avoid immediate rematches
-            // Top half of bracket vs bottom half logic usually
-            for(let i=0; i<wbR1.length; i++) {
-                // Map WB matches 0,1 -> LB 0. WB 2,3 -> LB 1.
-                const targetLbIdx = Math.floor(i/2);
-                const targetSlot = i%2; 
-                wbR1[i].nextLose = { id: lbR1[targetLbIdx].id, slot: targetSlot };
-            }
-
-            // Wire LB internal + Drops from WB
-            // Pattern: 
-            // Odd LB rounds (1, 3, 5...) receive WB losers.
-            // Even LB rounds (2, 4, 6...) are just LB winners advancing.
-            
-            // Actually, standard DE:
-            // L1: WB R1 losers.
-            // L2: L1 Winners + WB R2 Losers.
-            // L3: L2 Winners.
-            // L4: L3 Winners + WB R3 Losers.
-            
-            // Let's wire purely based on existence
-            let currentLbR = 1;
-            let currentWbR = 2; // WB round that feeds into LB
-            
-            while(currentLbR < maxLbRound) {
-                const currentLbMatches = matches.filter(m => m.type === 'loser' && m.round === currentLbR);
-                const nextLbMatches = matches.filter(m => m.type === 'loser' && m.round === currentLbR + 1);
-                
-                // If next round has SAME amount of matches, it's a "Drop Round" (fed by WB)
-                if (nextLbMatches.length === currentLbMatches.length) {
-                    // Current LB winners go to slot 0 of next
-                    for(let i=0; i<currentLbMatches.length; i++) {
-                        currentLbMatches[i].nextWin = { id: nextLbMatches[i].id, slot: 0 };
-                    }
-                    // WB Losers go to slot 1
-                    const wbDropMatches = matches.filter(m => m.type === 'winner' && m.round === currentWbR);
-                    // We need to reverse map or cross map to avoid repeat matchups
-                    for(let i=0; i<wbDropMatches.length; i++) {
-                         // Simple map for robustness
-                         if(i < nextLbMatches.length) {
-                            wbDropMatches[i].nextLose = { id: nextLbMatches[i].id, slot: 1 };
-                         }
-                    }
-                    currentWbR++;
-                } else {
-                    // It's a "consolidation round" (halving matches)
-                    for(let i=0; i<currentLbMatches.length; i++) {
-                        const target = nextLbMatches[Math.floor(i/2)];
-                        currentLbMatches[i].nextWin = { id: target.id, slot: i%2 };
-                    }
-                }
-                currentLbR++;
-            }
-
-            // --- Grand Finals Wiring ---
-            const finalId = 'grand-final';
-            const grandFinal = { id: finalId, type: 'final', round: 1, players: [null, null], winner: null };
-            matches.push(grandFinal);
-            
-            // WB Winner -> GF Slot 0
-            wbFinalMatch.nextWin = { id: finalId, slot: 0 };
-            
-            // LB Winner -> GF Slot 1
-            const lbFinalMatch = matches.filter(m => m.type === 'loser' && m.round === maxLbRound)[0];
-            if(lbFinalMatch) lbFinalMatch.nextWin = { id: finalId, slot: 1 };
-
-            // Note: WB Final Loser needs to go to LB Final
-            // The WB Final is the one before wbFinalMatch? No, wbFinalMatch IS the match that produces the WB winner.
-            // The loser of wbFinalMatch goes to the LB Final (maxLbRound).
-            // Actually, logic check:
-            // WB Final produces 1 undefeated (to GF) and 1 loser.
-            // That loser goes to the very last match of LB.
-            // Let's fix the WB drop for the final WB round.
-            wbFinalMatch.nextLose = { id: lbFinalMatch.id, slot: 1 }; // Last LB match gets WB finalist loser in slot 1 (usually)
-            
-            // The last LB match needs a player in slot 0 too.
-            // That comes from the previous LB round.
-            // (Handled by the loop above hopefully, but let's verify)
-            
-            appState.bracket = { matches };
-            
-            // Auto-Advance BYEs
-            matches.forEach(m => {
-                const byeIdx = m.players.findIndex(p => p && p.id === 'bye');
-                if (byeIdx !== -1) {
-                    const realPlayerIdx = byeIdx === 0 ? 1 : 0;
-                    if(m.players[realPlayerIdx] && m.players[realPlayerIdx].id !== 'bye') {
-                       advanceBracket(m.id, m.players[realPlayerIdx].id); 
-                    }
-                }
-            });
-            
-            renderTournamentBracket();
-        }
-
-        function advanceBracket(matchId, winnerId) {
-            const matches = appState.bracket.matches;
-            const match = matches.find(m => m.id === matchId);
-            if (!match || match.winner) return; // Already decided
-
-            const winner = match.players.find(p => p.id === winnerId);
-            const loser = match.players.find(p => p.id !== winnerId);
-            match.winner = winner;
-
-            // Handle standard advancements
-            if (match.nextWin) {
-                const nextM = matches.find(m => m.id === match.nextWin.id);
-                if (nextM) nextM.players[match.nextWin.slot] = winner;
-            }
-            if (match.nextLose) {
-                const nextM = matches.find(m => m.id === match.nextLose.id);
-                if (nextM) nextM.players[match.nextLose.slot] = loser;
-            }
-            
-            // --- Grand Final Logic ---
-            if (match.id === 'grand-final') {
-                // If the player from Slot 0 (WB Winner) wins, it's over.
-                // If the player from Slot 1 (LB Winner) wins, we need a reset.
-                
-                // Note: We need to know who came from where.
-                // By our generation, Slot 0 is always WB.
-                if (match.players[0].id === winner.id) {
-                    // WB Winner won. Over.
-                    appState.podium = { first: winner, second: loser };
-                    triggerConfetti();
-                } else {
-                    // LB Winner won. Reset needed.
-                    // Check if reset match already exists
-                    if (!matches.find(m => m.id === 'grand-final-reset')) {
-                        matches.push({
-                            id: 'grand-final-reset',
-                            type: 'final-reset',
-                            round: 2,
-                            players: [winner, loser], // Rematch
-                            winner: null
-                        });
-                        alert("Bracket Reset! The challenger forced a second match!");
-                    }
-                }
-            }
-            
-            // --- Grand Final Reset Logic ---
-            if (match.id === 'grand-final-reset') {
-                appState.podium = { first: winner, second: loser };
+            window.pickGroups = (size) => {
+                const pool = appState.students.filter(s => s.isPresent).sort(() => Math.random() - 0.5);
+                const groups = []; while(pool.length) groups.push(pool.splice(0, size));
+                const html = groups.map((g, i) => `
+                    <div class="bg-white border-4 border-slate-800 rounded-2xl p-4 shadow-tactile">
+                        <div class="text-center font-black text-white bg-slate-800 rounded-lg py-1 mb-3 uppercase text-sm tracking-widest border-2 border-slate-900">Group ${i+1}</div>
+                        <div class="flex flex-col gap-2">${g.map(s => `<div class="bg-slate-50 border-2 border-slate-800 p-2 rounded-xl flex items-center gap-3"><span class="text-3xl">${getStudentEmoji(s)}</span><span class="font-bold text-lg">${s.name}</span></div>`).join('')}</div>
+                    </div>`).join('');
+                document.getElementById('result-content').innerHTML = `<div class="w-full h-full overflow-y-auto no-scrollbar grid grid-cols-2 lg:grid-cols-3 gap-5 p-2 items-start content-start">${html}</div>`;
                 triggerConfetti();
-            }
-
-            renderTournamentBracket();
+            };
         }
 
-        function renderHangman() {
-             toolDisplay.innerHTML = `<div class="h-full flex items-center justify-center"><p class="text-slate-400 font-bold text-3xl">Game loaded...</p></div>`;
+        // --- 6. TOURNAMENT BRACKET ---
+        function renderTournamentBracket() {
+            if (!appState.bracket) {
+                toolDisplay.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full animate-pop-in bg-board">
+                        <div class="p-8 bg-white border-8 border-slate-800 shadow-cartoon rounded-[3rem] mb-10"><i data-lucide="trophy" class="w-32 h-32 text-crayon-yellow"></i></div>
+                        <h2 class="text-6xl font-display text-slate-800 mb-10" style="-webkit-text-stroke: 1px white;">Class Tournament</h2>
+                        <button onclick="window.genBracket()" class="btn-tactile bg-crayon-blue border-4 border-slate-800 text-white px-12 py-6 rounded-3xl font-black text-3xl flex items-center gap-4"><i data-lucide="git-branch" class="w-8 h-8"></i> Create Bracket</button>
+                    </div>`;
+                return;
+            }
+
+            const renderMatch = (m) => {
+                const p1 = m.players[0], p2 = m.players[1], wId = m.winner?.id;
+                const rP = (p) => {
+                    if(!p) return '<div class="h-14 bg-slate-100 border-2 border-slate-300 rounded-xl mb-1 flex items-center px-4"><span class="text-slate-400 font-bold">TBD</span></div>';
+                    if(p.id === 'bye') return '<div class="h-14 flex items-center px-4 border-2 border-transparent"><span class="text-slate-400 font-bold opacity-50">BYE</span></div>';
+                    const isW = wId === p.id, isL = wId && wId !== p.id, canClick = !wId;
+                    return `
+                        <div ${canClick ? `onclick="window.advBracket('${m.id}', '${p.id}')"` : ''} 
+                             class="h-14 flex items-center px-4 rounded-xl border-4 mb-1 cursor-pointer transition-all select-none
+                             ${isW ? 'bg-crayon-green border-slate-800 text-white font-black shadow-sm' : isL ? 'bg-slate-100 border-slate-300 text-slate-400 opacity-60' : 'bg-white border-slate-800 hover:bg-crayon-yellow text-slate-800 font-bold shadow-tactile'}">
+                             <span class="text-3xl mr-3 drop-shadow-sm">${getStudentEmoji(p)}</span><span class="truncate text-xl">${p.name}</span>
+                        </div>`;
+                };
+                return `<div class="w-[320px] bg-white p-3 rounded-2xl border-4 border-slate-800 shadow-tactile mb-8 relative">
+                           <div class="absolute -left-6 top-1/2 w-6 h-2 bg-slate-800"></div>
+                           ${rP(p1)}<div class="h-1 bg-slate-800 my-2 rounded-full"></div>${rP(p2)}
+                        </div>`;
+            };
+
+            const wbMatches = appState.bracket.matches.filter(m => m.type === 'winner' || m.type === 'final');
+            
+            toolDisplay.innerHTML = `
+                <div class="h-full flex flex-col bg-board">
+                    <div class="p-4 bg-crayon-yellow border-b-4 border-slate-800 flex justify-between items-center z-10 shadow-sm">
+                        <h2 class="font-display text-3xl text-slate-900 flex items-center gap-3"><i data-lucide="trophy" class="w-8 h-8"></i> Tournament</h2>
+                        <button onclick="appState.bracket=null;renderTournamentBracket()" class="text-white font-bold btn-tactile px-6 py-2 bg-red-500 border-4 border-slate-800 rounded-xl hover:bg-red-600">Reset Bracket</button>
+                    </div>
+                    <div class="flex-grow overflow-auto p-10 custom-scrollbar">
+                        <div class="flex gap-16 min-w-max">
+                            <div class="flex flex-col gap-4">
+                                <h3 class="font-black text-slate-800 bg-white border-4 border-slate-800 px-6 py-2 rounded-xl w-max tracking-widest text-lg mb-6 shadow-tactile uppercase">Quarterfinals</h3>
+                                ${wbMatches.map(m => renderMatch(m)).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            window.genBracket = () => {
+                const pool = appState.students.filter(s => s.isPresent).sort(()=>Math.random()-0.5);
+                if(pool.length < 2) return alert("Need more students!");
+                const matches = []; let size=2; while(size<pool.length) size*=2;
+                while(pool.length < size) pool.push({id:'bye', name:'BYE'});
+                
+                for(let i=0; i<size/2; i++) matches.push({ id:`M${i+1}`, type:'winner', players:[pool[i], pool[size-1-i]], winner:null });
+                appState.bracket = { matches };
+                
+                matches.forEach(m => { if(m.players[1].id==='bye') window.advBracket(m.id, m.players[0].id, true); });
+                renderTournamentBracket();
+            };
+
+            window.advBracket = (mId, wId, silent=false) => {
+                const m = appState.bracket.matches.find(x => x.id === mId);
+                if(!m || m.winner) return;
+                m.winner = m.players.find(p => p.id === wId);
+                if(!silent) { triggerConfetti(); renderTournamentBracket(); }
+            };
         }
 
         // --- Helpers ---
         function triggerConfetti() {
             for(let i=0; i<40; i++) {
                 const c = document.createElement('div');
-                c.className = 'fixed w-4 h-4 rounded-full z-[100] pointer-events-none';
-                c.style.backgroundColor = ['#facc15', '#ef4444', '#3b82f6', '#22c55e', '#a855f7'][Math.floor(Math.random()*5)];
-                c.style.left = Math.random() * 100 + 'vw';
-                c.style.top = '-10px';
+                c.className = 'fixed w-5 h-5 rounded-md border-2 border-slate-800 z-[100] pointer-events-none';
+                c.style.backgroundColor = ['#f59e0b', '#dc2626', '#3b82f6', '#22c55e', '#a855f7'][Math.floor(Math.random()*5)];
+                c.style.left = (Math.random() * 100) + 'vw'; c.style.top = '-20px';
                 document.body.appendChild(c);
-                const anim = c.animate([
-                    { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
-                    { transform: `translateY(100vh) rotate(${720}deg)`, opacity: 0 }
-                ], { duration: 1500 + Math.random()*2000, easing: 'ease-out' });
+                const anim = c.animate([{ transform: `translateY(0) rotate(0) scale(1)`, opacity: 1 }, { transform: `translateY(100vh) rotate(720deg) scale(0.5)`, opacity: 1 }], { duration: 1500 + Math.random()*1500, easing: 'ease-in-out' });
                 anim.onfinish = () => c.remove();
             }
         }
 
         function setupFullscreen() {
-            const btn = document.getElementById('fullscreen-btn');
-            const container = document.getElementById('app-container');
-            btn.onclick = async () => {
-                if (!document.fullscreenElement) {
-                    try { if (container.requestFullscreen) await container.requestFullscreen(); else container.classList.add('viewport-fullscreen'); } 
-                    catch (e) { container.classList.add('viewport-fullscreen'); }
-                } else {
-                    if (document.exitFullscreen) await document.exitFullscreen();
-                    container.classList.remove('viewport-fullscreen');
-                }
+            document.getElementById('fullscreen-btn').onclick = () => {
+                if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+                else document.exitFullscreen();
             };
         }
 
